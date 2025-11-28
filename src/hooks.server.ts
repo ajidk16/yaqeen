@@ -1,26 +1,36 @@
-import type { Handle } from '@sveltejs/kit';
-import * as auth from '$lib/server/auth';
+import { auth } from "$lib/server/auth";
+import type { Handle } from "@sveltejs/kit";
 
-const handleAuth: Handle = async ({ event, resolve }) => {
-	const sessionToken = event.cookies.get(auth.sessionCookieName);
-
-	if (!sessionToken) {
-		event.locals.user = null;
-		event.locals.session = null;
-		return resolve(event);
-	}
-
-	const { session, user } = await auth.validateSessionToken(sessionToken);
+export const handle: Handle = async ({ event, resolve }) => {
+	const session = await auth.api.getSession({
+		headers: event.request.headers
+	});
 
 	if (session) {
-		auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
+		event.locals.user = session.user;
+		event.locals.session = session.session;
 	} else {
-		auth.deleteSessionTokenCookie(event);
+		event.locals.user = null;
+		event.locals.session = null;
 	}
 
-	event.locals.user = user;
-	event.locals.session = session;
+	const protectedRoutes = ['/dashboard', '/journal', '/stats', '/profile', '/habits'];
+	const isProtectedRoute = protectedRoutes.some(route => event.url.pathname.startsWith(route));
+	const isAuthRoute = ['/login', '/register'].some(route => event.url.pathname.startsWith(route));
+
+	if (isProtectedRoute && !session) {
+		return new Response(null, {
+			status: 303,
+			headers: { Location: '/login' }
+		});
+	}
+
+	if (isAuthRoute && session) {
+		return new Response(null, {
+			status: 303,
+			headers: { Location: '/dashboard' }
+		});
+	}
+
 	return resolve(event);
 };
-
-export const handle: Handle = handleAuth;
