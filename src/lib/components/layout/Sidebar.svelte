@@ -13,12 +13,12 @@
 </script>
 
 <aside class="fixed left-0 top-0 hidden h-screen w-20 flex-col items-center border-r border-slate-100 bg-white py-8 md:flex z-50 shadow-sm">
-	<div class="mb-6">
+	<a href="/" class="mb-6">
 		<!-- Logo Placeholder -->
 		<div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-purple-600 text-white font-bold shadow-lg shadow-primary/30 transition-transform hover:scale-110">
 			H
 		</div>
-	</div>
+	</a>
 
 	<button onclick={openAddHabit} class="mb-6 group relative flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all duration-300 hover:bg-primary hover:text-white hover:shadow-lg hover:shadow-primary/30">
 		<Plus size={24} strokeWidth={3} class="transition-transform group-hover:rotate-90" />

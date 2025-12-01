@@ -17,6 +17,7 @@
 			password,
 			callbackURL: '/dashboard'
 		});
+
 		loading = false;
 		if (error) {
 			alert(error.message);

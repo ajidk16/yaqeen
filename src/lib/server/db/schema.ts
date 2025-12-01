@@ -8,7 +8,8 @@ export const user = pgTable('user', {
 	image: text('image'),
 	createdAt: timestamp('created_at').notNull(),
 	updatedAt: timestamp('updated_at').notNull(),
-	preferences: jsonb('preferences') // Keeping our custom field
+	preferences: jsonb('preferences'), // Keeping our custom field
+	settings: jsonb('settings') // periodMode, etc.
 });
 
 export const session = pgTable('session', {

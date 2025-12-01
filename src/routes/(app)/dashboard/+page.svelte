@@ -1,5 +1,53 @@
 <script>
 	import { Check, Sparkles, Moon, BookOpen, Activity } from 'lucide-svelte';
+	import HabitCard from '$lib/components/dashboard/HabitCard.svelte';
+	import confetti from 'canvas-confetti';
+
+	let habits = $state([
+		{ id: 1, title: 'Sholat Subuh', type: 'ibadah', category: 'wajib', time: '04:15 WIB', completed: false },
+		{ id: 2, title: 'Baca Quran', type: 'learning', category: 'sunnah', progress: '1/5 Hal', completed: false }
+	]);
+
+	const toggleHabit = (id) => {
+		habits = habits.map(h => {
+			if (h.id === id) return { ...h, completed: !h.completed };
+			return h;
+		});
+
+		const allCompleted = habits.every(h => h.completed);
+		if (allCompleted) {
+			triggerConfetti();
+		}
+	};
+
+	const triggerConfetti = () => {
+		const duration = 3 * 1000;
+		const animationEnd = Date.now() + duration;
+		const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+		const randomInRange = (min, max) => Math.random() * (max - min) + min;
+
+		const interval = setInterval(function() {
+			const timeLeft = animationEnd - Date.now();
+
+			if (timeLeft <= 0) {
+				return clearInterval(interval);
+			}
+
+			const particleCount = 50 * (timeLeft / duration);
+			confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+			confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+		}, 250);
+	};
+
+	const addStarterPack = () => {
+		habits = [
+			{ id: 1, title: 'Sholat Subuh', type: 'ibadah', category: 'wajib', time: '04:15 WIB', completed: false },
+			{ id: 2, title: 'Dzikir Pagi', type: 'ibadah', category: 'sunnah', completed: false },
+			{ id: 3, title: 'Minum Air', type: 'health', category: 'health', progress: '0/8 Gelas', completed: false },
+			{ id: 4, title: 'Baca Quran', type: 'learning', category: 'sunnah', progress: '1/5 Hal', completed: false }
+		];
+	};
 </script>
 
 <header class="mb-8 animate-fade-in-up">
@@ -11,7 +59,10 @@
 			<p class="mt-1 text-sm text-slate-500">"Mulai harimu dengan Bismillah."</p>
 		</div>
 		<div class="flex items-center gap-2 rounded-full border border-slate-100 bg-white px-3 py-1.5 shadow-sm transition-transform hover:scale-105">
-			<span class="text-orange-500 animate-pulse">🔥</span>
+			<div class="relative">
+				<span class="text-orange-500 text-xl animate-bounce absolute -top-1 left-0 opacity-50 blur-sm">🔥</span>
+				<span class="text-orange-500 text-xl relative z-10">🔥</span>
+			</div>
 			<span class="font-bold text-slate-700">12</span>
 			<span class="text-xs text-slate-400">Day Streak</span>
 		</div>
@@ -53,43 +104,22 @@
 </div>
 
 <div class="space-y-3 animate-fade-in-up" style="animation-delay: 0.2s;">
-	<!-- Habit Card: Ibadah -->
-	<div class="group relative flex items-center justify-between overflow-hidden rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition-all hover:shadow-md hover:border-ibadah/30">
-		<div class="z-10 flex items-center gap-4">
-			<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-ibadah-bg text-ibadah transition-transform group-hover:scale-110">
-				<Moon size={24} />
-			</div>
-			<div>
-				<h3 class="font-bold text-slate-800 transition-colors group-hover:text-ibadah">Sholat Subuh</h3>
-				<div class="flex items-center gap-2 text-xs text-slate-500">
-					<span class="rounded-md bg-slate-100 px-2 py-0.5 font-medium">Wajib</span>
-					<span>04:15 WIB</span>
+	{#if habits.length === 0}
+		<div class="rounded-2xl bg-white p-6 text-center shadow-sm border border-slate-100">
+			<div class="mb-4 flex justify-center">
+				<div class="rounded-full bg-primary/10 p-4 text-primary">
+					<Sparkles size={32} />
 				</div>
 			</div>
+			<h3 class="mb-2 text-lg font-bold text-slate-800">Mulai Perjalananmu</h3>
+			<p class="mb-6 text-sm text-slate-500">Belum ada kebiasaan? Aktifkan paket sunnah harian untuk memulai.</p>
+			<button onclick={addStarterPack} class="w-full rounded-xl bg-primary py-3 font-bold text-white shadow-lg shadow-primary/30 transition-all hover:bg-primary-600 hover:scale-105 active:scale-95">
+				Aktifkan Starter Pack
+			</button>
 		</div>
-		<button class="flex h-10 w-10 items-center justify-center rounded-full border-2 border-slate-200 text-transparent transition-all hover:border-ibadah hover:bg-ibadah hover:text-white focus:outline-none active:scale-95">
-			<Check size={20} strokeWidth={3} />
-		</button>
-		<div class="absolute bottom-0 left-0 top-0 -z-0 w-0 bg-ibadah-bg opacity-30 transition-all duration-500 group-hover:w-full"></div>
-	</div>
-
-	<!-- Habit Card: Custom -->
-	<div class="group relative flex items-center justify-between overflow-hidden rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition-all hover:shadow-md hover:border-learning/30">
-		<div class="z-10 flex items-center gap-4">
-			<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-learning-bg text-learning transition-transform group-hover:scale-110">
-				<BookOpen size={24} />
-			</div>
-			<div>
-				<h3 class="font-bold text-slate-800 transition-colors group-hover:text-learning">Baca Quran</h3>
-				<div class="flex items-center gap-2 text-xs text-slate-500">
-					<span class="rounded-md bg-slate-100 px-2 py-0.5 font-medium">Sunnah</span>
-					<span class="text-learning font-bold">1/5 Hal</span>
-				</div>
-			</div>
-		</div>
-		<button class="flex h-10 w-10 items-center justify-center rounded-full border-2 border-slate-200 text-transparent transition-all hover:border-learning hover:bg-learning hover:text-white focus:outline-none active:scale-95">
-			<Check size={20} strokeWidth={3} />
-		</button>
-		<div class="absolute bottom-0 left-0 top-0 -z-0 w-0 bg-learning-bg opacity-30 transition-all duration-500 group-hover:w-full"></div>
-	</div>
+	{:else}
+		{#each habits as habit (habit.id)}
+			<HabitCard {habit} onToggle={() => toggleHabit(habit.id)} />
+		{/each}
+	{/if}
 </div>
