@@ -1,63 +1,194 @@
-<script>
-	import { ArrowRight, Loader2 } from 'lucide-svelte';
-	import { authClient } from '$lib/auth-client';
-	import { goto } from '$app/navigation';
+<script lang="ts">
+	import { fade, fly } from 'svelte/transition';
+	import { quintOut } from 'svelte/easing';
+	import { User, Mail, Lock, Eye, EyeOff, UserPlus, CheckCircle2 } from 'lucide-svelte';
+	import { Card, Input, Button, Checkbox, Alert } from '$lib/components/ui';
 
-	let { form } = $props();
-	
 	let name = $state('');
 	let email = $state('');
 	let password = $state('');
-	let loading = $state(false);
+	let confirmPassword = $state('');
+	let agreeTerms = $state(false);
+	let showPassword = $state(false);
+	let showConfirmPassword = $state(false);
+	let isLoading = $state(false);
+	let error = $state<string | null>(null);
 
-	const handleRegister = async (e) => {
-		e.preventDefault();
-		loading = true;
-		const { data, error } = await authClient.signUp.email({
-			email,
-			password,
-			name,
-			callbackURL: '/dashboard'
-		});
-		loading = false;
-		if (error) {
-			alert(error.message); // Ideally use a toast notification
-		} else {
-			goto('/dashboard');
+	function togglePasswordVisibility() {
+		showPassword = !showPassword;
+	}
+
+	function toggleConfirmPasswordVisibility() {
+		showConfirmPassword = !showConfirmPassword;
+	}
+
+	async function handleRegister(event: Event) {
+		event.preventDefault();
+		isLoading = true;
+		error = null;
+
+		if (password !== confirmPassword) {
+			error = "Passwords do not match";
+			isLoading = false;
+			return;
 		}
-	};
+
+		if (!agreeTerms) {
+			error = "You must agree to the terms and conditions";
+			isLoading = false;
+			return;
+		}
+
+		// Simulate API call
+		setTimeout(() => {
+			isLoading = false;
+			// For demo purposes
+			console.log('Register attempt:', { name, email, password, agreeTerms });
+		}, 1500);
+	}
 </script>
 
-<div class="text-center animate-fade-in-up">
-	<h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">Create an account</h2>
-	<p class="mt-2 text-sm text-slate-600">
-		Already have an account? <a href="/login" class="font-medium text-primary hover:text-primary-600 transition-colors">Sign in</a>
-	</p>
-</div>
+<div class="min-h-screen w-full grid lg:grid-cols-2">
+	<!-- Left Side: Register Form -->
+	<div class="flex flex-col justify-center items-center p-4 sm:p-8 lg:p-12 bg-base-100 relative overflow-hidden">
+		<!-- Mobile Background Decoration -->
+		<div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0 lg:hidden">
+			<div class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-primary/5 blur-[100px] animate-pulse"></div>
+			<div class="absolute top-[40%] -right-[10%] w-[40%] h-[40%] rounded-full bg-secondary/5 blur-[100px] animate-pulse delay-700"></div>
+		</div>
 
-<form class="mt-8 space-y-6 animate-fade-in-up" style="animation-delay: 0.1s;" onsubmit={handleRegister}>
-	<div class="space-y-4">
-		<div>
-			<label for="name" class="sr-only">Full Name</label>
-			<input id="name" name="name" type="text" autocomplete="name" required bind:value={name} class="block w-full rounded-xl border-0 py-3.5 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 transition-all" placeholder="Full Name" />
-		</div>
-		<div>
-			<label for="email-address" class="sr-only">Email address</label>
-			<input id="email-address" name="email" type="email" autocomplete="email" required bind:value={email} class="block w-full rounded-xl border-0 py-3.5 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 transition-all" placeholder="Email address" />
-		</div>
-		<div>
-			<label for="password" class="sr-only">Password</label>
-			<input id="password" name="password" type="password" autocomplete="new-password" required bind:value={password} class="block w-full rounded-xl border-0 py-3.5 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 transition-all" placeholder="Password" />
-		</div>
-	</div>
+		<div class="w-full max-w-md z-10 space-y-8" in:fly={{ y: 20, duration: 800, easing: quintOut }}>
+			<div class="text-center lg:text-left">
+				<div class="inline-flex items-center justify-center size-12 rounded-xl bg-secondary/10 text-secondary mb-6 lg:mb-8">
+					<UserPlus class="size-6" />
+				</div>
+				<h1 class="text-3xl font-bold tracking-tight">Create an account</h1>
+				<p class="text-base-content/60 mt-2">Join HabbiTrax and start your journey today</p>
+			</div>
 
-	<div>
-		<button type="submit" disabled={loading} class="group relative flex w-full justify-center items-center gap-2 rounded-xl bg-primary px-3 py-3.5 text-sm font-bold text-white shadow-lg shadow-primary/30 transition-all hover:bg-primary-600 hover:scale-[1.02] hover:shadow-primary/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-70 disabled:cursor-not-allowed">
-			{#if loading}
-				<Loader2 size={18} class="animate-spin" />
-			{:else}
-				Sign up <ArrowRight size={18} class="transition-transform group-hover:translate-x-1" />
+			{#if error}
+				<div in:fade>
+					<Alert variant="error" title="Error">
+						{error}
+					</Alert>
+				</div>
 			{/if}
-		</button>
+
+			<form onsubmit={handleRegister} class="space-y-6">
+				<div class="space-y-4">
+					<Input
+						label="Full Name"
+						type="text"
+						placeholder="John Doe"
+						bind:value={name}
+						startIcon={User}
+						required
+						class="bg-base-200/50 focus:bg-base-100"
+					/>
+
+					<Input
+						label="Email"
+						type="email"
+						placeholder="name@example.com"
+						bind:value={email}
+						startIcon={Mail}
+						required
+						class="bg-base-200/50 focus:bg-base-100"
+					/>
+
+					<div class="relative">
+						<Input
+							label="Password"
+							type={showPassword ? 'text' : 'password'}
+							placeholder="••••••••"
+							bind:value={password}
+							startIcon={Lock}
+							endIcon={showPassword ? EyeOff : Eye}
+							onendIconClick={togglePasswordVisibility}
+							required
+							class="bg-base-200/50 focus:bg-base-100"
+						/>
+					</div>
+
+					<div class="relative">
+						<Input
+							label="Confirm Password"
+							type={showConfirmPassword ? 'text' : 'password'}
+							placeholder="••••••••"
+							bind:value={confirmPassword}
+							startIcon={Lock}
+							endIcon={showConfirmPassword ? EyeOff : Eye}
+							onendIconClick={toggleConfirmPasswordVisibility}
+							required
+							class="bg-base-200/50 focus:bg-base-100"
+						/>
+					</div>
+				</div>
+
+				<div class="flex items-start">
+					<Checkbox 
+						label="I agree to the Terms of Service and Privacy Policy" 
+						bind:checked={agreeTerms} 
+						required
+					/>
+				</div>
+
+				<Button
+					type="submit"
+					variant="secondary"
+					block
+					size="lg"
+					loading={isLoading}
+					class="shadow-lg shadow-secondary/20 hover:shadow-secondary/40 transition-all duration-300"
+				>
+					Create Account
+				</Button>
+			</form>
+
+			<div class="text-center text-sm text-base-content/60">
+				Already have an account? 
+				<a href="/login" class="link link-secondary link-hover font-medium ml-1">
+					Sign in
+				</a>
+			</div>
+		</div>
 	</div>
-</form>
+
+	<!-- Right Side: Decorative/Branding (Hidden on Mobile) -->
+	<div class="hidden lg:flex relative flex-col justify-center items-center bg-base-200 text-base-content p-12 overflow-hidden">
+		<!-- Animated Background -->
+		<div class="absolute inset-0 w-full h-full bg-gradient-to-bl from-secondary/10 to-primary/10 z-0"></div>
+		<div class="absolute -top-[20%] -left-[20%] w-[80%] h-[80%] rounded-full bg-secondary/10 blur-[120px] animate-pulse"></div>
+		<div class="absolute -bottom-[20%] -right-[20%] w-[80%] h-[80%] rounded-full bg-primary/10 blur-[120px] animate-pulse delay-1000"></div>
+
+		<!-- Content -->
+		<div class="relative z-10 max-w-lg text-center space-y-8" in:fly={{ x: -20, duration: 1000, delay: 200, easing: quintOut }}>
+			<div class="relative">
+				<!-- Abstract Illustration Placeholder -->
+				<div class="w-64 h-64 mx-auto bg-gradient-to-tl from-secondary to-primary rounded-3xl -rotate-3 shadow-2xl flex items-center justify-center mb-12 group transition-transform hover:-rotate-6 duration-500">
+					<div class="w-[98%] h-[98%] bg-base-100 rounded-[22px] flex items-center justify-center overflow-hidden relative">
+						<div class="absolute inset-0 bg-grid-pattern opacity-5"></div>
+						<UserPlus class="size-24 text-secondary group-hover:scale-110 transition-transform duration-500" />
+					</div>
+				</div>
+			</div>
+
+			<div class="space-y-4">
+				<h2 class="text-4xl font-bold tracking-tight">Join the Community</h2>
+				<p class="text-lg text-base-content/70">
+					Connect with thousands of others who are building better habits and transforming their lives with HabbiTrax.
+				</p>
+			</div>
+
+			<!-- Feature List -->
+			<div class="grid grid-cols-2 gap-4 text-left pt-8">
+				{#each ['Community Support', 'Expert Tips', 'Custom Challenges', 'Sync Across Devices'] as feature}
+					<div class="flex items-center gap-2 bg-base-100/50 backdrop-blur-sm p-3 rounded-lg border border-base-content/5">
+						<CheckCircle2 class="size-5 text-secondary" />
+						<span class="font-medium text-sm">{feature}</span>
+					</div>
+				{/each}
+			</div>
+		</div>
+	</div>
+</div>
