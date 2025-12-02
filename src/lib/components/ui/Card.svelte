@@ -22,7 +22,7 @@
 		class: className = '',
 		children,
 		figure,
-		actions
+		actions,
 	}: Props = $props();
 </script>
 

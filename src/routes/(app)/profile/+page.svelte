@@ -17,6 +17,44 @@
 			}
 		});
 	};
+
+	const listProfile = [
+		{
+			title: 'Edit Profil',
+			svg: User,
+			path: '/profile/edit',
+			bg: 'bg-blue-50',
+			text: 'text-blue-500'
+		},
+		{
+			title: 'Notifikasi',
+			svg: Bell,
+			path: '/profile/notifications',
+			bg: 'bg-purple-50',
+			text: 'text-purple-500'
+		},
+		{
+			title: 'Preferensi',
+			svg: Settings,
+			path: '/profile/settings',
+			bg: 'bg-emerald-50',
+			text: 'text-emerald-500'
+		},
+		{
+			title: 'Keamanan & Privasi',
+			svg: Shield,
+			path: '/profile/security',
+			bg: 'bg-rose-50',
+			text: 'text-rose-500'
+		},
+		{
+			title: 'Bantuan & Support',
+			svg: HelpCircle,
+			path: '/profile/support',
+			bg: 'bg-orange-50',
+			text: 'text-orange-500'
+		}
+	]
 </script>
 
 <div class="space-y-6 animate-fade-in-up">
@@ -51,69 +89,17 @@
 	<!-- Settings List -->
 	<section class="overflow-hidden rounded-2xl bg-white shadow-sm border border-slate-100">
 		<div class="divide-y divide-slate-50">
-			<button class="flex w-full items-center justify-between p-4 transition-colors hover:bg-slate-50">
+			{#each listProfile as item}
+			<a href={item.path} class="flex w-full items-center justify-between p-4 transition-colors hover:bg-slate-50">
 				<div class="flex items-center gap-3">
-					<div class="rounded-lg bg-blue-50 p-2 text-blue-500">
-						<User size={20} />
+					<div class="rounded-lg {item.bg} p-2 {item.text}">
+						<item.svg size={20} />
 					</div>
-					<span class="font-medium text-slate-700">Edit Profil</span>
+					<span class="font-medium {item.text}">{item.title}</span>
 				</div>
 				<ChevronRight size={18} class="text-slate-400" />
-			</button>
-			<button class="flex w-full items-center justify-between p-4 transition-colors hover:bg-slate-50">
-				<div class="flex items-center gap-3">
-					<div class="rounded-lg bg-purple-50 p-2 text-purple-500">
-						<Bell size={20} />
-					</div>
-					<span class="font-medium text-slate-700">Notifikasi</span>
-				</div>
-				<ChevronRight size={18} class="text-slate-400" />
-			</button>
-			<button class="flex w-full items-center justify-between p-4 transition-colors hover:bg-slate-50">
-				<div class="flex items-center gap-3">
-					<div class="rounded-lg bg-emerald-50 p-2 text-emerald-500">
-						<Settings size={20} />
-					</div>
-					<span class="font-medium text-slate-700">Preferensi (Mazhab, Lokasi)</span>
-				</div>
-				<ChevronRight size={18} class="text-slate-400" />
-			</button>
-			
-			<!-- Period Mode Toggle -->
-			<div class="flex w-full items-center justify-between p-4 transition-colors hover:bg-slate-50">
-				<div class="flex items-center gap-3">
-					<div class="rounded-lg bg-rose-50 p-2 text-rose-500">
-						<Activity size={20} />
-					</div>
-					<div class="text-left">
-						<span class="block font-medium text-slate-700">Mode Haid (Udzur Syar'i)</span>
-						<span class="text-xs text-slate-400">Pause streak ibadah otomatis</span>
-					</div>
-				</div>
-				<label class="relative inline-flex cursor-pointer items-center">
-					<input type="checkbox" value="" class="peer sr-only">
-					<div class="peer h-6 w-11 rounded-full bg-slate-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-rose-500 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-rose-300"></div>
-				</label>
-			</div>
-
-			<button class="flex w-full items-center justify-between p-4 transition-colors hover:bg-slate-50">
-				<div class="flex items-center gap-3">
-					<div class="rounded-lg bg-orange-50 p-2 text-orange-500">
-						<Shield size={20} />
-					</div>
-					<span class="font-medium text-slate-700">Keamanan & Privasi</span>
-				</div>
-				<ChevronRight size={18} class="text-slate-400" />
-			</button>
-			<button class="flex w-full items-center justify-between p-4 transition-colors hover:bg-slate-50">
-				<div class="flex items-center gap-3">
-					<div class="rounded-lg bg-slate-100 p-2 text-slate-500">
-						<HelpCircle size={20} />
-					</div>
-					<span class="font-medium text-slate-700">Bantuan & Support</span>
-				</div>
-				<ChevronRight size={18} class="text-slate-400" />
-			</button>
+			</a>
+			{/each}
 		</div>
 	</section>
 

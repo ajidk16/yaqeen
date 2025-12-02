@@ -8,6 +8,7 @@
 		containerClass?: string;
 		startIcon?: any; // Component type or snippet
 		endIcon?: any;
+		onendIconClick?: () => void;
 	}
 
 	let {
@@ -19,6 +20,7 @@
 		containerClass = '',
 		startIcon,
 		endIcon,
+		onendIconClick,
 		...rest
 	}: Props = $props();
 </script>
@@ -48,18 +50,18 @@
 		/>
 
 		{#if endIcon}
-			<button type="button" class="absolute right-0 pr-3 flex items-center inset-y-0 z-10 cursor-pointer text-base-content/50 hover:text-base-content transition-colors" onclick={rest.onendIconClick}>
+			<button type="button" class="absolute right-0 pr-3 flex items-center inset-y-0 z-10 cursor-pointer text-base-content/50 hover:text-base-content transition-colors" onclick={onendIconClick}>
 				<svelte:component this={endIcon} class="size-5" />
 			</button>
 		{/if}
 	</div>
 
 	{#if error}
-		<label class="label">
+		<label class="label" for="{rest.id}">
 			<span class="label-text-alt text-error">{error}</span>
 		</label>
 	{:else if helperText}
-		<label class="label">
+		<label class="label" for="{rest.id}">
 			<span class="label-text-alt text-base-content/60">{helperText}</span>
 		</label>
 	{/if}
