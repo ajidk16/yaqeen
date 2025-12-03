@@ -3,6 +3,7 @@
 	import {  fly, scale, slide } from 'svelte/transition';
 	import { MapPin, Bell, BellOff, Clock, Loader2, RefreshCw } from 'lucide-svelte';
 	import { Button, Badge } from '$lib/components/ui';
+	import { invalidateAll } from '$app/navigation';
 
 	// Types
 	interface PrayerTime {
@@ -15,12 +16,15 @@
 		notificationEnabled: boolean;
 	}
 
+	let { data } = $props();
+
 	// State
-	let locationName = $state('Detecting Location...');
-	let isLoading = $state(true);
+	let locationName = $derived(data.locationName);
+	let isLoading = $state(false);
 	let error = $state<string | null>(null);
-	let prayers = $state<PrayerTime[]>([]);
-	let nextPrayer = $state<PrayerTime | null>(null);
+	let prayers = $derived(data.prayerTimes || []);
+	
+	let nextPrayer = $state<any>(null);
 	let timeToNextPrayer = $state('');
 	let currentTime = $state(new Date());
 	
@@ -80,8 +84,6 @@
 			
 			const response = await fetch(`https://api.aladhan.com/v1/timings/${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}?latitude=${lat}&longitude=${lng}&method=${method}`);
 			const data = await response.json();
-
-			console.log('Prayer Times Data:', data);
 
 			if (data.code === 200) {
 				const timings = data.data.timings;
@@ -228,39 +230,41 @@
 
 		<!-- Prayer List -->
 		<div class="space-y-3">
-			{#if isLoading}
+			{#if isLoading && prayers.length === 0}
 				{#each Array(5) as _}
 					<div class="skeleton h-20 w-full rounded-2xl"></div>
 				{/each}
 			{:else}
 				{#each prayers as prayer, i (prayer.id)}
+					{@const isNext = nextPrayer?.id === prayer.id}
+					{@const isPassed = prayer.timestamp < currentTime.getTime()}
 					<div 
 						class="group relative overflow-hidden rounded-2xl border transition-all duration-300
-						{prayer.isNext 
+						{isNext 
 							? 'bg-base-100 border-primary shadow-lg scale-[1.02] z-10' 
 							: 'bg-base-100/50 border-base-content/5 hover:bg-base-100 hover:border-base-content/20'}"
 						in:fly={{ y: 20, duration: 500, delay: i * 100 }}
 					>
 						<!-- Active Indicator Strip -->
-						{#if prayer.isNext}
+						{#if isNext}
 							<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary"></div>
 						{/if}
 
 						<div class="p-4 flex items-center justify-between">
 							<div class="flex items-center gap-4">
-								<div class="flex flex-col items-center justify-center size-12 rounded-xl {prayer.isNext ? 'bg-primary/10 text-primary' : 'bg-base-200 text-base-content/50'}">
+								<div class="flex flex-col items-center justify-center size-12 rounded-xl {isNext ? 'bg-primary/10 text-primary' : 'bg-base-200 text-base-content/50'}">
 									<span class="text-xs font-bold uppercase">{prayer.id.substring(0, 3)}</span>
 								</div>
 								<div>
-									<h3 class="font-bold text-lg {prayer.isNext ? 'text-primary' : ''}">{prayer.name}</h3>
-									<p class="text-sm font-mono {prayer.isPassed ? 'text-base-content/40 line-through' : 'text-base-content/60'}">
+									<h3 class="font-bold text-lg {isNext ? 'text-primary' : ''}">{prayer.name}</h3>
+									<p class="text-sm font-mono {isPassed ? 'text-base-content/40 line-through' : 'text-base-content/60'}">
 										{prayer.time}
 									</p>
 								</div>
 							</div>
 
 							<div class="flex items-center gap-2">
-								{#if prayer.isNext}
+								{#if isNext}
 									<Badge variant="primary" class="animate-pulse">Next</Badge>
 								{/if}
 								

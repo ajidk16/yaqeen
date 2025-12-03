@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount, onDestroy } from 'svelte';
 	import { fade, fly, scale, slide } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 	import { Flame, Clock, Calendar, CheckCircle, BookOpen, Activity, ArrowRight, Sparkles, Heart } from 'lucide-svelte';
@@ -6,22 +7,57 @@
 	import { goto } from '$app/navigation';
 
 	let { data } = $props();
+	
+	// Calculate next prayer from data
+	let nextPrayer = $derived.by(() => {
+		if (!data.prayerTimes) return null;
+		const now = new Date().getTime();
+		return data.prayerTimes.find((p: any) => p.timestamp > now) || null;
+	});
 
 	// Merge server data with local state for nextPrayer
 	let user = $derived({
 		...data.user,
-		nextPrayer: { name: 'Ashar', time: '15:30' } // Placeholder, ideally calculate from prayer times
+		nextPrayer: nextPrayer ? { ...nextPrayer } : { name: 'All Done', time: 'See you tomorrow' }
 	});
 
 	let currentTime = $state(new Date());
+	let timeToNextPrayer = $state('');
+	let timerInterval: any;
 
-	// Update time every minute
-	$effect(() => {
-		const interval = setInterval(() => {
+	onMount(() => {
+		timerInterval = setInterval(() => {
 			currentTime = new Date();
-		}, 60000);
-		return () => clearInterval(interval);
+			updateCountdown();
+		}, 1000);
+		updateCountdown();
 	});
+
+	onDestroy(() => {
+		if (timerInterval) clearInterval(timerInterval);
+	});
+
+	function updateCountdown() {
+		if (!nextPrayer) {
+			timeToNextPrayer = '';
+			return;
+		}
+
+		const now = new Date().getTime();
+		const diff = nextPrayer.timestamp - now;
+
+		if (diff <= 0) {
+			// Ideally trigger refresh or handle next day
+			timeToNextPrayer = '00:00:00';
+			return;
+		}
+
+		const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+		const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+		const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+		timeToNextPrayer = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+	}
 
 	function getGreeting() {
 		const hour = currentTime.getHours();
@@ -38,7 +74,7 @@
 		<header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4" in:fly={{ y: -20, duration: 800, easing: quintOut }}>
 			<div>
 				<h1 class="text-3xl font-bold">
-					{getGreeting()}, <span class="text-primary">{user.name}!</span> 👋
+					{getGreeting()}, <span class="text-primary capitalize">{user.name}!</span> 👋
 				</h1>
 				<p class="text-base-content/60 mt-1">"Mulai harimu dengan Bismillah."</p>
 			</div>
@@ -68,7 +104,18 @@
 							<span class="text-sm font-medium uppercase tracking-wider">Next Prayer</span>
 						</div>
 						<h2 class="text-4xl font-bold mb-1">{user.nextPrayer.name}</h2>
-						<p class="text-2xl font-mono opacity-90">{user.nextPrayer.time}</p>
+						
+						{#if nextPrayer}
+							<div class="text-5xl font-black font-mono tracking-tighter my-2 tabular-nums">
+								{timeToNextPrayer}
+							</div>
+							<div class="inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">
+								<Clock class="size-3" />
+								<span>{user.nextPrayer.time}</span>
+							</div>
+						{:else}
+							<p class="text-2xl font-mono opacity-90">{user.nextPrayer.time}</p>
+						{/if}
 					</div>
 					
 					<div class="flex flex-col gap-2">
