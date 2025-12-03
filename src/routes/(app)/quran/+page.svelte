@@ -6,32 +6,43 @@
 	import confetti from 'canvas-confetti';
 	import { onMount } from 'svelte';
 
-	// Types
-	type JournalEntry = {
-		tilawahProgress: number;
-		hafalanProgress: number[];
-		hafalanSurah: string;
-		hafalanAyahStart: number;
-		hafalanAyahEnd: number;
-	};
+	import { goto } from '$app/navigation';
+
+	let { data } = $props();
 
 	// State
-	let currentDate = $state(new Date());
-	let tilawahTarget = $state(10); // Pages per day
+	let currentDate = $state(new Date(data.date));
+	let tilawahTarget = $state(data.userSettings?.quranTarget || 10); // Pages per day
+	let isEditingTarget = $state(false);
 	let currentJuz = $state(1);
 	
-	// Data Store (In-memory for now, could be localStorage/DB)
-	let journalData = $state<Record<string, JournalEntry>>({});
+	// Initialize state from server data
+	let currentEntry = $state({
+		tilawahProgress: data.quranProgress?.pagesRead ?? 0,
+		hafalanProgress: data.quranProgress?.hafalanProgress ?? [],
+		hafalanSurah: data.quranProgress?.hafalanSurah ?? 'Al-Fatihah',
+		hafalanAyahStart: data.quranProgress?.hafalanAyahStart ?? 1,
+		hafalanAyahEnd: data.quranProgress?.hafalanAyahEnd ?? 7
+	});
+
+	// Sync state when data changes (e.g. navigation)
+	$effect(() => {
+		currentDate = new Date(data.date);
+		currentEntry = {
+			tilawahProgress: data.quranProgress?.pagesRead ?? 0,
+			hafalanProgress: data.quranProgress?.hafalanProgress ?? [],
+			hafalanSurah: data.quranProgress?.hafalanSurah ?? 'Al-Fatihah',
+			hafalanAyahStart: data.quranProgress?.hafalanAyahStart ?? 1,
+			hafalanAyahEnd: data.quranProgress?.hafalanAyahEnd ?? 7
+		};
+		// Update target if it changed on server (though usually it won't change on nav unless we refetch user settings)
+		if (data.userSettings?.quranTarget) {
+			tilawahTarget = data.userSettings.quranTarget;
+		}
+	});
 
 	// Derived State for Current Date
 	let dateKey = $derived(currentDate.toISOString().split('T')[0]);
-	let currentEntry = $derived(journalData[dateKey] || {
-		tilawahProgress: 0,
-		hafalanProgress: [],
-		hafalanSurah: 'Al-Mulk',
-		hafalanAyahStart: 1,
-		hafalanAyahEnd: 30
-	});
 
 	// Date Formatters
 	let formattedDate = $derived(new Intl.DateTimeFormat('en-GB', { 
@@ -51,25 +62,49 @@
 	// Derived Metrics
 	let tilawahPercentage = $derived(Math.min((currentEntry.tilawahProgress / tilawahTarget) * 100, 100));
 	let hafalanTotalAyahs = $derived(currentEntry.hafalanAyahEnd - currentEntry.hafalanAyahStart + 1);
-	let hafalanPercentage = $derived(Math.round((currentEntry.hafalanProgress.length / hafalanTotalAyahs) * 100));
+	let hafalanPercentage = $derived(Math.round((Array.isArray(currentEntry.hafalanProgress) ? currentEntry.hafalanProgress.length : 0) / hafalanTotalAyahs * 100));
 
 	// Actions
+	let saveTimeout: NodeJS.Timeout;
+
+	async function saveProgress() {
+		clearTimeout(saveTimeout);
+		saveTimeout = setTimeout(async () => {
+			const formData = new FormData();
+			formData.append('tilawahProgress', currentEntry.tilawahProgress.toString());
+			formData.append('hafalanSurah', currentEntry.hafalanSurah);
+			formData.append('hafalanAyahStart', currentEntry.hafalanAyahStart.toString());
+			formData.append('hafalanAyahEnd', currentEntry.hafalanAyahEnd.toString());
+			formData.append('hafalanProgress', JSON.stringify(currentEntry.hafalanProgress));
+
+			await fetch(`?/update&date=${dateKey}`, {
+				method: 'POST',
+				body: formData
+			});
+		}, 500);
+	}
+
+	async function saveTarget() {
+		isEditingTarget = false;
+		const formData = new FormData();
+		formData.append('target', tilawahTarget.toString());
+		
+		await fetch('?/updateTarget', {
+			method: 'POST',
+			body: formData
+		});
+	}
+
 	function changeDate(days: number) {
 		const newDate = new Date(currentDate);
 		newDate.setDate(newDate.getDate() + days);
-		currentDate = newDate;
+		const newDateStr = newDate.toISOString().split('T')[0];
+		goto(`?date=${newDateStr}`);
 	}
 
-	function updateEntry(updates: Partial<JournalEntry>) {
-		const entry = journalData[dateKey] || {
-			tilawahProgress: 0,
-			hafalanProgress: [],
-			hafalanSurah: 'Al-Mulk',
-			hafalanAyahStart: 1,
-			hafalanAyahEnd: 30
-		};
-		
-		journalData[dateKey] = { ...entry, ...updates };
+	function updateEntry(updates: Partial<typeof currentEntry>) {
+		currentEntry = { ...currentEntry, ...updates };
+		saveProgress();
 	}
 
 	function incrementTilawah() {
@@ -90,7 +125,7 @@
 	}
 
 	function toggleAyah(ayah: number) {
-		let newProgress = [...currentEntry.hafalanProgress];
+		let newProgress = Array.isArray(currentEntry.hafalanProgress) ? [...currentEntry.hafalanProgress] : [];
 		if (newProgress.includes(ayah)) {
 			newProgress = newProgress.filter(a => a !== ayah);
 		} else {
@@ -195,7 +230,23 @@
 							<Target class="size-5 text-primary" />
 							Daily Tilawah
 						</h2>
-						<Badge class="font-mono">Target: {tilawahTarget} Pages</Badge>
+						{#if isEditingTarget}
+							<div class="flex items-center gap-2">
+								<input 
+									type="number" 
+									class="input input-xs input-bordered w-16 text-center font-mono" 
+									bind:value={tilawahTarget} 
+									onblur={saveTarget}
+									onkeydown={(e) => e.key === 'Enter' && saveTarget()}
+									autofocus={true}
+								/>
+								<span class="text-xs text-base-content/60">Pages</span>
+							</div>
+						{:else}
+							<button class="badge font-mono cursor-pointer hover:bg-base-200 transition-colors" onclick={() => isEditingTarget = true}>
+								Target: {tilawahTarget} Pages
+							</button>
+						{/if}
 					</div>
 
 					<!-- Circular Progress -->
@@ -307,7 +358,7 @@
 								{@const ayahNum = currentEntry.hafalanAyahStart + i}
 								<button 
 									class="aspect-square rounded-lg border-2 flex items-center justify-center text-sm font-medium transition-all duration-200
-									{currentEntry.hafalanProgress.includes(ayahNum) 
+									{currentEntry.hafalanProgress.includes(ayahNum ?? 0) 
 										? 'bg-secondary border-secondary text-white scale-95' 
 										: 'border-base-content/10 hover:border-secondary/50 text-base-content/60'}"
 									onclick={() => toggleAyah(ayahNum)}
@@ -326,28 +377,28 @@
 			<div class="stats shadow bg-base-100 border border-base-content/5">
 				<div class="stat place-items-center p-4">
 					<div class="stat-title text-xs">Total Khatam</div>
-					<div class="stat-value text-primary text-2xl">2</div>
+					<div class="stat-value text-primary text-2xl">{data.stats?.totalKhatam ?? 0}</div>
 					<div class="stat-desc">Times this year</div>
 				</div>
 			</div>
 			<div class="stats shadow bg-base-100 border border-base-content/5">
 				<div class="stat place-items-center p-4">
 					<div class="stat-title text-xs">Current Streak</div>
-					<div class="stat-value text-secondary text-2xl">12</div>
+					<div class="stat-value text-secondary text-2xl">{data.stats?.currentStreak ?? 0}</div>
 					<div class="stat-desc">Days</div>
 				</div>
 			</div>
 			<div class="stats shadow bg-base-100 border border-base-content/5">
 				<div class="stat place-items-center p-4">
 					<div class="stat-title text-xs">Total Pages</div>
-					<div class="stat-value text-accent text-2xl">450</div>
+					<div class="stat-value text-accent text-2xl">{data.stats?.totalPages ?? 0}</div>
 					<div class="stat-desc">Read all time</div>
 				</div>
 			</div>
 			<div class="stats shadow bg-base-100 border border-base-content/5">
 				<div class="stat place-items-center p-4">
 					<div class="stat-title text-xs">Ayahs Memorized</div>
-					<div class="stat-value text-info text-2xl">156</div>
+					<div class="stat-value text-info text-2xl">{data.stats?.ayahsMemorized ?? 0}</div>
 					<div class="stat-desc">Total ayahs</div>
 				</div>
 			</div>

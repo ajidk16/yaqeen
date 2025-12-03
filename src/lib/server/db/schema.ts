@@ -108,10 +108,12 @@ export const quranProgress = pgTable('quran_progress', {
 export const hafalanProgress = pgTable('hafalan_progress', {
 	id: text('id').primaryKey(),
 	userId: text('user_id').references(() => user.id).notNull(),
+	date: date('date').notNull(),
 	surahName: text('surah_name').notNull(),
 	ayahStart: integer('ayah_start').notNull(),
 	ayahEnd: integer('ayah_end').notNull(),
-	status: text('status').notNull(), // 'memorizing', 'completed', 'reviewing'
+	progress: jsonb('progress'), // Array of completed ayah numbers
+	status: text('status').default('memorizing'), // 'memorizing', 'completed', 'reviewing'
 	lastReviewed: timestamp('last_reviewed'),
 	createdAt: timestamp('created_at').defaultNow()
 });

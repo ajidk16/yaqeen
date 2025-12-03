@@ -49,7 +49,7 @@
 		<div tabindex="0" role="button" class="btn m-1">{label ?? 'Dropdown'}</div>
 	{/if}
 
-	<ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+	<ul class="dropdown-content z-1 menu p-2 shadow bg-base-100 rounded-box w-52">
 		{@render children?.()}
 	</ul>
 </div>

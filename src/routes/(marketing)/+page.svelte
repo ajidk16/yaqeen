@@ -255,7 +255,7 @@
 	<!-- CTA Section -->
 	<section class="py-24 bg-base-100">
 		<div class="container mx-auto px-4">
-			<div class="bg-gradient-to-r from-primary to-secondary rounded-3xl p-12 text-center text-primary-content relative overflow-hidden">
+			<div class="bg-linear-to-r from-primary to-secondary rounded-3xl p-12 text-center text-primary-content relative overflow-hidden">
 				<div class="absolute top-0 left-0 w-full h-full bg-grid-pattern opacity-10"></div>
 				<div class="relative z-10 max-w-2xl mx-auto space-y-8">
 					<h2 class="text-3xl md:text-5xl font-bold">Ready to Transform Your Habits?</h2>
