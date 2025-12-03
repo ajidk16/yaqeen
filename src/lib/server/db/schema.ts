@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm';
 import { pgTable, text, integer, timestamp, boolean, jsonb, date } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
@@ -140,3 +141,10 @@ export const supportTickets = pgTable('support_tickets', {
 	status: text('status').default('open'), // 'open', 'closed', 'in_progress'
 	createdAt: timestamp('created_at').defaultNow()
 });
+
+export const ibadahLogs	= relations(habitLogs, ({ one }) => ({
+  habit: one(habits, {
+    fields: [habitLogs.habitId],
+    references: [habits.id],
+  }),
+}));

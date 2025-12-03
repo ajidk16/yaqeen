@@ -4,10 +4,15 @@
 	import { Sun, Moon, Users, User, Check, Calendar, ChevronLeft, ChevronRight, Star, MapPin, Loader2 } from 'lucide-svelte';
 	import { Card, Button, Badge } from '$lib/components/ui';
 	import { onMount } from 'svelte';
+	import { goto, invalidateAll } from '$app/navigation';
+	import { page } from '$app/stores';
 
-	let selectedDate = $state(new Date());
+	let { data } = $props();
+
+	let selectedDate = $state(new Date(data.date));
 	let isLoadingTimes = $state(false);
 	let locationName = $state('Jakarta, ID');
+	const ibadahHabits = $derived(data.ibadahHabits);
 	
 	// Fardhu Prayers State
 	type PrayerStatus = 'none' | 'munfarid' | 'jamaah';
@@ -28,52 +33,83 @@
 		{ id: 'isya', name: 'Isya', time: '--:--', status: 'none', icon: Moon }
 	]);
 
-	// Sunnah Prayers State
+	// Sunnah Prayers State (Habits)
 	interface SunnahPrayer {
 		id: string;
-		name: string;
-		category: 'rawatib' | 'extra';
+		title: string; // Changed from name to title to match DB
+		category: string;
 		completed: boolean;
 		time?: string;
 	}
 
-	let sunnahPrayers = $state<SunnahPrayer[]>([
-		{ id: 'qobliyah_subuh', name: '2 Rakaat Qobliyah Subuh', category: 'rawatib', completed: false },
-		{ id: 'qobliyah_dzuhur', name: '2/4 Rakaat Qobliyah Dzuhur', category: 'rawatib', completed: false },
-		{ id: 'badiyah_dzuhur', name: '2 Rakaat Badiyah Dzuhur', category: 'rawatib', completed: false },
-		{ id: 'badiyah_maghrib', name: '2 Rakaat Badiyah Maghrib', category: 'rawatib', completed: false },
-		{ id: 'badiyah_isya', name: '2 Rakaat Badiyah Isya', category: 'rawatib', completed: false },
-		{ id: 'dhuha', name: 'Sholat Dhuha', category: 'extra', completed: false, time: '07:00 - 11:00' },
-		{ id: 'tahajud', name: 'Sholat Tahajud', category: 'extra', completed: false, time: '01:00 - 04:00' }
-	]);
+	let sunnahPrayers = $state<SunnahPrayer[]>([]);
 
-	function updateFardhuStatus(id: string, status: PrayerStatus) {
+	// Initialize from data
+	$effect(() => {
+		if (data.prayerLogs) {
+			fardhuPrayers.forEach(prayer => {
+				const log = data.prayerLogs.find((l: any) => l.prayerName === prayer?.id);
+				prayer.status = (log?.status as PrayerStatus) || 'none';
+			});
+		}
+		
+		if (data.sunnahPrayers) {
+			sunnahPrayers = data.sunnahPrayers.map((h: any) => ({
+				id: h.id,
+				title: h.title,
+				category: h.category,
+				completed: h.completed,
+				time: h.time
+			}));
+		}
+
+		selectedDate = new Date(data.date);
+	});
+
+	async function updateFardhuStatus(id: string, status: PrayerStatus) {
+		// Optimistic update
 		const index = fardhuPrayers.findIndex(p => p.id === id);
 		if (index !== -1) {
 			fardhuPrayers[index].status = status;
 		}
+
+		const formData = new FormData();
+		formData.append('prayerName', id);
+		formData.append('status', status);
+
+		await fetch(`?/updatePrayer&date=${data.date}`, {
+			method: 'POST',
+			body: formData
+		});
+		
+		// Ideally handle error and revert if needed
+		invalidateAll();
 	}
 
-	function toggleSunnah(id: string) {
+	async function toggleSunnah(id: string) {
+		// Optimistic update
 		const index = sunnahPrayers.findIndex(p => p.id === id);
 		if (index !== -1) {
 			sunnahPrayers[index].completed = !sunnahPrayers[index].completed;
 		}
+
+		const formData = new FormData();
+		formData.append('habitId', id);
+
+		await fetch(`?/toggleHabit&date=${data.date}`, {
+			method: 'POST',
+			body: formData
+		});
+
+		invalidateAll();
 	}
 
 	// Date Navigation
 	function changeDate(days: number) {
 		const newDate = new Date(selectedDate);
 		newDate.setDate(selectedDate.getDate() + days);
-		selectedDate = newDate;
-		// In a real app, we would also fetch the user's logs for the new date here
-		resetStatuses(); 
-	}
-
-	function resetStatuses() {
-		// Reset statuses for demo purposes when date changes
-		fardhuPrayers.forEach(p => p.status = 'none');
-		sunnahPrayers.forEach(p => p.completed = false);
+		const dateStr = newDate.toISOString().split('T')[0];
+		goto(`?date=${dateStr}`);
 	}
 
 	// Fetch Prayer Times
@@ -88,10 +124,10 @@
 			const dateStr = `${selectedDate.getDate()}-${selectedDate.getMonth() + 1}-${selectedDate.getFullYear()}`;
 			
 			const response = await fetch(`https://api.aladhan.com/v1/timings/${dateStr}?latitude=${lat}&longitude=${lng}&method=${method}`);
-			const data = await response.json();
+			const resData = await response.json();
 			
-			if (data.code === 200) {
-				const timings = data.data.timings;
+			if (resData.code === 200) {
+				const timings = resData.data.timings;
 				
 				// Update Fardhu times
 				const timeMap: Record<string, string> = {
@@ -122,16 +158,21 @@
 
 	// Progress Calculation
 	let fardhuProgress = $derived(
-		(fardhuPrayers.filter(p => p.status !== 'none').length / fardhuPrayers.length) * 100
+		fardhuPrayers.length > 0 
+			? (fardhuPrayers.filter(p => p.status !== 'none').length / fardhuPrayers.length) * 100 
+			: 0
 	);
 	
 	let sunnahProgress = $derived(
-		(sunnahPrayers.filter(p => p.completed).length / sunnahPrayers.length) * 100
+		sunnahPrayers.length > 0
+			? (sunnahPrayers.filter(p => p.completed).length / sunnahPrayers.length) * 100
+			: 0
 	);
 
 	const formatDate = (date: Date) => {
 		return new Intl.DateTimeFormat('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(date);
 	};
+	
 </script>
 
 <div class="min-h-screen bg-base-100 p-4 pb-24 lg:p-8">
@@ -205,30 +246,30 @@
 									<prayer.icon size="24" />
 								</div>
 								<div>
-									<h3 class="font-bold text-lg">{prayer.name}</h3>
+									<h3 class="font-bold text-lg">{prayer?.name}</h3>
 									<p class="text-sm text-base-content/60 font-mono flex items-center gap-1">
-										{prayer.time}
+										{prayer?.time}
 									</p>
 								</div>
 							</div>
 
 							<div class="flex items-center gap-2 bg-base-200/50 p-1 rounded-lg">
 								<button 
-									class="btn btn-sm border-none shadow-none {prayer.status === 'none' ? 'btn-active bg-base-300' : 'btn-ghost'}"
-									onclick={() => updateFardhuStatus(prayer.id, 'none')}
+									class="btn btn-sm border-none shadow-none {prayer?.status === 'none' ? 'btn-active bg-base-300' : 'btn-ghost'}"
+									onclick={() => updateFardhuStatus(prayer?.id, 'none')}
 								>
 									Not Done
 								</button>
 								<button 
-									class="btn btn-sm border-none shadow-none gap-2 {prayer.status === 'munfarid' ? 'bg-info text-info-content' : 'btn-ghost'}"
-									onclick={() => updateFardhuStatus(prayer.id, 'munfarid')}
+									class="btn btn-sm border-none shadow-none gap-2 {prayer?.status === 'munfarid' ? 'bg-info text-info-content' : 'btn-ghost'}"
+									onclick={() => updateFardhuStatus(prayer?.id, 'munfarid')}
 								>
 									<User class="size-4" />
 									Munfarid
 								</button>
 								<button 
-									class="btn btn-sm border-none shadow-none gap-2 {prayer.status === 'jamaah' ? 'bg-success text-success-content' : 'btn-ghost'}"
-									onclick={() => updateFardhuStatus(prayer.id, 'jamaah')}
+									class="btn btn-sm border-none shadow-none gap-2 {prayer?.status === 'jamaah' ? 'bg-success text-success-content' : 'btn-ghost'}"
+									onclick={() => updateFardhuStatus(prayer?.id, 'jamaah')}
 								>
 									<Users class="size-4" />
 									Jamaah
@@ -240,20 +281,20 @@
 			</div>
 		</section>
 
-		<!-- Sunnah Prayers -->
+		<!-- Sunnah Prayers (Dynamic Habits) -->
 		<section class="space-y-6">
 			<h2 class="text-xl font-bold flex items-center gap-2">
 				<div class="size-2 rounded-full bg-secondary"></div>
-				Sunnah Prayers
+				Ibadah Lainnya
 			</h2>
 
 			<div class="grid md:grid-cols-2 gap-6">
-				<!-- Rawatib -->
+				<!-- Sunnah -->
 				<div class="space-y-4">
-					<h3 class="text-sm font-medium text-base-content/60 uppercase tracking-wider ml-1">Rawatib</h3>
-					{#each sunnahPrayers.filter(p => p.category === 'rawatib') as prayer, i}
+					<h3 class="text-sm font-medium text-base-content/60 uppercase tracking-wider ml-1">Sunnah</h3>
+					{#each sunnahPrayers.filter(p => p.category === 'Sunnah') as prayer, i}
 						<button 
-							class="w-full text-left group"
+							class="w-full text-left group cursor-pointer"
 							onclick={() => toggleSunnah(prayer.id)}
 							in:fly={{ y: 20, duration: 600, delay: 600 + (i * 50), easing: quintOut }}
 						>
@@ -263,23 +304,26 @@
 										<Check class="size-3.5" />
 									{/if}
 								</div>
-								<span class="font-medium {prayer.completed ? 'text-secondary' : ''}">{prayer.name}</span>
+								<span class="font-medium {prayer.completed ? 'text-secondary' : ''}">{prayer.title}</span>
 							</div>
 						</button>
 					{/each}
+					{#if sunnahPrayers.filter(p => p.category === 'Sunnah').length === 0}
+						<div class="text-sm text-base-content/40 italic ml-1">Belum ada habit Sunnah</div>
+					{/if}
 				</div>
 
-				<!-- Extra Sunnah -->
+				<!-- Mubah / Extra -->
 				<div class="space-y-4">
-					<h3 class="text-sm font-medium text-base-content/60 uppercase tracking-wider ml-1">Extra Sunnah</h3>
-					{#each sunnahPrayers.filter(p => p.category === 'extra') as prayer, i}
+					<h3 class="text-sm font-medium text-base-content/60 uppercase tracking-wider ml-1">Mubah</h3>
+					{#each sunnahPrayers.filter(p => p.category === 'Mubah') as prayer, i}
 						<div 
 							class="card bg-base-100 shadow-sm border border-base-content/10 overflow-hidden group hover:shadow-md transition-all duration-300"
 							in:fly={{ y: 20, duration: 600, delay: 800 + (i * 100), easing: quintOut }}
 						>
 							<div class="card-body p-0">
 								<button 
-									class="w-full text-left p-6 flex items-center justify-between"
+									class="w-full text-left p-6 flex items-center justify-between cursor-pointer"
 									onclick={() => toggleSunnah(prayer.id)}
 								>
 									<div class="flex items-center gap-4">
@@ -287,8 +331,8 @@
 											<Star class="size-5" />
 										</div>
 										<div>
-											<h3 class="font-bold">{prayer.name}</h3>
-											<p class="text-xs text-base-content/60 mt-1">{prayer.time}</p>
+											<h3 class="font-bold">{prayer.title}</h3>
+											<p class="text-xs text-base-content/60 mt-1">{prayer.time || 'Anytime'}</p>
 										</div>
 									</div>
 									
@@ -301,6 +345,9 @@
 							</div>
 						</div>
 					{/each}
+					{#if sunnahPrayers.filter(p => p.category === 'Mubah').length === 0}
+						<div class="text-sm text-base-content/40 italic ml-1">Belum ada habit Mubah</div>
+					{/if}
 				</div>
 			</div>
 		</section>
