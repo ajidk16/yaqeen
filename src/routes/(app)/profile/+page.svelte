@@ -1,21 +1,9 @@
 <script>
+	import { page } from '$app/state';
 	import { User, Settings, Bell, Shield, HelpCircle, LogOut, ChevronRight, Camera, Activity } from 'lucide-svelte';
-	import { authClient } from '$lib/auth-client';
-
-	let userProfile = {
-		name: 'Fatih',
-		email: 'fatih@example.com',
-		avatar: null
-	};
 
 	const handleLogout = async () => {
-		await authClient.signOut({
-			fetchOptions: {
-				onSuccess: () => {
-					window.location.href = '/login';
-				}
-			}
-		});
+		console.log('Logging out...');
 	};
 
 	const listProfile = [
@@ -67,8 +55,8 @@
 	<section class="flex items-center gap-4 rounded-2xl bg-white p-5 shadow-sm border border-slate-100">
 		<div class="relative">
 			<div class="flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 text-slate-400">
-				{#if userProfile.avatar}
-					<img src={userProfile.avatar} alt="Avatar" class="h-full w-full rounded-full object-cover" />
+				{#if page.data.user.image}
+					<img src={page.data.user.image} alt="user mage" class="h-full w-full rounded-full object-cover" />
 				{:else}
 					<User size={40} />
 				{/if}
@@ -78,8 +66,8 @@
 			</button>
 		</div>
 		<div>
-			<h2 class="text-lg font-bold text-slate-800">{userProfile.name}</h2>
-			<p class="text-sm text-slate-500">{userProfile.email}</p>
+			<h2 class="text-lg font-bold text-slate-800">{page.data.user.name}</h2>
+			<p class="text-sm text-slate-500">{page.data.user.email}</p>
 			<span class="mt-2 inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
 				Premium Member
 			</span>

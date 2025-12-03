@@ -264,10 +264,11 @@
             method="POST" 
             action={editingHabitId ? '?/update' : '?/create'} 
             use:enhance={() => {
-                return async ({ result }) => {
+                return async ({ result, update }) => {
                     if (result.type === 'success') {
                         triggerToast(editingHabitId ? 'Habit updated' : 'Habit created');
                         closeModal();
+						await update()
                     }
                 };
             }}
@@ -369,10 +370,11 @@
             method="POST" 
             action="?/delete" 
             use:enhance={() => {
-                return async ({ result }) => {
+                return async ({ result, update }) => {
                     if (result.type === 'success') {
                         triggerToast('Habit deleted');
                         closeDeleteModal();
+						await update()
                     }
                 };
             }}

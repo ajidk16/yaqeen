@@ -15,3 +15,4 @@ export { default as Badge } from './Badge.svelte';
 export { default as Tooltip } from './Tooltip.svelte';
 export { default as Avatar } from './Avatar.svelte';
 export { default as Loading } from './Loading.svelte';
+export { default as Toast } from './Toast.svelte';

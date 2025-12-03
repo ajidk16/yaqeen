@@ -3,26 +3,40 @@
 	import { quintOut } from 'svelte/easing';
 	import { ArrowLeft, Bell, Clock, Zap, Info } from 'lucide-svelte';
 	import { Card, Button } from '$lib/components/ui';
+	import { goto } from '$app/navigation';
+	import { enhance } from '$app/forms';
+	import { toast } from '$lib/stores/toast';
+	import confetti from 'canvas-confetti';
+	import type { PageData } from './$types';
+	import { page } from '$app/state';
 
-	let notifications = $state({
-		pushEnabled: true,
-		prayers: {
-			fajr: true,
-			dhuhr: true,
-			asr: true,
-			maghrib: true,
-			isha: true
-		},
-		habits: true,
-		updates: false
+	const profile = $derived(page.data.user)
+	
+	let prayerSettings = $state(profile.preferences.notificationSettings?.prayers ?? {
+		fajr: true,
+		dhuhr: true,
+		asr: true,
+		maghrib: true,
+		isha: true
 	});
+
+	let isSaving = $state(false);
+
+	function triggerConfetti() {
+		confetti({
+			particleCount: 100,
+			spread: 70,
+			origin: { y: 0.6 },
+			colors: ['#10B981', '#34D399', '#FBBF24', '#F472B6']
+		});
+	}
 </script>
 
 <div class="min-h-screen bg-base-100 p-4 pb-24 lg:p-8">
 	<div class="max-w-2xl mx-auto space-y-6">
 		<!-- Header -->
 		<header class="flex items-center gap-4" in:fly={{ y: -20, duration: 800, easing: quintOut }}>
-			<Button variant="ghost" circle size="sm" href="/profile">
+			<Button variant="ghost" circle size="sm" onclick={()=>goto('/profile')}>
 				<ArrowLeft class="size-5" />
 			</Button>
 			<div>
@@ -31,7 +45,25 @@
 			</div>
 		</header>
 
-		<div class="space-y-6" in:fly={{ y: 20, duration: 800, delay: 100 }}>
+		<form 
+			method="POST" 
+			action="?/update" 
+			use:enhance={() => {
+				isSaving = true;
+				return async ({ result, update }) => {
+					isSaving = false;
+					if (result.type === 'success') {
+						toast.add('Notification settings saved!', 'success');
+						triggerConfetti();
+						update();
+					} else {
+						toast.add('Failed to save settings.', 'error');
+					}
+				};
+			}}
+			class="space-y-6" 
+			in:fly={{ y: 20, duration: 800, delay: 100 }}
+		>
 			<!-- Global Toggle -->
 			<Card class="bg-base-100 shadow-sm border border-base-content/10">
 				<div class="p-6 flex items-center justify-between">
@@ -44,13 +76,23 @@
 							<p class="text-xs text-base-content/40">Matikan untuk senyapkan semua</p>
 						</div>
 					</div>
-					<input type="checkbox" class="toggle toggle-primary" bind:checked={notifications.pushEnabled} />
+					<input 
+						type="checkbox" 
+						name="pushEnabled"
+						class="toggle toggle-primary" 
+						bind:checked={profile.preferences.notifications} 
+					/>
+					<!-- Auto-submit on global toggle change? Or just keep the save button? 
+						 The previous design didn't have a save button, it implied auto-save or needed one.
+						 Let's add a save button for consistency with other forms, or auto-submit.
+						 Given the user request "ketika berhasil simpan muncul toast", a save button is clearer.
+					-->
 				</div>
 			</Card>
 
-			{#if notifications.pushEnabled}
+			{#if profile.preferences.notifications}
 				<!-- Prayer Times -->
-				<div class="bg-base-100 shadow-sm border border-base-content/10" transition:fade>
+				<div class="bg-base-100 shadow-sm border border-base-content/10 rounded-box" transition:fade>
 					<div class="p-6 space-y-4">
 						<h3 class="font-bold text-lg flex items-center gap-2">
 							<Clock class="size-5 text-secondary" />
@@ -58,14 +100,14 @@
 						</h3>
 						
 						<div class="space-y-3">
-							{#each Object.entries(notifications.prayers) as [prayer, enabled]}
+							{#each Object.entries(prayerSettings) as [prayer, enabled]}
 								<div class="flex items-center justify-between p-2 hover:bg-base-200/50 rounded-lg transition-colors">
 									<span class="capitalize font-medium text-base-content/80">{prayer}</span>
 									<input 
 										type="checkbox" 
+										name={prayer}
 										class="toggle toggle-sm toggle-secondary" 
-										checked={enabled} 
-										onclick={() => notifications.prayers[prayer as keyof typeof notifications.prayers] = !enabled}
+										bind:checked={prayerSettings[prayer as keyof typeof prayerSettings]}
 									/>
 								</div>
 							{/each}
@@ -74,7 +116,7 @@
 				</div>
 
 				<!-- Other Notifications -->
-				<div class="bg-base-100 shadow-sm border border-base-content/10" transition:fade>
+				<div class="bg-base-100 shadow-sm border border-base-content/10 rounded-box" transition:fade>
 					<div class="p-6 space-y-4">
 						<h3 class="font-bold text-lg flex items-center gap-2">
 							<Zap class="size-5 text-accent" />
@@ -87,7 +129,12 @@
 									<p class="font-medium">Pengingat Kebiasaan</p>
 									<p class="text-xs text-base-content/40">Reminder harian untuk habit</p>
 								</div>
-								<input type="checkbox" class="toggle toggle-accent" bind:checked={notifications.habits} />
+								<input 
+									type="checkbox" 
+									name="habits"
+									class="toggle toggle-accent" 
+									bind:checked={profile.preferences.notificationSettings.habits} 
+								/>
 							</div>
 
 							<div class="flex items-center justify-between">
@@ -95,12 +142,33 @@
 									<p class="font-medium">Info & Update Aplikasi</p>
 									<p class="text-xs text-base-content/40">Berita fitur baru</p>
 								</div>
-								<input type="checkbox" class="toggle toggle-accent" bind:checked={notifications.updates} />
+								<input 
+									type="checkbox" 
+									name="updates"
+									class="toggle toggle-accent" 
+									bind:checked={profile.preferences.notificationSettings.updates} 
+								/>
 							</div>
 						</div>
 					</div>
 				</div>
 			{/if}
-		</div>
+
+			<div class="sticky bottom-6 pt-4">
+				<Button 
+					type="submit" 
+					variant="primary" 
+					class="w-full shadow-lg shadow-primary/20"
+					disabled={isSaving}
+				>
+					{#if isSaving}
+						<span class="loading loading-spinner loading-sm"></span>
+						Menyimpan...
+					{:else}
+						Simpan Pengaturan
+					{/if}
+				</Button>
+			</div>
+		</form>
 	</div>
 </div>

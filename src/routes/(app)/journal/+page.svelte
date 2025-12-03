@@ -1,46 +1,40 @@
 <script lang="ts">
 	import { fade, fly, scale, slide } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
-	import { Smile, Frown, Meh, Heart, Coffee, Calendar, Plus, Save, Trash2, Sparkles, BookHeart, ChevronLeft, ChevronRight } from 'lucide-svelte';
-	import { Card, Button, Textarea } from '$lib/components/ui';
+	import { Smile, Frown, Meh, Heart, Coffee, Calendar, Plus, Save, Trash2, Sparkles, BookHeart, ChevronLeft, ChevronRight, Pencil } from 'lucide-svelte';
+	import { Card, Button, Textarea, Modal, Input, Loading } from '$lib/components/ui';
 	import confetti from 'canvas-confetti';
+	import { enhance } from '$app/forms';
+	import { toast } from '$lib/stores/toast';
+	import { page } from '$app/state';
+
+
 
 	// Types
 	type MoodType = 'happy' | 'blessed' | 'neutral' | 'tired' | 'sad';
-
-	interface JournalLog {
-		id: string;
-		date: Date;
-		mood: MoodType;
-		gratitude: string;
-	}
 
 	// State
 	let currentDate = $state(new Date());
 	let selectedMood = $state<MoodType>('happy');
 	let gratitudeText = $state('');
-	let logs = $state<JournalLog[]>([
-		{
-			id: '1',
-			date: new Date(Date.now() - 86400000), // Yesterday
-			mood: 'blessed',
-			gratitude: 'Alhamdulillah for the rain today, it felt so peaceful.'
-		},
-		{
-			id: '2',
-			date: new Date(Date.now() - 172800000), // 2 days ago
-			mood: 'tired',
-			gratitude: 'Grateful that I managed to finish my work deadlines.'
-		}
-	]);
+	let isSubmitting = $state(false);
+
+	// Edit State
+	let isEditModalOpen = $state(false);
+	let editingLog = $state<{ id: string, mood: MoodType, gratitude: string } | null>(null);
+
+	// Delete State
+	let isDeleteModalOpen = $state(false);
+	let deletingLogId = $state<string | null>(null);
 
 	// Derived
 	let filteredLogs = $derived(
-		logs.filter(log => 
-			log.date.getDate() === currentDate.getDate() &&
-			log.date.getMonth() === currentDate.getMonth() &&
-			log.date.getFullYear() === currentDate.getFullYear()
-		).sort((a, b) => b.date.getTime() - a.date.getTime())
+		page?.data?.logs?.filter((log : {date:Date}) => {
+			const logDate = new Date(log.date);
+			return logDate.getDate() === currentDate.getDate() &&
+			logDate.getMonth() === currentDate.getMonth() &&
+			logDate.getFullYear() === currentDate.getFullYear();
+		})
 	);
 
 	let formattedDate = $derived(new Intl.DateTimeFormat('en-GB', { 
@@ -66,26 +60,14 @@
 		currentDate = newDate;
 	}
 
-	function saveLog() {
-		if (!gratitudeText.trim()) return;
-
-		const newLog: JournalLog = {
-			id: crypto.randomUUID(),
-			date: new Date(currentDate), // Use current selected date
-			mood: selectedMood,
-			gratitude: gratitudeText
-		};
-
-		logs = [newLog, ...logs];
-		gratitudeText = '';
-		selectedMood = 'happy';
-		triggerConfetti();
+	function openEditModal(log: any) {
+		editingLog = { id: log.id, mood: log.mood as MoodType, gratitude: log.gratitude };
+		isEditModalOpen = true;
 	}
 
-	function deleteLog(id: string) {
-		if (confirm('Delete this journal entry?')) {
-			logs = logs.filter(l => l.id !== id);
-		}
+	function openDeleteModal(id: string) {
+		deletingLogId = id;
+		isDeleteModalOpen = true;
 	}
 
 	function triggerConfetti() {
@@ -97,21 +79,21 @@
 		});
 	}
 
-	function getMoodColor(type: MoodType) {
+	function getMoodColor(type: string) {
 		const mood = moods.find(m => m.type === type);
 		return mood ? mood.color : 'text-base-content';
 	}
 
-	function getMoodIcon(type: MoodType) {
+	function getMoodIcon(type: string) {
 		const mood = moods.find(m => m.type === type);
 		return mood ? mood.icon : Smile;
 	}
 
-	function formatTime(date: Date) {
+	function formatTime(date: Date | string) {
 		return new Intl.DateTimeFormat('en-US', { 
 			hour: '2-digit',
 			minute: '2-digit'
-		}).format(date);
+		}).format(new Date(date));
 	}
 </script>
 
@@ -144,59 +126,91 @@
 		<!-- Input Section -->
 		<div class="card bg-base-100 shadow-lg border border-primary/10 overflow-visible" in:scale={{ duration: 600, start: 0.95, delay: 100 }}>
 			<div class="card-body p-6 space-y-6">
-				<!-- Mood Selector -->
-				<div class="space-y-3">
-					<label class="label" for="">
-						<span class="label-text font-medium text-base">How are you feeling?</span>
-					</label>
-					<div class="flex justify-between overflow-x-auto p-2 gap-2">
-						{#each moods as mood}
-							<button 
-								class="flex flex-1 flex-col items-center gap-2 rounded-xl p-3 transition-all
-								{selectedMood === mood.type ? mood.bg : 'bg-slate-50 hover:bg-slate-100'}"
-								onclick={() => selectedMood = mood.type}
-							>
-								<div class="size-10 flex items-center justify-center transition-transform duration-300 {selectedMood === mood.type ? 'scale-110' : ''}">
-									<mood.icon class="size-8 {selectedMood === mood.type ? mood.color : 'text-base-content/30'}" 
-										strokeWidth={selectedMood === mood.type ? 2.5 : 2}/>
-								</div>
-								<span class="text-xs font-medium {selectedMood === mood.type ? mood.color : 'text-base-content/50'}">
-									{mood.label}
-								</span>
-							</button>
-						{/each}
-					</div>
-				</div>
+				<form 
+					method="POST" 
+					action="?/create" 
+					use:enhance={() => {
+						isSubmitting = true;
+						return async ({ result, update }) => {
+							isSubmitting = false;
+							if (result.type === 'success') {
+								toast.add('Journal entry saved!', 'success');
+								triggerConfetti();
+								gratitudeText = '';
+								selectedMood = 'happy';
+								await update();
+							} else {
+								toast.add('Failed to save entry.', 'error');
+							}
+						};
+					}}
+					class="space-y-6"
+				>
+					<input type="hidden" name="date" value={currentDate.toISOString()} />
+					<input type="hidden" name="mood" value={selectedMood} />
 
-				<!-- Gratitude Input -->
-				<div class="space-y-3">
-					<label class="label">
-						<span class="label-text font-medium text-base">What are you grateful for today?</span>
-					</label>
-					<div class="relative">
-						<Textarea 
-							placeholder="Today, I am grateful for..." 
-							class="min-h-[120px] text-lg leading-relaxed resize-none bg-base-100 border-base-content/10 focus:border-primary/50"
-							bind:value={gratitudeText}
-						/>
-						<div class="absolute bottom-3 right-3">
-							<Sparkles class="size-5 text-primary/20" />
+					<!-- Mood Selector -->
+					<div class="space-y-3">
+						<label class="label" for="">
+							<span class="label-text font-medium text-base">How are you feeling?</span>
+						</label>
+						<div class="flex justify-between overflow-x-auto p-2 gap-2">
+							{#each moods as mood}
+								<button 
+									type="button"
+									class="flex flex-1 flex-col items-center gap-2 rounded-xl p-3 transition-all
+									{selectedMood === mood.type ? mood.bg : 'bg-slate-50 hover:bg-slate-100'}"
+									onclick={() => selectedMood = mood.type}
+								>
+									<div class="size-10 flex items-center justify-center transition-transform duration-300 {selectedMood === mood.type ? 'scale-110' : ''}">
+										<mood.icon class="size-8 {selectedMood === mood.type ? mood.color : 'text-base-content/30'}" 
+											strokeWidth={selectedMood === mood.type ? 2.5 : 2}/>
+									</div>
+									<span class="text-xs font-medium {selectedMood === mood.type ? mood.color : 'text-base-content/50'}">
+										{mood.label}
+									</span>
+								</button>
+							{/each}
 						</div>
 					</div>
-				</div>
 
-				<!-- Action -->
-				<div class="flex justify-end">
-					<Button 
-						variant="primary" 
-						class="gap-2 px-8 rounded-full shadow-lg shadow-primary/20"
-						disabled={!gratitudeText.trim()}
-						onclick={saveLog}
-					>
-						<Save class="size-4" />
-						Save Entry
-					</Button>
-				</div>
+					<!-- Gratitude Input -->
+					<div class="space-y-3">
+						<label class="label" for="gratitude">
+							<span class="label-text font-medium text-base">What are you grateful for today?</span>
+						</label>
+						<div class="relative">
+							<Textarea 
+								name="gratitude"
+								placeholder="Today, I am grateful for..." 
+								class="min-h-[120px] text-lg leading-relaxed resize-none bg-base-100 border-base-content/10 focus:border-primary/50"
+								bind:value={gratitudeText}
+							/>
+							<div class="absolute bottom-3 right-3">
+								<Sparkles class="size-5 text-primary/20" />
+							</div>
+						</div>
+					</div>
+
+					<!-- Action -->
+					<div class="flex justify-end">
+						<Button 
+							type="submit"
+							variant="primary" 
+							class="gap-2 px-8 rounded-full shadow-lg shadow-primary/20"
+							disabled={!gratitudeText.trim() || isSubmitting}
+							loading={isSubmitting}
+						>
+							{#if isSubmitting}
+								<Loading variant='infinity' />
+								loading
+							{:else}
+								<Save class="size-4" />
+								Save Entry
+							{/if}
+						</Button>
+					</div>
+				</form>
 			</div>
 		</div>
 
@@ -231,17 +245,26 @@
 										</div>
 										<div class="space-y-1">
 											<p class="text-base-content/80 leading-relaxed whitespace-pre-wrap">{log.gratitude}</p>
-											<p class="text-xs text-base-content/40 font-medium pt-1">{formatTime(log.date)}</p>
+											<p class="text-xs text-base-content/40 font-medium pt-1">{formatTime(log.createdAt || new Date())}</p>
 										</div>
 									</div>
 									
-									<button 
-										class="btn btn-ghost btn-xs btn-circle text-error opacity-0 group-hover:opacity-100 transition-opacity"
-										onclick={() => deleteLog(log.id)}
-										title="Delete Entry"
-									>
-										<Trash2 class="size-4" />
-									</button>
+									<div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+										<button 
+											class="btn btn-ghost btn-xs btn-circle text-base-content/60"
+											onclick={() => openEditModal(log)}
+											title="Edit Entry"
+										>
+											<Pencil class="size-4" />
+										</button>
+										<button 
+											class="btn btn-ghost btn-xs btn-circle text-error"
+											onclick={() => openDeleteModal(log.id)}
+											title="Delete Entry"
+										>
+											<Trash2 class="size-4" />
+										</button>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -251,3 +274,103 @@
 		</div>
 	</div>
 </div>
+
+<!-- Edit Modal -->
+<Modal bind:open={isEditModalOpen} title="Edit Journal Entry">
+	{#if editingLog}
+		<form 
+			method="POST" 
+			action="?/update" 
+			use:enhance={() => {
+				isSubmitting = true
+				return async ({ result, update }) => {
+					if (result.type === 'success') {
+						toast.add('Entry updated successfully!', 'success');
+						isEditModalOpen = false;
+						triggerConfetti();
+						isSubmitting = false
+						await update();
+					} else {
+						toast.add('Failed to update entry.', 'error');
+					}
+				};
+			}}
+			class="space-y-6"
+		>
+			<input type="hidden" name="id" value={editingLog.id} />
+			<input type="hidden" name="mood" value={editingLog.mood} />
+
+			<!-- Mood Selector -->
+			<div class="space-y-3">
+				<label class="label" for="">
+					<span class="label-text font-medium text-base">Mood</span>
+				</label>
+				<div class="flex justify-between overflow-x-auto p-2 gap-2">
+					{#each moods as mood}
+						<button 
+							type="button"
+							class="flex flex-1 flex-col items-center gap-2 rounded-xl p-3 transition-all
+							{editingLog.mood === mood.type ? mood.bg : 'bg-slate-50 hover:bg-slate-100'}"
+							onclick={() => editingLog!.mood = mood.type}
+						>
+							<div class="size-8 flex items-center justify-center transition-transform duration-300 {editingLog.mood === mood.type ? 'scale-110' : ''}">
+								<mood.icon class="size-6 {editingLog.mood === mood.type ? mood.color : 'text-base-content/30'}" />
+							</div>
+						</button>
+					{/each}
+				</div>
+			</div>
+
+			<div class="space-y-3">
+				<label class="label" for="edit-gratitude">
+					<span class="label-text font-medium">Gratitude</span>
+				</label>
+				<Textarea 
+					name="gratitude"
+					bind:value={editingLog.gratitude}
+					class="min-h-[120px]"
+				/>
+			</div>
+
+			<div class="flex justify-end gap-3">
+				<Button type="button" variant="ghost" onclick={() => isEditModalOpen = false}>Cancel</Button>
+				<Button type="submit" variant="primary" disabled={isSubmitting}>
+					{#if isSubmitting}
+						<Loading variant='infinity' />
+						loading
+					{:else}
+						<Save class="size-4" />
+						Update
+					{/if}
+				</Button>
+			</div>
+		</form>
+	{/if}
+</Modal>
+
+<!-- Delete Modal -->
+<Modal bind:open={isDeleteModalOpen} title="Delete Entry">
+	<div class="space-y-4">
+		<p>Are you sure you want to delete this journal entry? This action cannot be undone.</p>
+		<form 
+			method="POST" 
+			action="?/delete" 
+			use:enhance={() => {
+				return async ({ result, update }) => {
+					if (result.type === 'success') {
+						toast.add('Entry deleted successfully.', 'info');
+						isDeleteModalOpen = false;
+						update();
+					} else {
+						toast.add('Failed to delete entry.', 'error');
+					}
+				};
+			}}
+			class="flex justify-end gap-3"
+		>
+			<input type="hidden" name="id" value={deletingLogId} />
+			<Button type="button" variant="ghost" onclick={() => isDeleteModalOpen = false}>Cancel</Button>
+			<Button type="submit" variant="error">Delete</Button>
+		</form>
+	</div>
+</Modal>

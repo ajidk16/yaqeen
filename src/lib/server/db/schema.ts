@@ -3,6 +3,8 @@ import { pgTable, text, integer, timestamp, boolean, jsonb, date } from 'drizzle
 export const user = pgTable('user', {
 	id: text('id').primaryKey(),
 	name: text('name').notNull(),
+	username: text('username').unique(),
+	bio: text('bio'),
 	email: text('email').notNull().unique(),
 	emailVerified: boolean('email_verified').notNull(),
 	image: text('image'),
@@ -123,5 +125,16 @@ export const moodLogs = pgTable('mood_logs', {
 	mood: text('mood').notNull(), // 'happy', 'blessed', 'neutral', 'tired', 'sad'
 	gratitude: text('gratitude'), // User's gratitude entry
 	notes: text('notes'),
+	createdAt: timestamp('created_at').defaultNow()
+});
+
+// --- Support ---
+
+export const supportTickets = pgTable('support_tickets', {
+	id: text('id').primaryKey(),
+	userId: text('user_id').references(() => user.id).notNull(),
+	subject: text('subject').notNull(),
+	message: text('message').notNull(),
+	status: text('status').default('open'), // 'open', 'closed', 'in_progress'
 	createdAt: timestamp('created_at').defaultNow()
 });

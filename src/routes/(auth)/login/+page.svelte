@@ -48,8 +48,8 @@
 				isLoading = true;
 				return async ({ update }) => {
 					isLoading = false;
-					update();
-					goto('/dashboard')
+					await update();
+					// goto('/dashboard')
 				};
 			}} class="space-y-6">
 				<div class="space-y-4">

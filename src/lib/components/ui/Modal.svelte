@@ -50,10 +50,10 @@
 		<div class="modal-action">
 			{#if actions}
 				{@render actions()}
-			{:else}
+			<!-- {:else}
 				<form method="dialog">
 					<button class="btn" onclick={() => (open = false)}>Close</button>
-				</form>
+				</form> -->
 			{/if}
 		</div>
 	</div>

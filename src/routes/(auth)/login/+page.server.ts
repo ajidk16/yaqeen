@@ -45,6 +45,8 @@ export const actions: Actions = {
 			});
 		}
 
+
+
         // Find the account associated with the user for password verification
         const existingAccount = await db.query.account.findFirst({
             where: eq(account.userId, existingUser.id)
@@ -55,6 +57,8 @@ export const actions: Actions = {
                 message: "Incorrect email or password"
             });
         }
+
+
 
 		const validPassword = await verify(existingAccount.password, password, {
 			memoryCost: 19456,
