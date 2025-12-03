@@ -5,22 +5,13 @@
 	import { Card, Button, Badge } from '$lib/components/ui';
 	import { goto } from '$app/navigation';
 
-	// Mock Data
-	const user = {
-		name: 'Fatih',
-		streak: 12,
-		nextPrayer: { name: 'Ashar', time: '15:30' },
-		progress: {
-			ibadah: 80,
-			habits: 60,
-			quran: 40
-		},
-		recentActivity: [
-			{ id: 1, type: 'prayer', title: 'Completed Dzuhur', time: '12:15 PM', icon: CheckCircle, color: 'text-success' },
-			{ id: 2, type: 'quran', title: 'Read 5 Pages', time: '10:00 AM', icon: BookOpen, color: 'text-primary' },
-			{ id: 3, type: 'habit', title: 'Morning Jog', time: '06:30 AM', icon: Activity, color: 'text-warning' }
-		]
-	};
+	let { data } = $props();
+
+	// Merge server data with local state for nextPrayer
+	let user = $derived({
+		...data.user,
+		nextPrayer: { name: 'Ashar', time: '15:30' } // Placeholder, ideally calculate from prayer times
+	});
 
 	let currentTime = $state(new Date());
 
@@ -136,13 +127,15 @@
 
 			<div class="grid gap-3">
 				{#each user.recentActivity as activity, i}
+					{@const Icon = activity.type === 'prayer' ? CheckCircle : activity.type === 'quran' ? BookOpen : Activity}
+					{@const color = activity.type === 'prayer' ? 'text-success' : activity.type === 'quran' ? 'text-primary' : 'text-warning'}
 					<div 
 						class="card bg-base-100 shadow-sm border border-base-content/5 hover:shadow-md transition-all duration-300"
 						in:fly={{ y: 20, duration: 500, delay: 400 + (i * 100) }}
 					>
 						<div class="card-body p-4 flex-row items-center gap-4">
 							<div class="size-10 rounded-full bg-base-200 flex items-center justify-center shrink-0">
-								<activity.icon class="size-5 {activity.color}" />
+								<Icon class="size-5 {color}" />
 							</div>
 							<div class="flex-1">
 								<h4 class="font-bold text-sm">{activity.title}</h4>
@@ -151,6 +144,11 @@
 						</div>
 					</div>
 				{/each}
+				{#if user.recentActivity.length === 0}
+					<div class="text-center py-8 text-base-content/40 italic">
+						Belum ada aktivitas hari ini.
+					</div>
+				{/if}
 			</div>
 		</div>
 
