@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { fade, fly, slide } from 'svelte/transition';
-	import { quintOut } from 'svelte/easing';
-	import { MapPin, Bell, BellOff, Clock, Loader2, Volume2, Navigation, RefreshCw } from 'lucide-svelte';
-	import { Card, Button, Badge } from '$lib/components/ui';
+	import {  fly, scale, slide } from 'svelte/transition';
+	import { MapPin, Bell, BellOff, Clock, Loader2, RefreshCw } from 'lucide-svelte';
+	import { Button, Badge } from '$lib/components/ui';
 
 	// Types
 	interface PrayerTime {
@@ -81,6 +80,8 @@
 			
 			const response = await fetch(`https://api.aladhan.com/v1/timings/${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}?latitude=${lat}&longitude=${lng}&method=${method}`);
 			const data = await response.json();
+
+			console.log('Prayer Times Data:', data);
 
 			if (data.code === 200) {
 				const timings = data.data.timings;
@@ -169,10 +170,6 @@
 			prayers[index].notificationEnabled = !prayers[index].notificationEnabled;
 		}
 	}
-
-	function formatTime(date: Date) {
-		return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-	}
 </script>
 
 <div class="min-h-screen bg-base-100 p-4 pb-24 lg:p-8">
@@ -199,7 +196,7 @@
 		{/if}
 
 		<!-- Hero Countdown -->
-		<div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-primary-focus text-primary-content shadow-xl" in:scale={{ duration: 600, start: 0.95 }}>
+		<div class="relative overflow-hidden rounded-3xl bg-linear-to-br from-primary to-primary-focus text-primary-content shadow-xl" in:scale={{ duration: 600, start: 0.95 }}>
 			<!-- Decorative Background Elements -->
 			<div class="absolute top-0 right-0 -mt-10 -mr-10 size-40 rounded-full bg-white/10 blur-3xl"></div>
 			<div class="absolute bottom-0 left-0 -mb-10 -ml-10 size-40 rounded-full bg-black/10 blur-3xl"></div>

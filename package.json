@@ -23,6 +23,7 @@
 	"devDependencies": {
 		"@eslint/compat": "^1.4.0",
 		"@eslint/js": "^9.39.1",
+		"@lucia-auth/adapter-drizzle": "^1.1.0",
 		"@oslojs/crypto": "^1.0.1",
 		"@oslojs/encoding": "^1.1.0",
 		"@playwright/test": "^1.56.1",
@@ -42,6 +43,7 @@
 		"eslint-plugin-svelte": "^3.13.0",
 		"framer-motion": "^12.23.25",
 		"globals": "^16.5.0",
+		"lucia": "^3.2.2",
 		"mdsvex": "^0.12.6",
 		"pg": "^8.16.3",
 		"playwright": "^1.56.1",
@@ -60,7 +62,6 @@
 	"dependencies": {
 		"@neondatabase/serverless": "^1.0.2",
 		"@node-rs/argon2": "^2.0.2",
-		"better-auth": "^1.4.3",
 		"canvas-confetti": "^1.9.4",
 		"lucide-svelte": "^0.555.0"
 	}

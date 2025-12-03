@@ -3,6 +3,7 @@
 	import { quintOut } from 'svelte/easing';
 	import { Flame, Clock, Calendar, CheckCircle, BookOpen, Activity, ArrowRight, Sparkles, Heart } from 'lucide-svelte';
 	import { Card, Button, Badge } from '$lib/components/ui';
+	import { goto } from '$app/navigation';
 
 	// Mock Data
 	const user = {
@@ -65,7 +66,7 @@
 
 		<div class="grid md:grid-cols-3 gap-6">
 			<!-- Next Prayer Widget -->
-			<div class="md:col-span-2 card bg-gradient-to-br from-primary to-primary-focus text-primary-content shadow-xl overflow-hidden relative" in:scale={{ duration: 600, start: 0.95, delay: 100 }}>
+			<div class="md:col-span-2 card bg-linear-to-br from-primary to-primary-focus text-primary-content shadow-xl overflow-hidden relative" in:scale={{ duration: 600, start: 0.95, delay: 100 }}>
 				<!-- Decorative -->
 				<div class="absolute top-0 right-0 -mt-10 -mr-10 size-40 rounded-full bg-white/10 blur-3xl"></div>
 				
@@ -80,7 +81,7 @@
 					</div>
 					
 					<div class="flex flex-col gap-2">
-						<Button variant="ghost" class="bg-white/20 hover:bg-white/30 text-white border-none gap-2" href="/jadwal-solat">
+						<Button variant="ghost" class="bg-white/20 hover:bg-white/30 text-white border-none gap-2" onclick={() => goto('/jadwal-solat')}>
 							View Schedule
 							<ArrowRight class="size-4" />
 						</Button>
@@ -130,7 +131,7 @@
 					<Calendar class="size-5 text-base-content/60" />
 					Recent Activity
 				</h2>
-				<Button variant="link" class="text-primary no-underline hover:underline p-0 h-auto" href="/stats">See All</Button>
+				<Button variant="link" class="text-primary no-underline hover:underline p-0 h-auto" onclick={() => goto('/ibadah')}>See All</Button>
 			</div>
 
 			<div class="grid gap-3">
@@ -141,7 +142,7 @@
 					>
 						<div class="card-body p-4 flex-row items-center gap-4">
 							<div class="size-10 rounded-full bg-base-200 flex items-center justify-center shrink-0">
-								<svelte:component this={activity.icon} class="size-5 {activity.color}" />
+								<activity.icon class="size-5 {activity.color}" />
 							</div>
 							<div class="flex-1">
 								<h4 class="font-bold text-sm">{activity.title}</h4>
@@ -155,21 +156,21 @@
 
 		<!-- Quick Actions -->
 		<div class="grid grid-cols-2 sm:grid-cols-4 gap-4" in:fly={{ y: 20, duration: 800, delay: 500 }}>
-			<Button variant="outline" class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-primary hover:text-primary transition-all" href="/journal">
+			<Button  class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-primary hover:text-primary transition-all" onclick={()=> goto('/stats')}>
 				<Heart class="size-6" />
 				<span class="text-xs font-medium">Log Mood</span>
 			</Button>
-			<Button variant="outline" class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-secondary hover:text-secondary transition-all" href="/habits">
+			<Button  class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-secondary hover:text-secondary transition-all" onclick={()=> goto('/habits')}>
 				<Sparkles class="size-6" />
 				<span class="text-xs font-medium">New Habit</span>
 			</Button>
-			<Button variant="outline" class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-accent hover:text-accent transition-all" href="/quran">
+			<Button  class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-accent hover:text-accent transition-all" onclick={()=> goto('/quran')}>
 				<BookOpen class="size-6" />
 				<span class="text-xs font-medium">Read Quran</span>
 			</Button>
-			<Button variant="outline" class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-info hover:text-info transition-all" href="/stats">
-				<Activity class="size-6" />
-				<span class="text-xs font-medium">View Stats</span>
+			<Button  class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-info hover:text-info transition-all" onclick={()=> goto('/journal')}>
+				<Calendar class="size-6" />
+				<span class="text-xs font-medium">Journal</span>
 			</Button>
 		</div>
 	</div>

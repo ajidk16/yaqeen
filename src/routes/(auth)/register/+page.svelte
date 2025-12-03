@@ -3,6 +3,10 @@
 	import { quintOut } from 'svelte/easing';
 	import { User, Mail, Lock, Eye, EyeOff, UserPlus, CheckCircle2 } from 'lucide-svelte';
 	import { Card, Input, Button, Checkbox, Alert } from '$lib/components/ui';
+	import { enhance } from '$app/forms';
+	import type { ActionData } from './$types';
+
+	let { form } = $props<{ form: ActionData }>();
 
 	let name = $state('');
 	let email = $state('');
@@ -12,7 +16,9 @@
 	let showPassword = $state(false);
 	let showConfirmPassword = $state(false);
 	let isLoading = $state(false);
-	let error = $state<string | null>(null);
+	
+	// Use form?.message or form?.error if available, otherwise local state
+	let error = $derived(form?.message || null);
 
 	function togglePasswordVisibility() {
 		showPassword = !showPassword;
@@ -20,31 +26,6 @@
 
 	function toggleConfirmPasswordVisibility() {
 		showConfirmPassword = !showConfirmPassword;
-	}
-
-	async function handleRegister(event: Event) {
-		event.preventDefault();
-		isLoading = true;
-		error = null;
-
-		if (password !== confirmPassword) {
-			error = "Passwords do not match";
-			isLoading = false;
-			return;
-		}
-
-		if (!agreeTerms) {
-			error = "You must agree to the terms and conditions";
-			isLoading = false;
-			return;
-		}
-
-		// Simulate API call
-		setTimeout(() => {
-			isLoading = false;
-			// For demo purposes
-			console.log('Register attempt:', { name, email, password, agreeTerms });
-		}, 1500);
 	}
 </script>
 
@@ -74,11 +55,18 @@
 				</div>
 			{/if}
 
-			<form onsubmit={handleRegister} class="space-y-6">
+			<form method="POST" use:enhance={() => {
+				isLoading = true;
+				return async ({ update }) => {
+					isLoading = false;
+					update();
+				};
+			}} class="space-y-6">
 				<div class="space-y-4">
 					<Input
 						label="Full Name"
 						type="text"
+						name="name"
 						placeholder="John Doe"
 						bind:value={name}
 						startIcon={User}
@@ -89,6 +77,7 @@
 					<Input
 						label="Email"
 						type="email"
+						name="email"
 						placeholder="name@example.com"
 						bind:value={email}
 						startIcon={Mail}
@@ -101,6 +90,7 @@
 							label="Password"
 							type={showPassword ? 'text' : 'password'}
 							placeholder="••••••••"
+							name="password"
 							bind:value={password}
 							startIcon={Lock}
 							endIcon={showPassword ? EyeOff : Eye}
@@ -116,6 +106,7 @@
 							type={showConfirmPassword ? 'text' : 'password'}
 							placeholder="••••••••"
 							bind:value={confirmPassword}
+							name="confirmPassword"
 							startIcon={Lock}
 							endIcon={showConfirmPassword ? EyeOff : Eye}
 							onendIconClick={toggleConfirmPasswordVisibility}

@@ -3,25 +3,22 @@
 	import { quintOut } from 'svelte/easing';
 	import { Mail, Lock, Eye, EyeOff, LogIn, CheckCircle2 } from 'lucide-svelte';
 	import { Card, Input, Button, Checkbox, Alert } from '$lib/components/ui';
+	import { enhance } from '$app/forms';
+	import type { ActionData } from './$types';
+	import { goto } from '$app/navigation';
+
+	let { form } = $props<{ form: ActionData }>();
+
 	let email = $state('');
 	let password = $state('');
 	let rememberMe = $state(false);
 	let showPassword = $state(false);
 	let isLoading = $state(false);
-	let error = $state<string | null>(null);
+	
+	let error = $derived(form?.message || null);
+
 	function togglePasswordVisibility() {
 		showPassword = !showPassword;
-	}
-	async function handleLogin(event: Event) {
-		event.preventDefault();
-		isLoading = true;
-		error = null;
-		// Simulate API call
-		setTimeout(() => {
-			isLoading = false;
-			// For demo purposes
-			console.log('Login attempt:', { email, password, rememberMe });
-		}, 1500);
 	}
 </script>
 <div class="min-h-screen w-full grid lg:grid-cols-2">
@@ -47,11 +44,19 @@
 					</Alert>
 				</div>
 			{/if}
-			<form onsubmit={handleLogin} class="space-y-6">
+			<form method="POST" use:enhance={() => {
+				isLoading = true;
+				return async ({ update }) => {
+					isLoading = false;
+					update();
+					goto('/dashboard')
+				};
+			}} class="space-y-6">
 				<div class="space-y-4">
 					<Input
 						label="Email"
 						type="email"
+						name="email"
 						placeholder="name@example.com"
 						bind:value={email}
 						startIcon={Mail}
@@ -62,6 +67,7 @@
 						<Input
 							label="Password"
 							type={showPassword ? 'text' : 'password'}
+							name="password"
 							placeholder="••••••••"
 							bind:value={password}
 							startIcon={Lock}

@@ -51,7 +51,7 @@
 	}).format(currentDate));
 
 	// Constants
-	const moods: { type: MoodType; icon: any; label: string; color: string }[] = [
+	const moods: { type: MoodType; icon: any; label: string; color: string, bg: string }[] = [
 		{ type: 'happy', icon: Smile, label: 'Happy', color: 'text-success', bg: 'bg-green-50 ring-2 ring-green-500 ring-offset-2 text-green-500' },
 		{ type: 'blessed', icon: Heart, label: 'Blessed', color: 'text-error', bg: 'bg-red-50 ring-2 ring-red-500 ring-offset-2 text-red-500' },
 		{ type: 'neutral', icon: Meh, label: 'Neutral', color: 'text-warning', bg: 'bg-yellow-50 ring-2 ring-yellow-500 ring-offset-2 text-yellow-500' },

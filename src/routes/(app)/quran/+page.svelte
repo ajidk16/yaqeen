@@ -164,7 +164,7 @@
 			<div>
 				<h1 class="text-3xl font-bold flex items-center gap-3">
 					<BookOpen class="size-8 text-primary" />
-					Quran Journal
+					Quran
 				</h1>
 				<p class="text-base-content/60">Track your recitation and memorization journey.</p>
 			</div>

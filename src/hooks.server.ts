@@ -1,36 +1,42 @@
-import { auth } from "$lib/server/auth";
-import type { Handle } from "@sveltejs/kit";
+import { lucia } from "$lib/server/auth";
+import { redirect, type Handle } from "@sveltejs/kit";
 
 export const handle: Handle = async ({ event, resolve }) => {
-	const session = await auth.api.getSession({
-		headers: event.request.headers
-	});
+	const sessionId = event.cookies.get(lucia.sessionCookieName);
 
-	if (session) {
-		event.locals.user = session.user;
-		event.locals.session = session.session;
-	} else {
+	if (!sessionId) {
 		event.locals.user = null;
 		event.locals.session = null;
+		if (event.route.id && event.route.id.startsWith('/(app)')) {
+			return redirect(303, '/login');
+		}
+		return resolve(event);
+	}
+	
+	const { session, user } = await lucia.validateSession(sessionId);
+
+	if (session && (event.route.id?.startsWith('/(auth)'))) {
+		throw redirect(302, '/');
 	}
 
-	const protectedRoutes = ['/dashboard', '/journal', '/stats', '/profile', '/habits'];
-	const isProtectedRoute = protectedRoutes.some(route => event.url.pathname.startsWith(route));
-	const isAuthRoute = ['/login', '/register'].some(route => event.url.pathname.startsWith(route));
+	if (session && session.fresh) {
+		const sessionCookie = lucia.createSessionCookie(session.id);
+		// sveltekit types deviates from the cookie api
+		event.cookies.set(sessionCookie.name, sessionCookie.value, {
+			path: ".",
+			...sessionCookie.attributes
+		});
+	}
+	if (!session) {
+		const sessionCookie = lucia.createBlankSessionCookie();
+		event.cookies.set(sessionCookie.name, sessionCookie.value, {
+			path: ".",
+			...sessionCookie.attributes
+		});
+	}
 
-	// if (isProtectedRoute && !session) {
-	// 	return new Response(null, {
-	// 		status: 303,
-	// 		headers: { Location: '/login' }
-	// 	});
-	// }
 
-	// if (isAuthRoute && session) {
-	// 	return new Response(null, {
-	// 		status: 303,
-	// 		headers: { Location: '/dashboard' }
-	// 	});
-	// }
-
+	event.locals.user = user;
+	event.locals.session = session;
 	return resolve(event);
 };

@@ -1,56 +1,98 @@
 <script lang="ts">
-	import { X, Moon, Activity, BookOpen } from 'lucide-svelte';
-	import { fade, fly } from 'svelte/transition';
+	import { X, Moon, Activity, BookOpen, Check, Dumbbell } from 'lucide-svelte';
+	import { fade, fly, scale } from 'svelte/transition';
 	import { isAddHabitModalOpen } from '$lib/stores/ui';
+	import { Input } from '../ui';
+	import Button from '../ui/Button.svelte';
+	import { categories, icons, type Category } from '$lib/utils/global';
+
+	let selectedCategory = $state<Category>('Mubah');
+	let selectedIcon = $state<any>(Dumbbell);
 
 	const onClose = () => {
 		$isAddHabitModalOpen = false;
 	};
 </script>
 
-{#if $isAddHabitModalOpen}
-	<div class="fixed inset-0 z-50 flex items-end justify-center p-4 backdrop-blur-sm md:items-center" transition:fade={{ duration: 200 }}>
-		<!-- Backdrop -->
-		<div class="absolute inset-0 bg-slate-900/40" onclick={onClose} role="button" tabindex="0" onkeydown={(e) => e.key === 'Escape' && onClose()}></div>
+<dialog class="modal modal-bottom sm:modal-end" class:modal-open={$isAddHabitModalOpen} transition:fade>
+	<div class="modal-box w-full sm:max-w-xl p-0 overflow-hidden bg-base-100">
+		<!-- Modal Header -->
+		<div class="p-4 sm:p-6 border-b border-base-content/10 flex justify-between items-center bg-base-100/50 backdrop-blur-sm sticky top-0 z-10">
+			<h3 class="font-bold text-xl">Tambah Kebiasaan</h3>
+			<button class="btn btn-sm btn-circle btn-ghost" onclick={onClose}>
+				<X class="size-5" />
+			</button>
+		</div>
 
-		<!-- Modal Content -->
-		<div class="relative w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl" transition:fly={{ y: 20, duration: 300 }}>
-			<div class="mb-6 flex items-center justify-between">
-				<h2 class="text-xl font-bold text-slate-800">Tambah Kebiasaan Baru</h2>
-				<button onclick={onClose} class="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors">
-					<X size={20} />
-				</button>
+		<div class="p-4 sm:p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+			<!-- Name Input -->
+			<div class="form-control w-full">
+				<label class="label" for="habit-name">
+					<span class="label-text font-medium">Habit Name</span>
+				</label>
+				<Input 
+					id="habit-name"
+					placeholder="e.g., Read Surah Al-Kahf" 
+					class="input-lg"
+				/>
 			</div>
 
 			<!-- Category Selection -->
-			<div class="mb-6 grid grid-cols-3 gap-3">
-				<button class="flex flex-col items-center gap-2 rounded-xl border-2 border-ibadah bg-ibadah-bg p-3 text-ibadah transition-transform hover:scale-105">
-					<Moon size={24} />
-					<span class="text-xs font-bold">Ibadah</span>
-				</button>
-				<button class="flex flex-col items-center gap-2 rounded-xl border border-slate-200 p-3 text-slate-500 transition-all hover:bg-slate-50 hover:border-slate-300">
-					<Activity size={24} />
-					<span class="text-xs font-medium">Health</span>
-				</button>
-				<button class="flex flex-col items-center gap-2 rounded-xl border border-slate-200 p-3 text-slate-500 transition-all hover:bg-slate-50 hover:border-slate-300">
-					<BookOpen size={24} />
-					<span class="text-xs font-medium">Ilmu</span>
-				</button>
-			</div>
-
-			<!-- Form Fields -->
-			<div class="space-y-4">
-				<div>
-					<label for="habit-name" class="mb-1 block text-sm font-medium text-slate-700">Nama Kebiasaan</label>
-					<input type="text" id="habit-name" placeholder="Contoh: Baca Al-Kahfi" class="w-full rounded-xl border-none bg-slate-50 px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all" />
+			<div class="space-y-3">
+				<span class="label-text font-medium block">Category</span>
+				<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+					{#each categories as cat}
+						<button 
+							class="relative p-3 sm:p-4 rounded-xl border-2 text-left transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] h-full flex flex-col
+							{selectedCategory === cat.label 
+								? `border-${cat.color} bg-${cat.color}/5 ring-1 ring-${cat.color}/20` 
+								: 'border-base-content/10 hover:border-base-content/20'}"
+							onclick={() => selectedCategory = cat.label}
+						>
+							<div class="flex items-center justify-between mb-1">
+								<span class="font-bold {selectedCategory === cat.label ? `text-${cat.color}` : ''}">{cat.label}</span>
+								{#if selectedCategory === cat.label}
+									<div class="size-5 rounded-full bg-{cat.color} text-white flex items-center justify-center" in:scale>
+										<Check class="size-3" />
+									</div>
+								{/if}
+							</div>
+							<p class="text-xs text-base-content/60 leading-tight">{cat.description}</p>
+						</button>
+					{/each}
 				</div>
-				
-				<!-- Additional fields can go here -->
 			</div>
 
-			<button class="mt-8 w-full rounded-xl bg-primary py-4 font-bold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary-600 hover:scale-[1.02] hover:shadow-primary/40 active:scale-95">
-				Simpan Kebiasaan
-			</button>
+			<!-- Icon Selection -->
+            <div class="space-y-3">
+                <span class="label-text font-medium block">Icon</span>
+                <div class="flex flex-wrap gap-3">
+                    {#each icons as icon}
+                        <button 
+                            class="size-12 rounded-xl flex items-center justify-center border-2 transition-all duration-200
+                            {selectedIcon === icon.component 
+                                ? `border-primary bg-primary text-primary-content scale-110 shadow-lg shadow-primary/20` 
+                                : 'border-base-content/10 hover:border-base-content/30 text-base-content/60'}"
+                            onclick={() => selectedIcon = icon.component}
+                            title={icon.label}
+                        >
+							<icon.component size='24' />
+                        </button>
+                    {/each}
+                </div>
+            </div>
+		</div>
+
+		<!-- Modal Actions -->
+		<div class="p-4 sm:p-6 border-t border-base-content/10 bg-base-100 flex justify-end gap-3">
+			<Button variant="ghost" onclick={onClose}>Cancel</Button>
+			<Button variant="primary" >
+				<Check class="size-4" />
+				Save Habit
+			</Button>
 		</div>
 	</div>
-{/if}
+	<form method="dialog" class="modal-backdrop">
+		<button onclick={onClose}>close</button>
+	</form>
+</dialog>

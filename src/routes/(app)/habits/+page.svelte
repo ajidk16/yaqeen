@@ -2,30 +2,22 @@
 	import { fade, fly, scale, slide } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 	import { quintOut } from 'svelte/easing';
-	import { Plus, Trash2, Dumbbell, Book, GlassWater, Sparkles, Check, Filter, Search, Flame, BookOpen, Coffee, Briefcase, Heart, Star, Zap, Pencil, X, AlertTriangle } from 'lucide-svelte';
-	import { Card, Button, Input, Badge } from '$lib/components/ui';
+	import { Plus, Trash2, Dumbbell, BookOpen, GlassWater, Coffee, Briefcase, Heart, Star, Zap, Pencil, X, AlertTriangle, Check, Search, Flame } from 'lucide-svelte';
+	import { Button, Input, Badge } from '$lib/components/ui';
+    import { enhance } from '$app/forms';
+	import { page } from '$app/state';
+
 
 	// Types
 	type Category = 'Wajib' | 'Sunnah' | 'Mubah';
 	
-	interface Habit {
-		id: string;
-		name: string;
-		category: Category;
-		icon: any;
-		createdAt: Date;
-	}
-
 	// State
-	let habits = $state<Habit[]>([
-		{ id: '1', name: 'Sholat Dhuha', category: 'Sunnah', icon: Sparkles, createdAt: new Date() },
-		{ id: '2', name: 'Read Quran', category: 'Wajib', icon: BookOpen, createdAt: new Date() },
-		{ id: '3', name: 'Morning Jog', category: 'Mubah', icon: Dumbbell, createdAt: new Date() }
-	]);
+    // habits is now derived from data
+    let habits = $derived(page.data.habits || []);
 
 	let newHabitName = $state('');
 	let selectedCategory = $state<Category>('Mubah');
-	let selectedIcon = $state<any>(Dumbbell);
+	let selectedIconName = $state('Exercise'); // Store name instead of component
 	let filter = $state<Category | 'All'>('All');
 	let searchQuery = $state('');
 	
@@ -60,81 +52,45 @@
 		{ component: Zap, label: 'Energy' }
 	];
 
+    function getIconComponent(name: string) {
+        return icons.find(i => i.label === name)?.component || Star;
+    }
+
 	// Derived State
 	let filteredHabits = $derived(
 		habits
-			.filter(h => filter === 'All' || h.category === filter)
-			.filter(h => h.name.toLowerCase().includes(searchQuery.toLowerCase()))
-			.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+			.filter((h: { category: string; }) => filter === 'All' || h.category === filter)
+			.filter((h: { title: string; }) => h.title.toLowerCase().includes(searchQuery.toLowerCase()))
+			.sort((a: { createdAt: string; }, b: { createdAt: string; }) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 	);
 
 	// Actions
-	function openModal(habit?: Habit) {
+	function openModal(habit?: any) {
 		if (habit) {
 			editingHabitId = habit.id;
-			newHabitName = habit.name;
-			selectedCategory = habit.category;
-			selectedIcon = habit.icon;
+			newHabitName = habit.title;
+			selectedCategory = habit.category as Category;
+			selectedIconName = habit.icon || 'Goal';
 		} else {
 			editingHabitId = null;
 			newHabitName = '';
 			selectedCategory = 'Mubah';
-			selectedIcon = Dumbbell;
+			selectedIconName = 'Exercise';
 		}
 		isModalOpen = true;
 	}
 
 	function closeModal() {
 		isModalOpen = false;
-		// Small delay to reset state after animation
 		setTimeout(() => {
 			editingHabitId = null;
 			newHabitName = '';
 		}, 300);
 	}
 
-	function saveHabit() {
-		if (!newHabitName.trim()) return;
-
-		if (editingHabitId) {
-			// Update existing
-			const index = habits.findIndex(h => h.id === editingHabitId);
-			if (index !== -1) {
-				habits[index] = {
-					...habits[index],
-					name: newHabitName,
-					category: selectedCategory,
-					icon: selectedIcon
-				};
-				triggerToast('Habit updated successfully');
-			}
-		} else {
-			// Create new
-			const newHabit: Habit = {
-				id: crypto.randomUUID(),
-				name: newHabitName,
-				category: selectedCategory,
-				icon: selectedIcon,
-				createdAt: new Date()
-			};
-			habits = [newHabit, ...habits];
-			triggerToast('Habit created successfully');
-		}
-		
-		closeModal();
-	}
-
 	function requestDelete(id: string) {
 		habitToDeleteId = id;
 		isDeleteModalOpen = true;
-	}
-
-	function confirmDelete() {
-		if (habitToDeleteId) {
-			habits = habits.filter(h => h.id !== habitToDeleteId);
-			triggerToast('Habit deleted successfully');
-			closeDeleteModal();
-		}
 	}
 
 	function closeDeleteModal() {
@@ -152,7 +108,7 @@
 		}, 3000);
 	}
 
-	function getCategoryColor(category: Category) {
+	function getCategoryColor(category: string) {
 		switch (category) {
 			case 'Wajib': return 'text-primary bg-primary/10 border-primary/20';
 			case 'Sunnah': return 'text-secondary bg-secondary/10 border-secondary/20';
@@ -161,7 +117,7 @@
 		}
 	}
 	
-	function getBadgeColor(category: Category) {
+	function getBadgeColor(category: string) {
 		switch (category) {
 			case 'Wajib': return 'badge-primary';
 			case 'Sunnah': return 'badge-secondary';
@@ -197,7 +153,7 @@
 				<div role="tablist" class="tabs tabs-lifted w-full sm:w-auto">
 					<button 
 						role="tab" 
-						class="tab {filter === 'All' ? 'tab-active [--tab-bg:theme(colors.base-100)]' : ''} text-base font-medium" 
+						class="tab {filter === 'All' ? 'tab-active [--tab-bg:var(--color-base-100)]' : ''} text-base font-medium" 
 						onclick={() => filter = 'All'}
 					>
 						All
@@ -205,7 +161,7 @@
 					{#each categories as cat}
 						<button 
 							role="tab" 
-							class="tab {filter === cat.label ? 'tab-active [--tab-bg:theme(colors.base-100)]' : ''} text-base font-medium"
+							class="tab {filter === cat.label ? 'tab-active [--tab-bg:var(--color-base-100)]' : ''} text-base font-medium"
 							onclick={() => filter = cat.label}
 						>
 							<span class={filter === cat.label ? `text-${cat.color}` : ''}>{cat.label}</span>
@@ -228,7 +184,7 @@
 		</div>
 
 		<!-- Habits List -->
-		<div class="grid gap-4 min-h-[300px] content-start">
+		<div class="grid gap-4 min-h-[300px] content-start mt-6">
 			{#if filteredHabits.length === 0}
 				<div class="text-center py-12 text-base-content/40" in:fade>
 					<div class="inline-flex items-center justify-center size-16 rounded-full bg-base-200 mb-4">
@@ -246,18 +202,33 @@
 					>
 						<div class="card bg-base-100 shadow-sm border border-base-content/10 hover:shadow-md transition-all duration-300 group">
 							<div class="card-body p-4 flex-row items-center gap-4">
-								<!-- Icon -->
-								<div class="size-12 rounded-2xl flex items-center justify-center shrink-0 {getCategoryColor(habit.category)}">
-									<svelte:component this={habit.icon} class="size-6" />
-								</div>
+                                <!-- Toggle Checkbox -->
+                                <form action="?/toggle" method="POST" use:enhance>
+                                    <input type="hidden" name="habitId" value={habit.id} />
+                                    <button 
+                                        class="size-12 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300
+                                        {habit.completed 
+                                            ? 'bg-success text-white scale-105 shadow-lg shadow-success/30' 
+                                            : `${getCategoryColor(habit.category)} hover:bg-base-200`}"
+                                    >
+                                        {#if habit.completed}
+                                            <Check class="size-6" />
+                                        {:else}
+                                            <!-- svelte-ignore svelte_component_deprecated -->
+                                            <svelte:component this={getIconComponent(habit.icon)} class="size-6" />
+                                        {/if}
+                                    </button>
+                                </form>
 
 								<!-- Content -->
 								<div class="flex-1 min-w-0">
 									<div class="flex items-center gap-2 mb-1">
-										<h3 class="font-bold text-lg truncate">{habit.name}</h3>
+										<h3 class="font-bold text-lg truncate {habit.completed ? 'line-through opacity-50' : ''}">{habit.title}</h3>
 										<div class="badge {getBadgeColor(habit.category)} badge-sm">{habit.category}</div>
 									</div>
-									<p class="text-xs text-base-content/50">Created {habit.createdAt.toLocaleDateString()}</p>
+									<p class="text-xs text-base-content/50">
+                                        {habit.completed ? 'Completed today' : 'Not completed yet'}
+                                    </p>
 								</div>
 
 								<!-- Actions -->
@@ -289,81 +260,102 @@
 <!-- Create/Edit Modal -->
 <dialog class="modal modal-bottom sm:modal-end" class:modal-open={isModalOpen}>
 	<div class="modal-box w-full sm:max-w-xl p-0 overflow-hidden bg-base-100">
-		<!-- Modal Header -->
-		<div class="p-4 sm:p-6 border-b border-base-content/10 flex justify-between items-center bg-base-100/50 backdrop-blur-sm sticky top-0 z-10">
-			<h3 class="font-bold text-xl">{modalTitle}</h3>
-			<button class="btn btn-sm btn-circle btn-ghost" onclick={closeModal}>
-				<X class="size-5" />
-			</button>
-		</div>
+        <form 
+            method="POST" 
+            action={editingHabitId ? '?/update' : '?/create'} 
+            use:enhance={() => {
+                return async ({ result }) => {
+                    if (result.type === 'success') {
+                        triggerToast(editingHabitId ? 'Habit updated' : 'Habit created');
+                        closeModal();
+                    }
+                };
+            }}
+        >
+            <input type="hidden" name="id" value={editingHabitId} />
+            <input type="hidden" name="type" value="custom" />
+            <input type="hidden" name="category" value={selectedCategory} />
+            <input type="hidden" name="icon" value={selectedIconName} />
+            
+            <!-- Modal Header -->
+            <div class="p-4 sm:p-6 border-b border-base-content/10 flex justify-between items-center bg-base-100/50 backdrop-blur-sm sticky top-0 z-10">
+                <h3 class="font-bold text-xl">{modalTitle}</h3>
+                <button type="button" class="btn btn-sm btn-circle btn-ghost" onclick={closeModal}>
+                    <X class="size-5" />
+                </button>
+            </div>
 
-		<div class="p-4 sm:p-6 space-y-6 max-h-[70vh] overflow-y-auto">
-			<!-- Name Input -->
-			<div class="form-control w-full">
-				<label class="label" for="habit-name">
-					<span class="label-text font-medium">Habit Name</span>
-				</label>
-				<Input 
-					id="habit-name"
-					placeholder="e.g., Read Surah Al-Kahf" 
-					bind:value={newHabitName} 
-					class="input-lg"
-				/>
-			</div>
+            <div class="p-4 sm:p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+                <!-- Name Input -->
+                <div class="form-control w-full">
+                    <label class="label" for="habit-name">
+                        <span class="label-text font-medium">Habit Name</span>
+                    </label>
+                    <Input 
+                        id="habit-name"
+                        name="title"
+                        placeholder="e.g., Read Surah Al-Kahf" 
+                        bind:value={newHabitName} 
+                        class="input-lg"
+                    />
+                </div>
 
-			<!-- Category Selection -->
-			<div class="space-y-3">
-				<span class="label-text font-medium block">Category</span>
-				<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-					{#each categories as cat}
-						<button 
-							class="relative p-3 sm:p-4 rounded-xl border-2 text-left transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] h-full flex flex-col
-							{selectedCategory === cat.label 
-								? `border-${cat.color} bg-${cat.color}/5 ring-1 ring-${cat.color}/20` 
-								: 'border-base-content/10 hover:border-base-content/20'}"
-							onclick={() => selectedCategory = cat.label}
-						>
-							<div class="flex items-center justify-between mb-1">
-								<span class="font-bold {selectedCategory === cat.label ? `text-${cat.color}` : ''}">{cat.label}</span>
-								{#if selectedCategory === cat.label}
-									<div class="size-5 rounded-full bg-{cat.color} text-white flex items-center justify-center" in:scale>
-										<Check class="size-3" />
-									</div>
-								{/if}
-							</div>
-							<p class="text-xs text-base-content/60 leading-tight">{cat.description}</p>
-						</button>
-					{/each}
-				</div>
-			</div>
+                <!-- Category Selection -->
+                <div class="space-y-3">
+                    <span class="label-text font-medium block">Category</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {#each categories as cat}
+                            <button 
+                                type="button"
+                                class="relative p-3 sm:p-4 rounded-xl border-2 text-left transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] h-full flex flex-col
+                                {selectedCategory === cat.label 
+                                    ? `border-${cat.color} bg-${cat.color}/5 ring-1 ring-${cat.color}/20` 
+                                    : 'border-base-content/10 hover:border-base-content/20'}"
+                                onclick={() => selectedCategory = cat.label}
+                            >
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-bold {selectedCategory === cat.label ? `text-${cat.color}` : ''}">{cat.label}</span>
+                                    {#if selectedCategory === cat.label}
+                                        <div class="size-5 rounded-full bg-{cat.color} text-white flex items-center justify-center" in:scale>
+                                            <Check class="size-3" />
+                                        </div>
+                                    {/if}
+                                </div>
+                                <p class="text-xs text-base-content/60 leading-tight">{cat.description}</p>
+                            </button>
+                        {/each}
+                    </div>
+                </div>
 
-			<!-- Icon Selection -->
-            <div class="space-y-3">
-                <span class="label-text font-medium block">Icon</span>
-                <div class="flex flex-wrap gap-3">
-                    {#each icons as icon}
-                        <button 
-                            class="size-12 rounded-xl flex items-center justify-center border-2 transition-all duration-200
-                            {selectedIcon === icon.component 
-                                ? `border-primary bg-primary text-primary-content scale-110 shadow-lg shadow-primary/20` 
-                                : 'border-base-content/10 hover:border-base-content/30 text-base-content/60'}"
-                            onclick={() => selectedIcon = icon.component}
-                            title={icon.label}
-                        >
-                            <svelte:component this={icon.component} class="size-6" />
-                        </button>
-                    {/each}
+                <!-- Icon Selection -->
+                <div class="space-y-3">
+                    <span class="label-text font-medium block">Icon</span>
+                    <div class="flex flex-wrap gap-3">
+                        {#each icons as icon}
+                            <button 
+                                type="button"
+                                class="size-12 rounded-xl flex items-center justify-center border-2 transition-all duration-200
+                                {selectedIconName === icon.label 
+                                    ? `border-primary bg-primary text-primary-content scale-110 shadow-lg shadow-primary/20` 
+                                    : 'border-base-content/10 hover:border-base-content/30 text-base-content/60'}"
+                                onclick={() => selectedIconName = icon.label}
+                                title={icon.label}
+                            >
+								<icon.component class="size-6" />
+                            </button>
+                        {/each}
+                    </div>
                 </div>
             </div>
-		</div>
 
-		<!-- Modal Actions -->
-		<div class="p-4 sm:p-6 border-t border-base-content/10 bg-base-100 flex justify-end gap-3">
-			<Button variant="ghost" onclick={closeModal}>Cancel</Button>
-			<Button variant="primary" onclick={saveHabit} disabled={!newHabitName.trim()}>
-				{editingHabitId ? 'Save Changes' : 'Create Habit'}
-			</Button>
-		</div>
+            <!-- Modal Actions -->
+            <div class="p-4 sm:p-6 border-t border-base-content/10 bg-base-100 flex justify-end gap-3">
+                <Button type="button" variant="ghost" onclick={closeModal}>Cancel</Button>
+                <Button type="submit" variant="primary" disabled={!newHabitName.trim()}>
+                    {editingHabitId ? 'Save Changes' : 'Create Habit'}
+                </Button>
+            </div>
+        </form>
 	</div>
 	<form method="dialog" class="modal-backdrop">
 		<button onclick={closeModal}>close</button>
@@ -373,17 +365,31 @@
 <!-- Delete Confirmation Modal -->
 <dialog class="modal modal-bottom sm:modal-middle" class:modal-open={isDeleteModalOpen}>
 	<div class="modal-box">
-		<div class="flex flex-col items-center text-center gap-4">
-			<div class="size-16 rounded-full bg-error/10 flex items-center justify-center text-error mb-2">
-				<AlertTriangle class="size-8" />
-			</div>
-			<h3 class="font-bold text-xl">Delete Habit?</h3>
-			<p class="text-base-content/60">Are you sure you want to delete this habit? This action cannot be undone.</p>
-		</div>
-		<div class="modal-action justify-center mt-8">
-			<Button variant="ghost" onclick={closeDeleteModal}>Cancel</Button>
-			<Button class="btn-error text-white" onclick={confirmDelete}>Delete</Button>
-		</div>
+        <form 
+            method="POST" 
+            action="?/delete" 
+            use:enhance={() => {
+                return async ({ result }) => {
+                    if (result.type === 'success') {
+                        triggerToast('Habit deleted');
+                        closeDeleteModal();
+                    }
+                };
+            }}
+        >
+            <input type="hidden" name="id" value={habitToDeleteId} />
+            <div class="flex flex-col items-center text-center gap-4">
+                <div class="size-16 rounded-full bg-error/10 flex items-center justify-center text-error mb-2">
+                    <AlertTriangle class="size-8" />
+                </div>
+                <h3 class="font-bold text-xl">Delete Habit?</h3>
+                <p class="text-base-content/60">Are you sure you want to delete this habit? This action cannot be undone.</p>
+            </div>
+            <div class="modal-action justify-center mt-8">
+                <Button type="button" variant="ghost" onclick={closeDeleteModal}>Cancel</Button>
+                <Button type="submit" class="btn-error text-white">Delete</Button>
+            </div>
+        </form>
 	</div>
 	<form method="dialog" class="modal-backdrop">
 		<button onclick={closeDeleteModal}>close</button>
