@@ -5,62 +5,27 @@
 	import { Flame, Clock, Calendar, CheckCircle, BookOpen, Activity, ArrowRight, Sparkles, Heart } from 'lucide-svelte';
 	import { Card, Button, Badge } from '$lib/components/ui';
 	import { goto } from '$app/navigation';
+	import { PrayerTimer } from '$lib/runes/prayer.svelte';
 
 	let { data } = $props();
 	
-	// Calculate next prayer from data
-	let nextPrayer = $derived.by(() => {
-		if (!data.prayerTimes) return null;
-		const now = new Date().getTime();
-		return data.prayerTimes.find((p: any) => p.timestamp > now) || null;
+	// Initialize Timer
+	const timer = new PrayerTimer(data.prayerTimes || []);
+
+	$effect(() => {
+		if (data.prayerTimes) {
+			timer.updatePrayers(data.prayerTimes);
+		}
 	});
 
 	// Merge server data with local state for nextPrayer
 	let user = $derived({
 		...data.user,
-		nextPrayer: nextPrayer ? { ...nextPrayer } : { name: 'All Done', time: 'See you tomorrow' }
+		nextPrayer: timer.nextPrayer ? { ...timer.nextPrayer } : { name: 'All Done', time: 'See you tomorrow' }
 	});
-
-	let currentTime = $state(new Date());
-	let timeToNextPrayer = $state('');
-	let timerInterval: any;
-
-	onMount(() => {
-		timerInterval = setInterval(() => {
-			currentTime = new Date();
-			updateCountdown();
-		}, 1000);
-		updateCountdown();
-	});
-
-	onDestroy(() => {
-		if (timerInterval) clearInterval(timerInterval);
-	});
-
-	function updateCountdown() {
-		if (!nextPrayer) {
-			timeToNextPrayer = '';
-			return;
-		}
-
-		const now = new Date().getTime();
-		const diff = nextPrayer.timestamp - now;
-
-		if (diff <= 0) {
-			// Ideally trigger refresh or handle next day
-			timeToNextPrayer = '00:00:00';
-			return;
-		}
-
-		const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-		const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-		const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-		timeToNextPrayer = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-	}
 
 	function getGreeting() {
-		const hour = currentTime.getHours();
+		const hour = timer.currentTime.getHours();
 		if (hour < 12) return 'Selamat Pagi';
 		if (hour < 15) return 'Selamat Siang';
 		if (hour < 18) return 'Selamat Sore';
@@ -105,9 +70,9 @@
 						</div>
 						<h2 class="text-4xl font-bold mb-1">{user.nextPrayer.name}</h2>
 						
-						{#if nextPrayer}
+						{#if timer.nextPrayer}
 							<div class="text-5xl font-black font-mono tracking-tighter my-2 tabular-nums">
-								{timeToNextPrayer}
+								{timer.countdown}
 							</div>
 							<div class="inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">
 								<Clock class="size-3" />

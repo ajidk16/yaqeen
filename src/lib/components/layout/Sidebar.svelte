@@ -32,15 +32,15 @@
 			path: '/habits'
 		},
 		{
-			icon: Calendar,
-			label: 'Journal',
+			icon: Heart,
+			label: 'Mood',
 			path: '/journal'
 		},
-		{
-			icon: Heart,
-			label: 'Log Mood',
-			path: '/stats'
-		},
+		// {
+		// 	icon: ChartBar,
+		// 	label: 'Stats',
+		// 	path: '/stats'
+		// },
 		{
 			icon: User,
 			label: 'Profile',
