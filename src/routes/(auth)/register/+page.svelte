@@ -43,13 +43,13 @@
 				<div class="inline-flex items-center justify-center size-12 rounded-xl bg-secondary/10 text-secondary mb-6 lg:mb-8">
 					<UserPlus class="size-6" />
 				</div>
-				<h1 class="text-3xl font-bold tracking-tight">Create an account</h1>
-				<p class="text-base-content/60 mt-2">Join YaaQeen and start your journey today</p>
+				<h1 class="text-3xl font-bold tracking-tight">Buat Akun Baru</h1>
+				<p class="text-base-content/60 mt-2">Bergabunglah dengan YaaQeen dan mulai perjalanan hijrahmu hari ini.</p>
 			</div>
 
 			{#if error}
 				<div in:fade>
-					<Alert variant="error" title="Error">
+					<Alert variant="error" title="Gagal Daftar">
 						{error}
 					</Alert>
 				</div>
@@ -64,10 +64,10 @@
 			}} class="space-y-6">
 				<div class="space-y-4">
 					<Input
-						label="Full Name"
+						label="Nama Lengkap"
 						type="text"
 						name="name"
-						placeholder="John Doe"
+						placeholder="Fulan bin Fulan"
 						bind:value={name}
 						startIcon={User}
 						required
@@ -78,7 +78,7 @@
 						label="Email"
 						type="email"
 						name="email"
-						placeholder="name@example.com"
+						placeholder="nama@contoh.com"
 						bind:value={email}
 						startIcon={Mail}
 						required
@@ -87,7 +87,7 @@
 
 					<div class="relative">
 						<Input
-							label="Password"
+							label="Kata Sandi"
 							type={showPassword ? 'text' : 'password'}
 							placeholder="••••••••"
 							name="password"
@@ -102,7 +102,7 @@
 
 					<div class="relative">
 						<Input
-							label="Confirm Password"
+							label="Konfirmasi Kata Sandi"
 							type={showConfirmPassword ? 'text' : 'password'}
 							placeholder="••••••••"
 							bind:value={confirmPassword}
@@ -118,7 +118,7 @@
 
 				<div class="flex items-start">
 					<Checkbox 
-						label="I agree to the Terms of Service and Privacy Policy" 
+						label="Saya menyetujui Syarat & Ketentuan serta Kebijakan Privasi" 
 						bind:checked={agreeTerms} 
 						required
 					/>
@@ -132,14 +132,14 @@
 					loading={isLoading}
 					class="shadow-lg shadow-secondary/20 hover:shadow-secondary/40 transition-all duration-300"
 				>
-					Create Account
+					Daftar Sekarang
 				</Button>
 			</form>
 
 			<div class="text-center text-sm text-base-content/60">
-				Already have an account? 
+				Sudah punya akun? 
 				<a href="/login" class="link link-secondary link-hover font-medium ml-1">
-					Sign in
+					Masuk
 				</a>
 			</div>
 		</div>
@@ -165,15 +165,15 @@
 			</div>
 
 			<div class="space-y-4">
-				<h2 class="text-4xl font-bold tracking-tight">Join the Community</h2>
+				<h2 class="text-4xl font-bold tracking-tight">Gabung Komunitas</h2>
 				<p class="text-lg text-base-content/70">
-					Connect with thousands of others who are building better habits and transforming their lives with YaaQeen.
+					Terhubung dengan ribuan orang yang sedang membangun kebiasaan baik dan mengubah hidup bersama YaaQeen.
 				</p>
 			</div>
 
 			<!-- Feature List -->
 			<div class="grid grid-cols-2 gap-4 text-left pt-8">
-				{#each ['Community Support', 'Expert Tips', 'Custom Challenges', 'Sync Across Devices'] as feature}
+				{#each ['Dukungan Komunitas', 'Tips Ahli', 'Tantangan Khusus', 'Sinkronisasi Perangkat'] as feature}
 					<div class="flex items-center gap-2 bg-base-100/50 backdrop-blur-sm p-3 rounded-lg border border-base-content/5">
 						<CheckCircle2 class="size-5 text-secondary" />
 						<span class="font-medium text-sm">{feature}</span>
