@@ -68,7 +68,7 @@
 			<h2 class="text-lg font-bold text-slate-800">{page.data.user.name}</h2>
 			<p class="text-sm text-slate-500">{page.data.user.email}</p>
 			<span class="mt-2 inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
-				Premium Member
+				Anggota Premium
 			</span>
 		</div>
 	</section>
@@ -82,7 +82,7 @@
 					<div class="rounded-lg {item.bg} p-2 {item.text}">
 						<item.svg size={20} />
 					</div>
-					<span class="font-medium {item.text}">{item.title}</span>
+					<span class="font-medium text-slate-700">{item.title}</span>
 				</div>
 				<ChevronRight size={18} class="text-slate-400" />
 			</a>

@@ -14,14 +14,14 @@
 	);
 
 	let title = $derived(
-		status === 404 ? 'Page Not Found' : 
-		status === 500 ? 'Server Error' : 
-		'Something Went Wrong'
+		status === 404 ? 'Halaman Tidak Ditemukan' : 
+		status === 500 ? 'Kesalahan Server' : 
+		'Terjadi Kesalahan'
 	);
 			   
 	let description = $derived(
-		status === 404 ? "Sorry, we couldn't find the page you're looking for." :
-		"An unexpected error occurred. Please try again later."
+		status === 404 ? "Maaf, kami tidak dapat menemukan halaman yang Anda cari." :
+		"Terjadi kesalahan yang tidak terduga. Silakan coba lagi nanti."
 	);
 </script>
 
@@ -58,12 +58,12 @@
 				onclick={() => history.back()}
 			>
 				<ArrowLeft size={20} />
-				Go Back
+				Kembali
 			</button>
 			
 			<a href="/" class="btn btn-primary gap-2 shadow-lg shadow-primary/30 rounded-xl">
 				<Home size={20} />
-				Back to Home
+				Ke Beranda
 			</a>
 		</div>
 

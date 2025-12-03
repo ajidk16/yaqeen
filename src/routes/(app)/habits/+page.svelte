@@ -36,9 +36,9 @@
 
 	// Constants
 	const categories: { label: Category; color: string; description: string }[] = [
-		{ label: 'Wajib', color: 'primary', description: 'Obligatory acts that must be done.' },
-		{ label: 'Sunnah', color: 'secondary', description: 'Recommended acts for extra reward.' },
-		{ label: 'Mubah', color: 'accent', description: 'Permissible daily activities.' }
+		{ label: 'Wajib', color: 'primary', description: 'Ibadah wajib yang harus dilakukan.' },
+		{ label: 'Sunnah', color: 'secondary', description: 'Amalan anjuran untuk pahala tambahan.' },
+		{ label: 'Mubah', color: 'accent', description: 'Aktivitas harian yang diperbolehkan.' }
 	];
 
 	const icons = [
@@ -132,8 +132,8 @@
 		<!-- Header -->
 		<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4" in:fly={{ y: -20, duration: 800, easing: quintOut }}>
 			<div>
-				<h1 class="text-3xl font-bold">Manage Habits</h1>
-				<p class="text-base-content/60">Customize your daily routine and spiritual goals.</p>
+				<h1 class="text-3xl font-bold">Kelola Kebiasaan</h1>
+				<p class="text-base-content/60">Sesuaikan rutinitas harian dan target spiritualmu.</p>
 			</div>
 			
 			<Button 
@@ -142,7 +142,7 @@
 				onclick={() => openModal()}
 			>
 				<Plus class="size-5" />
-				New Habit
+				Kebiasaan Baru
 			</Button>
 		</div>
 
@@ -156,7 +156,7 @@
 						class="tab {filter === 'All' ? 'tab-active [--tab-bg:var(--color-base-100)]' : ''} text-base font-medium" 
 						onclick={() => filter = 'All'}
 					>
-						All
+						Semua
 					</button>
 					{#each categories as cat}
 						<button 
@@ -175,7 +175,7 @@
 					</div>
 					<input 
 						type="text" 
-						placeholder="Search habits..." 
+						placeholder="Cari kebiasaan..." 
 						class="input input-bordered input-sm w-full pl-10 rounded-full"
 						bind:value={searchQuery}
 					/>
@@ -190,8 +190,8 @@
 					<div class="inline-flex items-center justify-center size-16 rounded-full bg-base-200 mb-4">
 						<Flame class="size-8" />
 					</div>
-					<p class="text-lg font-medium">No habits found</p>
-					<p class="text-sm">Create a new habit to get started!</p>
+					<p class="text-lg font-medium">Tidak ada kebiasaan ditemukan</p>
+					<p class="text-sm">Buat kebiasaan baru untuk memulai!</p>
 				</div>
 			{:else}
 				{#each filteredHabits as habit (habit.id)}
@@ -227,7 +227,7 @@
 										<div class="badge {getBadgeColor(habit.category)} badge-sm">{habit.category}</div>
 									</div>
 									<p class="text-xs text-base-content/50">
-                                        {habit.completed ? 'Completed today' : 'Not completed yet'}
+                                        {habit.completed ? 'Selesai hari ini' : 'Belum selesai'}
                                     </p>
 								</div>
 
@@ -236,14 +236,14 @@
 									<button 
 										class="btn btn-ghost btn-circle btn-sm"
 										onclick={() => openModal(habit)}
-										title="Edit Habit"
+										title="Ubah Kebiasaan"
 									>
 										<Pencil class="size-4" />
 									</button>
 									<button 
 										class="btn btn-ghost btn-circle btn-sm text-error"
 										onclick={() => requestDelete(habit.id)}
-										title="Delete Habit"
+										title="Hapus Kebiasaan"
 									>
 										<Trash2 class="size-4" />
 									</button>
@@ -266,7 +266,7 @@
             use:enhance={() => {
                 return async ({ result, update }) => {
                     if (result.type === 'success') {
-                        triggerToast(editingHabitId ? 'Habit updated' : 'Habit created');
+                        triggerToast(editingHabitId ? 'Kebiasaan diperbarui' : 'Kebiasaan dibuat');
                         closeModal();
 						await update()
                     }
@@ -280,7 +280,7 @@
             
             <!-- Modal Header -->
             <div class="p-4 sm:p-6 border-b border-base-content/10 flex justify-between items-center bg-base-100/50 backdrop-blur-sm sticky top-0 z-10">
-                <h3 class="font-bold text-xl">{modalTitle}</h3>
+                <h3 class="font-bold text-xl">{editingHabitId ? 'Ubah Kebiasaan' : 'Buat Kebiasaan Baru'}</h3>
                 <button type="button" class="btn btn-sm btn-circle btn-ghost" onclick={closeModal}>
                     <X class="size-5" />
                 </button>
@@ -290,12 +290,12 @@
                 <!-- Name Input -->
                 <div class="form-control w-full">
                     <label class="label" for="habit-name">
-                        <span class="label-text font-medium">Habit Name</span>
+                        <span class="label-text font-medium">Nama Kebiasaan</span>
                     </label>
                     <Input 
                         id="habit-name"
                         name="title"
-                        placeholder="e.g., Read Surah Al-Kahf" 
+                        placeholder="Contoh: Baca Surah Al-Kahfi" 
                         bind:value={newHabitName} 
                         class="input-lg"
                     />
@@ -303,7 +303,7 @@
 
                 <!-- Category Selection -->
                 <div class="space-y-3">
-                    <span class="label-text font-medium block">Category</span>
+                    <span class="label-text font-medium block">Kategori</span>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         {#each categories as cat}
                             <button 
@@ -330,7 +330,7 @@
 
                 <!-- Icon Selection -->
                 <div class="space-y-3">
-                    <span class="label-text font-medium block">Icon</span>
+                    <span class="label-text font-medium block">Ikon</span>
                     <div class="flex flex-wrap gap-3">
                         {#each icons as icon}
                             <button 
@@ -351,9 +351,9 @@
 
             <!-- Modal Actions -->
             <div class="p-4 sm:p-6 border-t border-base-content/10 bg-base-100 flex justify-end gap-3">
-                <Button type="button" variant="ghost" onclick={closeModal}>Cancel</Button>
+                <Button type="button" variant="ghost" onclick={closeModal}>Batal</Button>
                 <Button type="submit" variant="primary" disabled={!newHabitName.trim()}>
-                    {editingHabitId ? 'Save Changes' : 'Create Habit'}
+                    {editingHabitId ? 'Simpan Perubahan' : 'Buat Kebiasaan'}
                 </Button>
             </div>
         </form>
@@ -372,7 +372,7 @@
             use:enhance={() => {
                 return async ({ result, update }) => {
                     if (result.type === 'success') {
-                        triggerToast('Habit deleted');
+                        triggerToast('Kebiasaan dihapus');
                         closeDeleteModal();
 						await update()
                     }
@@ -384,12 +384,12 @@
                 <div class="size-16 rounded-full bg-error/10 flex items-center justify-center text-error mb-2">
                     <AlertTriangle class="size-8" />
                 </div>
-                <h3 class="font-bold text-xl">Delete Habit?</h3>
-                <p class="text-base-content/60">Are you sure you want to delete this habit? This action cannot be undone.</p>
+                <h3 class="font-bold text-xl">Hapus Kebiasaan?</h3>
+                <p class="text-base-content/60">Apakah Anda yakin ingin menghapus kebiasaan ini? Tindakan ini tidak dapat dibatalkan.</p>
             </div>
             <div class="modal-action justify-center mt-8">
-                <Button type="button" variant="ghost" onclick={closeDeleteModal}>Cancel</Button>
-                <Button type="submit" class="btn-error text-white">Delete</Button>
+                <Button type="button" variant="ghost" onclick={closeDeleteModal}>Batal</Button>
+                <Button type="submit" class="btn-error text-white">Hapus</Button>
             </div>
         </form>
 	</div>

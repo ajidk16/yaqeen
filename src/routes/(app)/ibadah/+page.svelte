@@ -180,7 +180,7 @@
 		<!-- Header -->
 		<div class="flex flex-col md:flex-row justify-between items-center gap-4" in:fly={{ y: -20, duration: 800, easing: quintOut }}>
 			<div>
-				<h1 class="text-3xl font-bold">Ibadah Tracker</h1>
+				<h1 class="text-3xl font-bold">Pantau Ibadah</h1>
 				<div class="flex items-center gap-2 text-base-content/60 mt-1">
 					<MapPin class="size-4" />
 					<span class="text-sm">{locationName}</span>
@@ -205,14 +205,14 @@
 		<div class="grid grid-cols-2 gap-4" in:fly={{ y: 20, duration: 800, delay: 100, easing: quintOut }}>
 			<Card class="bg-linear-to-br from-primary/10 to-primary/5 border-primary/20">
 				<div class="p-4 text-center">
-					<h3 class="text-sm font-medium text-base-content/70 mb-2">Fardhu Completion</h3>
+					<h3 class="text-sm font-medium text-base-content/70 mb-2">Ibadah Wajib</h3>
 					<div class="text-3xl font-bold text-primary">{Math.round(fardhuProgress)}%</div>
 					<progress class="progress progress-primary w-full mt-2" value={fardhuProgress} max="100"></progress>
 				</div>
 			</Card>
 			<Card class="bg-linear-to-br from-secondary/10 to-secondary/5 border-secondary/20">
 				<div class="p-4 text-center">
-					<h3 class="text-sm font-medium text-base-content/70 mb-2">Sunnah Completion</h3>
+					<h3 class="text-sm font-medium text-base-content/70 mb-2">Ibadah Sunnah</h3>
 					<div class="text-3xl font-bold text-secondary">{Math.round(sunnahProgress)}%</div>
 					<progress class="progress progress-secondary w-full mt-2" value={sunnahProgress} max="100"></progress>
 				</div>
@@ -224,12 +224,12 @@
 			<div class="flex items-center justify-between">
 				<h2 class="text-xl font-bold flex items-center gap-2">
 					<div class="size-2 rounded-full bg-primary"></div>
-					Fardhu Prayers
+					Sholat Wajib
 				</h2>
 				{#if isLoadingTimes}
 					<div class="flex items-center gap-2 text-xs text-base-content/50">
 						<Loader2 class="size-3 animate-spin" />
-						Updating times...
+						Memperbarui waktu...
 					</div>
 				{/if}
 			</div>
@@ -258,21 +258,21 @@
 									class="btn btn-sm border-none shadow-none {prayer?.status === 'none' ? 'btn-active bg-base-300' : 'btn-ghost'}"
 									onclick={() => updateFardhuStatus(prayer?.id, 'none')}
 								>
-									Not Done
+									Belum
 								</button>
 								<button 
 									class="btn btn-sm border-none shadow-none gap-2 {prayer?.status === 'munfarid' ? 'bg-info text-info-content' : 'btn-ghost'}"
 									onclick={() => updateFardhuStatus(prayer?.id, 'munfarid')}
 								>
 									<User class="size-4" />
-									Munfarid
+									Sendiri
 								</button>
 								<button 
 									class="btn btn-sm border-none shadow-none gap-2 {prayer?.status === 'jamaah' ? 'bg-success text-success-content' : 'btn-ghost'}"
 									onclick={() => updateFardhuStatus(prayer?.id, 'jamaah')}
 								>
 									<Users class="size-4" />
-									Jamaah
+									Berjamaah
 								</button>
 							</div>
 						</div>
@@ -309,7 +309,7 @@
 						</button>
 					{/each}
 					{#if sunnahPrayers.filter(p => p.category === 'Sunnah').length === 0}
-						<div class="text-sm text-base-content/40 italic ml-1">Belum ada habit Sunnah</div>
+						<div class="text-sm text-base-content/40 italic ml-1">Belum ada target Sunnah</div>
 					{/if}
 				</div>
 
@@ -332,7 +332,7 @@
 										</div>
 										<div>
 											<h3 class="font-bold">{prayer.title}</h3>
-											<p class="text-xs text-base-content/60 mt-1">{prayer.time || 'Anytime'}</p>
+											<p class="text-xs text-base-content/60 mt-1">{prayer.time || 'Kapan saja'}</p>
 										</div>
 									</div>
 									
@@ -346,7 +346,7 @@
 						</div>
 					{/each}
 					{#if sunnahPrayers.filter(p => p.category === 'Mubah').length === 0}
-						<div class="text-sm text-base-content/40 italic ml-1">Belum ada habit Mubah</div>
+						<div class="text-sm text-base-content/40 italic ml-1">Belum ada target Mubah</div>
 					{/if}
 				</div>
 			</div>

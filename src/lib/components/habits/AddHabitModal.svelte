@@ -28,18 +28,18 @@
 			<!-- Name Input -->
 			<div class="form-control w-full">
 				<label class="label" for="habit-name">
-					<span class="label-text font-medium">Habit Name</span>
+					<span class="label-text font-medium">Nama Kebiasaan</span>
 				</label>
 				<Input 
 					id="habit-name"
-					placeholder="e.g., Read Surah Al-Kahf" 
+					placeholder="Contoh: Baca Surah Al-Kahfi" 
 					class="input-lg"
 				/>
 			</div>
 
 			<!-- Category Selection -->
 			<div class="space-y-3">
-				<span class="label-text font-medium block">Category</span>
+				<span class="label-text font-medium block">Kategori</span>
 				<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
 					{#each categories as cat}
 						<button 
@@ -65,7 +65,7 @@
 
 			<!-- Icon Selection -->
             <div class="space-y-3">
-                <span class="label-text font-medium block">Icon</span>
+                <span class="label-text font-medium block">Ikon</span>
                 <div class="flex flex-wrap gap-3">
                     {#each icons as icon}
                         <button 
@@ -85,10 +85,10 @@
 
 		<!-- Modal Actions -->
 		<div class="p-4 sm:p-6 border-t border-base-content/10 bg-base-100 flex justify-end gap-3">
-			<Button variant="ghost" onclick={onClose}>Cancel</Button>
+			<Button variant="ghost" onclick={onClose}>Batal</Button>
 			<Button variant="primary" >
 				<Check class="size-4" />
-				Save Habit
+				Simpan Kebiasaan
 			</Button>
 		</div>
 	</div>

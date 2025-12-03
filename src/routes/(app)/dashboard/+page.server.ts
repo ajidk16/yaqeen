@@ -2,7 +2,8 @@ import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import { prayerLogs, habits, habitLogs, quranProgress } from '$lib/server/db/schema';
-import { eq, and, desc, gte, lte } from 'drizzle-orm';
+import { eq, and, desc} from 'drizzle-orm';
+import { lucia } from '$lib/server/auth.js';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
@@ -128,3 +129,20 @@ export const load: PageServerLoad = async ({ locals }) => {
 		}
 	};
 };
+
+
+export const actions ={
+	logout:async ({ locals, cookies }) => {
+		if (locals.session) {
+			await lucia.invalidateSession(locals.session.id);
+		}
+
+		const sessionCookie = lucia.createBlankSessionCookie();
+		cookies.set(sessionCookie.name, sessionCookie.value, {
+			path: "/",
+			...sessionCookie.attributes
+		});
+
+		redirect(302, "/");
+	}
+}

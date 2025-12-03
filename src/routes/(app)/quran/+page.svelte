@@ -45,15 +45,14 @@
 	let dateKey = $derived(currentDate.toISOString().split('T')[0]);
 
 	// Date Formatters
-	let formattedDate = $derived(new Intl.DateTimeFormat('en-GB', { 
-		weekday: 'short', 
+	let formattedDate = $derived(new Intl.DateTimeFormat('id-ID', { 
+		weekday: 'long', 
 		day: 'numeric', 
-		month: 'short', 
+		month: 'long', 
 		year: 'numeric' 
 	}).format(currentDate));
 
-	let hijriDate = $derived(new Intl.DateTimeFormat('en-GB', { 
-		calendar: 'islamic-umalqura',
+	let hijriDate = $derived(new Intl.DateTimeFormat('id-ID-u-ca-islamic', { 
 		day: 'numeric',
 		month: 'long',
 		year: 'numeric'
@@ -201,7 +200,7 @@
 					<BookOpen class="size-8 text-primary" />
 					Quran
 				</h1>
-				<p class="text-base-content/60">Track your recitation and memorization journey.</p>
+				<p class="text-base-content/60">Pantau perjalanan tilawah dan hafalanmu.</p>
 			</div>
 			
 			<!-- Date Navigation -->
@@ -228,7 +227,7 @@
 					<div class="flex items-center justify-between">
 						<h2 class="text-xl font-bold flex items-center gap-2">
 							<Target class="size-5 text-primary" />
-							Daily Tilawah
+							Tilawah Harian
 						</h2>
 						{#if isEditingTarget}
 							<div class="flex items-center gap-2">
@@ -240,11 +239,11 @@
 									onkeydown={(e) => e.key === 'Enter' && saveTarget()}
 									autofocus={true}
 								/>
-								<span class="text-xs text-base-content/60">Pages</span>
+								<span class="text-xs text-base-content/60">Halaman</span>
 							</div>
 						{:else}
 							<button class="badge font-mono cursor-pointer hover:bg-base-200 transition-colors" onclick={() => isEditingTarget = true}>
-								Target: {tilawahTarget} Pages
+								Target: {tilawahTarget} Halaman
 							</button>
 						{/if}
 					</div>
@@ -268,7 +267,7 @@
 							</svg>
 							<div class="absolute inset-0 flex flex-col items-center justify-center">
 								<span class="text-4xl font-bold">{currentEntry.tilawahProgress}</span>
-								<span class="text-xs text-base-content/60 uppercase tracking-widest">Pages</span>
+								<span class="text-xs text-base-content/60 uppercase tracking-widest">Halaman</span>
 							</div>
 						</div>
 					</div>
@@ -281,7 +280,7 @@
 							onclick={decrementTilawah}
 							disabled={currentEntry.tilawahProgress === 0}
 						>
-							-1 Page
+							-1 Halaman
 						</Button>
 						<Button 
 							variant="primary" 
@@ -289,7 +288,7 @@
 							onclick={incrementTilawah}
 							disabled={currentEntry.tilawahProgress >= tilawahTarget}
 						>
-							+1 Page
+							+1 Halaman
 						</Button>
 					</div>
 				</div>
@@ -301,9 +300,9 @@
 					<div class="flex items-center justify-between">
 						<h2 class="text-xl font-bold flex items-center gap-2">
 							<Trophy class="size-5 text-secondary" />
-							Hafalan Progress
+							Progres Hafalan
 						</h2>
-						<Badge variant="secondary" class="font-mono">{hafalanPercentage}% Done</Badge>
+						<Badge variant="secondary" class="font-mono">{hafalanPercentage}% Selesai</Badge>
 					</div>
 
 					<div class="space-y-4">
@@ -325,7 +324,7 @@
 						<div class="flex gap-4">
 							<div class="form-control flex-1">
 								<label class="label" for="">
-									<span class="label-text text-xs">Start Ayah</span>
+									<span class="label-text text-xs">Ayat Awal</span>
 								</label>
 								<input 
 									type="number" 
@@ -337,7 +336,7 @@
 							</div>
 							<div class="form-control flex-1">
 								<label class="label" for="">
-									<span class="label-text text-xs">End Ayah</span>
+									<span class="label-text text-xs">Ayat Akhir</span>
 								</label>
 								<input 
 									type="number" 
@@ -352,7 +351,7 @@
 
 					<!-- Ayah Grid -->
 					<div class="space-y-2">
-						<p class="text-xs font-medium text-base-content/60 uppercase tracking-wider">Mark Completed Ayahs</p>
+						<p class="text-xs font-medium text-base-content/60 uppercase tracking-wider">Tandai Ayat Selesai</p>
 						<div class="grid grid-cols-5 sm:grid-cols-6 gap-2 max-h-[180px] overflow-y-auto pr-2 custom-scrollbar">
 							{#each Array(hafalanTotalAyahs) as _, i}
 								{@const ayahNum = currentEntry.hafalanAyahStart + i}
@@ -378,28 +377,28 @@
 				<div class="stat place-items-center p-4">
 					<div class="stat-title text-xs">Total Khatam</div>
 					<div class="stat-value text-primary text-2xl">{data.stats?.totalKhatam ?? 0}</div>
-					<div class="stat-desc">Times this year</div>
+					<div class="stat-desc">Kali tahun ini</div>
 				</div>
 			</div>
 			<div class="stats shadow bg-base-100 border border-base-content/5">
 				<div class="stat place-items-center p-4">
-					<div class="stat-title text-xs">Current Streak</div>
+					<div class="stat-title text-xs">Streak Saat Ini</div>
 					<div class="stat-value text-secondary text-2xl">{data.stats?.currentStreak ?? 0}</div>
-					<div class="stat-desc">Days</div>
+					<div class="stat-desc">Hari</div>
 				</div>
 			</div>
 			<div class="stats shadow bg-base-100 border border-base-content/5">
 				<div class="stat place-items-center p-4">
-					<div class="stat-title text-xs">Total Pages</div>
+					<div class="stat-title text-xs">Total Halaman</div>
 					<div class="stat-value text-accent text-2xl">{data.stats?.totalPages ?? 0}</div>
-					<div class="stat-desc">Read all time</div>
+					<div class="stat-desc">Dibaca sepanjang waktu</div>
 				</div>
 			</div>
 			<div class="stats shadow bg-base-100 border border-base-content/5">
 				<div class="stat place-items-center p-4">
-					<div class="stat-title text-xs">Ayahs Memorized</div>
+					<div class="stat-title text-xs">Ayat Dihafal</div>
 					<div class="stat-value text-info text-2xl">{data.stats?.ayahsMemorized ?? 0}</div>
-					<div class="stat-desc">Total ayahs</div>
+					<div class="stat-desc">Total ayat</div>
 				</div>
 			</div>
 		</div>

@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { House, Calendar, ChartBar, User, LogOut, Plus, AlarmClock, Flame,BookOpenText, Heart } from 'lucide-svelte';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { isAddHabitModalOpen } from '$lib/stores/ui';
 	import { enhance } from '$app/forms';
 
 	// Helper to check active state
-	const isActive = (path: string) => $page.url.pathname.startsWith(path);
+	const isActive = (path: string) => page.url.pathname.startsWith(path);
 
 	const openAddHabit = () => {
 		$isAddHabitModalOpen = true;
@@ -14,7 +14,7 @@
 	const listMenu = [
 		{
 			icon: House,
-			label: 'Home',
+			label: 'Beranda',
 			path: '/dashboard'
 		},
 		{
@@ -29,12 +29,12 @@
 		},
 		{
 			icon: Flame,
-			label: 'Habits',
+			label: 'Kebiasaan',
 			path: '/habits'
 		},
 		{
 			icon: Heart,
-			label: 'Mood',
+			label: 'Jurnal',
 			path: '/journal'
 		},
 		// {
@@ -44,7 +44,7 @@
 		// },
 		{
 			icon: User,
-			label: 'Profile',
+			label: 'Profil',
 			path: '/profile'
 		}
 	]	
@@ -61,7 +61,7 @@
 
 	<button onclick={openAddHabit} class="mb-6 group relative flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all duration-300 hover:bg-primary hover:text-white hover:shadow-lg hover:shadow-primary/30">
 		<Plus size={24} strokeWidth={3} class="transition-transform group-hover:rotate-90" />
-		<span class="absolute left-16 rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-medium text-white opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2 shadow-xl whitespace-nowrap">New Habit</span>
+		<span class="absolute left-16 rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-medium text-white opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2 shadow-xl whitespace-nowrap">Kebiasaan Baru</span>
 	</button>
 
 	<nav class="flex flex-1 flex-col gap-6">
@@ -74,10 +74,10 @@
 	</nav>
 
 	<div class="mt-auto">
-		<form action="/logout" method="POST" use:enhance>
-			<button class="group relative flex h-12 w-12 items-center justify-center rounded-2xl text-slate-400 transition-all duration-300 hover:bg-red-50 hover:text-red-500 hover:shadow-sm">
+		<form action="/dashboard/?/logout" method="POST" use:enhance>
+			<button type='submit' class="group relative flex h-12 w-12 items-center justify-center rounded-2xl text-slate-400 transition-all duration-300 hover:bg-red-50 hover:text-red-500 hover:shadow-sm">
 				<LogOut size={22} class="transition-transform group-hover:scale-110" />
-				<span class="absolute left-16 rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-medium text-white opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2 shadow-xl">Logout</span>
+				<span class="absolute left-16 rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-medium text-white opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2 shadow-xl">Keluar</span>
 			</button>
 		</form>
 	</div>

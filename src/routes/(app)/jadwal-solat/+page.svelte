@@ -25,7 +25,7 @@
 	function refreshLocation() {
 		isLoading = true;
 		if (!navigator.geolocation) {
-			error = "Geolocation is not supported";
+			error = "Geolokasi tidak didukung";
 			isLoading = false;
 			return;
 		}
@@ -46,7 +46,7 @@
 			},
 			(err) => {
 				console.error(err);
-				error = "Unable to retrieve location";
+				error = "Gagal mengambil lokasi";
 				isLoading = false;
 			}
 		);
@@ -93,7 +93,7 @@
 			<div class="absolute bottom-0 left-0 -mb-10 -ml-10 size-40 rounded-full bg-black/10 blur-3xl"></div>
 
 			<div class="relative p-8 text-center space-y-2">
-				<p class="text-primary-content/80 font-medium tracking-wide text-sm uppercase">Next Prayer</p>
+				<p class="text-primary-content/80 font-medium tracking-wide text-sm uppercase">Sholat Berikutnya</p>
 				
 				{#if isLoading}
 					<div class="h-16 flex items-center justify-center">
@@ -110,8 +110,8 @@
 					</div>
 				{:else}
 					<div class="py-8">
-						<h2 class="text-2xl font-bold">All prayers done</h2>
-						<p class="text-primary-content/80">See you tomorrow!</p>
+						<h2 class="text-2xl font-bold">Semua sholat selesai</h2>
+						<p class="text-primary-content/80">Sampai jumpa besok!</p>
 					</div>
 				{/if}
 			</div>
@@ -154,7 +154,7 @@
 
 							<div class="flex items-center gap-2">
 								{#if isNext}
-									<Badge variant="primary" class="animate-pulse">Next</Badge>
+									<Badge variant="primary" class="animate-pulse">Berikutnya</Badge>
 								{/if}
 								
 								<button 
@@ -176,8 +176,8 @@
 
 		<!-- Footer Info -->
 		<div class="text-center text-xs text-base-content/40 pb-8">
-			<p>Data provided by Aladhan API</p>
-			<p>Calculation Method: Kemenag RI</p>
+			<p>Data disediakan oleh Aladhan API</p>
+			<p>Metode Perhitungan: Kemenag RI</p>
 		</div>
 
 	</div>

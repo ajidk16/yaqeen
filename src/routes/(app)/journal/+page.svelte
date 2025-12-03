@@ -37,20 +37,20 @@
 		})
 	);
 
-	let formattedDate = $derived(new Intl.DateTimeFormat('en-GB', { 
-		weekday: 'short', 
+	let formattedDate = $derived(new Intl.DateTimeFormat('id-ID', { 
+		weekday: 'long', 
 		day: 'numeric', 
-		month: 'short', 
+		month: 'long', 
 		year: 'numeric' 
 	}).format(currentDate));
 
 	// Constants
 	const moods: { type: MoodType; icon: any; label: string; color: string, bg: string }[] = [
-		{ type: 'happy', icon: Smile, label: 'Happy', color: 'text-success', bg: 'bg-green-50 ring-2 ring-green-500 ring-offset-2 text-green-500' },
-		{ type: 'blessed', icon: Heart, label: 'Blessed', color: 'text-error', bg: 'bg-red-50 ring-2 ring-red-500 ring-offset-2 text-red-500' },
-		{ type: 'neutral', icon: Meh, label: 'Neutral', color: 'text-warning', bg: 'bg-yellow-50 ring-2 ring-yellow-500 ring-offset-2 text-yellow-500' },
-		{ type: 'tired', icon: Coffee, label: 'Tired', color: 'text-neutral', bg: 'bg-gray-50 ring-2 ring-gray-500 ring-offset-2 text-gray-500' },
-		{ type: 'sad', icon: Frown, label: 'Sad', color: 'text-info', bg: 'bg-blue-50 ring-2 ring-blue-500 ring-offset-2 text-blue-500' }
+		{ type: 'happy', icon: Smile, label: 'Senang', color: 'text-success', bg: 'bg-green-50 ring-2 ring-green-500 ring-offset-2 text-green-500' },
+		{ type: 'blessed', icon: Heart, label: 'Berkah', color: 'text-error', bg: 'bg-red-50 ring-2 ring-red-500 ring-offset-2 text-red-500' },
+		{ type: 'neutral', icon: Meh, label: 'Biasa', color: 'text-warning', bg: 'bg-yellow-50 ring-2 ring-yellow-500 ring-offset-2 text-yellow-500' },
+		{ type: 'tired', icon: Coffee, label: 'Lelah', color: 'text-neutral', bg: 'bg-gray-50 ring-2 ring-gray-500 ring-offset-2 text-gray-500' },
+		{ type: 'sad', icon: Frown, label: 'Sedih', color: 'text-info', bg: 'bg-blue-50 ring-2 ring-blue-500 ring-offset-2 text-blue-500' }
 	];
 
 	// Actions
@@ -90,7 +90,7 @@
 	}
 
 	function formatTime(date: Date | string) {
-		return new Intl.DateTimeFormat('en-US', { 
+		return new Intl.DateTimeFormat('id-ID', { 
 			hour: '2-digit',
 			minute: '2-digit'
 		}).format(new Date(date));
@@ -106,7 +106,7 @@
 					<BookHeart class="size-8 text-primary" />
 					Jurnal Syukur
 				</h1>
-				<p class="text-base-content/60">Reflect on your day and count your blessings.</p>
+				<p class="text-base-content/60">Renungkan harimu dan hitung nikmat-Nya.</p>
 			</div>
 
 			<!-- Date Navigation -->
@@ -134,13 +134,13 @@
 						return async ({ result, update }) => {
 							isSubmitting = false;
 							if (result.type === 'success') {
-								toast.add('Journal entry saved!', 'success');
+								toast.add('Catatan jurnal tersimpan!', 'success');
 								triggerConfetti();
 								gratitudeText = '';
 								selectedMood = 'happy';
 								await update();
 							} else {
-								toast.add('Failed to save entry.', 'error');
+								toast.add('Gagal menyimpan catatan.', 'error');
 							}
 						};
 					}}
@@ -152,7 +152,7 @@
 					<!-- Mood Selector -->
 					<div class="space-y-3">
 						<label class="label" for="">
-							<span class="label-text font-medium text-base">How are you feeling?</span>
+							<span class="label-text font-medium text-base">Apa yang kamu rasakan?</span>
 						</label>
 						<div class="flex justify-between overflow-x-auto p-2 gap-2">
 							{#each moods as mood}
@@ -177,12 +177,12 @@
 					<!-- Gratitude Input -->
 					<div class="space-y-3">
 						<label class="label" for="gratitude">
-							<span class="label-text font-medium text-base">What are you grateful for today?</span>
+							<span class="label-text font-medium text-base">Apa yang kamu syukuri hari ini?</span>
 						</label>
 						<div class="relative">
 							<Textarea 
 								name="gratitude"
-								placeholder="Today, I am grateful for..." 
+								placeholder="Hari ini, aku bersyukur karena..." 
 								class="min-h-[120px] text-lg leading-relaxed resize-none bg-base-100 border-base-content/10 focus:border-primary/50"
 								bind:value={gratitudeText}
 							/>
@@ -203,10 +203,10 @@
 						>
 							{#if isSubmitting}
 								<Loading variant='infinity' />
-								loading
+								memuat
 							{:else}
 								<Save class="size-4" />
-								Save Entry
+								Simpan Catatan
 							{/if}
 						</Button>
 					</div>
@@ -218,14 +218,14 @@
 		<div class="space-y-4">
 			<h2 class="text-xl font-bold flex items-center gap-2 px-1" in:fly={{ y: 20, duration: 600, delay: 200 }}>
 				<Calendar class="size-5 text-base-content/60" />
-				Entries for {formattedDate}
+				Catatan untuk {formattedDate}
 			</h2>
 
 			<div class="space-y-4">
 				{#if filteredLogs.length === 0}
 					<div class="text-center py-12 text-base-content/40 bg-base-100 rounded-3xl border border-dashed border-base-content/10" in:fade>
 						<Sparkles class="size-8 mx-auto mb-2 opacity-50" />
-						<p>No entries for this day. Start your journal!</p>
+						<p>Belum ada catatan hari ini. Mulai menulis!</p>
 					</div>
 				{:else}
 					{#each filteredLogs as log, i (log.id)}
@@ -255,14 +255,14 @@
 										<button 
 											class="btn btn-ghost btn-xs btn-circle text-base-content/60"
 											onclick={() => openEditModal(log)}
-											title="Edit Entry"
+											title="Ubah Catatan"
 										>
 											<Pencil class="size-4" />
 										</button>
 										<button 
 											class="btn btn-ghost btn-xs btn-circle text-error"
 											onclick={() => openDeleteModal(log.id)}
-											title="Delete Entry"
+											title="Hapus Catatan"
 										>
 											<Trash2 class="size-4" />
 										</button>
@@ -278,7 +278,7 @@
 </div>
 
 <!-- Edit Modal -->
-<Modal bind:open={isEditModalOpen} title="Edit Journal Entry">
+<Modal bind:open={isEditModalOpen} title="Ubah Catatan Jurnal">
 	{#if editingLog}
 		<form 
 			method="POST" 
@@ -287,13 +287,13 @@
 				isSubmitting = true
 				return async ({ result, update }) => {
 					if (result.type === 'success') {
-						toast.add('Entry updated successfully!', 'success');
+						toast.add('Catatan berhasil diperbarui!', 'success');
 						isEditModalOpen = false;
 						triggerConfetti();
 						isSubmitting = false
 						await update();
 					} else {
-						toast.add('Failed to update entry.', 'error');
+						toast.add('Gagal memperbarui catatan.', 'error');
 					}
 				};
 			}}
@@ -305,7 +305,7 @@
 			<!-- Mood Selector -->
 			<div class="space-y-3">
 				<label class="label" for="">
-					<span class="label-text font-medium text-base">Mood</span>
+					<span class="label-text font-medium text-base">Perasaan</span>
 				</label>
 				<div class="flex justify-between overflow-x-auto p-2 gap-2">
 					{#each moods as mood}
@@ -325,7 +325,7 @@
 
 			<div class="space-y-3">
 				<label class="label" for="edit-gratitude">
-					<span class="label-text font-medium">Gratitude</span>
+					<span class="label-text font-medium">Rasa Syukur</span>
 				</label>
 				<Textarea 
 					name="gratitude"
@@ -335,14 +335,14 @@
 			</div>
 
 			<div class="flex justify-end gap-3">
-				<Button type="button" variant="ghost" onclick={() => isEditModalOpen = false}>Cancel</Button>
+				<Button type="button" variant="ghost" onclick={() => isEditModalOpen = false}>Batal</Button>
 				<Button type="submit" variant="primary" disabled={isSubmitting}>
 					{#if isSubmitting}
 						<Loading variant='infinity' />
-						loading
+						memuat
 					{:else}
 						<Save class="size-4" />
-						Update
+						Perbarui
 					{/if}
 				</Button>
 			</div>
@@ -351,28 +351,28 @@
 </Modal>
 
 <!-- Delete Modal -->
-<Modal bind:open={isDeleteModalOpen} title="Delete Entry">
+<Modal bind:open={isDeleteModalOpen} title="Hapus Catatan">
 	<div class="space-y-4">
-		<p>Are you sure you want to delete this journal entry? This action cannot be undone.</p>
+		<p>Apakah Anda yakin ingin menghapus catatan ini? Tindakan ini tidak dapat dibatalkan.</p>
 		<form 
 			method="POST" 
 			action="?/delete" 
 			use:enhance={() => {
 				return async ({ result, update }) => {
 					if (result.type === 'success') {
-						toast.add('Entry deleted successfully.', 'info');
+						toast.add('Catatan berhasil dihapus.', 'info');
 						isDeleteModalOpen = false;
 						update();
 					} else {
-						toast.add('Failed to delete entry.', 'error');
+						toast.add('Gagal menghapus catatan.', 'error');
 					}
 				};
 			}}
 			class="flex justify-end gap-3"
 		>
 			<input type="hidden" name="id" value={deletingLogId} />
-			<Button type="button" variant="ghost" onclick={() => isDeleteModalOpen = false}>Cancel</Button>
-			<Button type="submit" variant="error">Delete</Button>
+			<Button type="button" variant="ghost" onclick={() => isDeleteModalOpen = false}>Batal</Button>
+			<Button type="submit" variant="error">Hapus</Button>
 		</form>
 	</div>
 </Modal>

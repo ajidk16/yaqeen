@@ -14,51 +14,51 @@
 	const personas = [
 		{
 			title: "Muslim Urban",
-			description: "Tech-savvy professionals balancing career goals with spiritual obligations.",
+			description: "Profesional yang menyeimbangkan karir cemerlang dengan kewajiban spiritual di tengah kesibukan.",
 			icon: Briefcase,
-			features: ["Prayer time sync with meetings", "Productivity analytics", "Focus mode"]
+			features: ["Notifikasi sholat sesuai jadwal meeting", "Analitik produktivitas ibadah", "Mode Fokus untuk kekhusyukan"]
 		},
 		{
 			title: "Penuntut Ilmu",
-			description: "Students dedicated to tracking Quran memorization and study routines.",
+			description: "Pelajar yang berdedikasi dalam menghafal Al-Quran dan menjaga rutinitas belajar.",
 			icon: BookOpen,
-			features: ["Hafalan tracker", "Study streak system", "Knowledge journal"]
+			features: ["Pelacak Hafalan Quran", "Sistem streak belajar", "Jurnal ilmu harian"]
 		},
 		{
-			title: "Komunitas Hijrah",
-			description: "Individuals seeking tools to maintain consistency in their self-improvement journey.",
+			title: "Pejuang Hijrah",
+			description: "Individu yang mencari alat bantu untuk menjaga konsistensi dalam perjalanan memperbaiki diri.",
 			icon: Heart,
-			features: ["Daily affirmations", "Community challenges", "Istiqomah milestones"]
+			features: ["Afirmasi harian Islami", "Tantangan kebaikan komunitas", "Milestone Istiqomah"]
 		}
 	];
 
 	const pricingPlans = [
 		{
-			name: "Free",
-			price: "$0",
-			period: "/forever",
-			description: "Essential tools for your daily habits.",
-			features: ["Up to 5 habits", "Basic analytics", "7-day history", "Community access"],
-			cta: "Get Started",
+			name: "Gratis",
+			price: "Rp 0",
+			period: "/selamanya",
+			description: "Fitur dasar untuk memulai kebiasaan baik.",
+			features: ["Hingga 5 kebiasaan", "Analitik dasar", "Riwayat 7 hari", "Akses komunitas"],
+			cta: "Mulai Gratis",
 			variant: "ghost"
 		},
 		{
 			name: "Pro",
-			price: "$4.99",
-			period: "/month",
-			description: "Unlock your full potential.",
-			features: ["Unlimited habits", "Advanced AI insights", "Unlimited history", "Cloud sync", "Priority support"],
-			cta: "Start Free Trial",
+			price: "Rp 19K",
+			period: "/bulan",
+			description: "Buka potensi penuh diri Anda.",
+			features: ["Kebiasaan tak terbatas", "Insight AI canggih", "Riwayat tak terbatas", "Sinkronisasi Cloud", "Dukungan prioritas"],
+			cta: "Coba Gratis",
 			variant: "primary",
 			popular: true
 		},
 		{
 			name: "Lifetime",
-			price: "$99",
-			period: "/once",
-			description: "Pay once, own it forever.",
-			features: ["All Pro features", "Lifetime updates", "Exclusive badges", "Early access to features"],
-			cta: "Get Lifetime",
+			price: "Rp 299K",
+			period: "/sekali bayar",
+			description: "Bayar sekali, miliki selamanya.",
+			features: ["Semua fitur Pro", "Update seumur hidup", "Lencana eksklusif", "Akses awal fitur baru"],
+			cta: "Ambil Paket Lifetime",
 			variant: "secondary"
 		}
 	];
@@ -77,24 +77,24 @@
 			{#if visible}
 				<div in:fly={{ y: 20, duration: 800, delay: 0, easing: quintOut }} class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-base-200/50 backdrop-blur-sm border border-base-content/5 mb-8">
 					<Sparkles class="size-4 text-primary" />
-					<span class="text-sm font-medium text-base-content/70">The Modern Muslim YaaQeen</span>
+					<span class="text-sm font-medium text-base-content/70">YaaQeen: Sahabat Hijrah Modern</span>
 				</div>
 
 				<h1 in:fly={{ y: 20, duration: 800, delay: 100, easing: quintOut }} class="text-5xl md:text-7xl font-bold tracking-tight mb-6">
-					Balance Your <span class="text-transparent bg-clip-text bg-linear-to-r from-primary to-secondary">Deen & Dunia</span>
+					Seimbangkan <span class="text-transparent bg-clip-text bg-linear-to-r from-primary to-secondary">Dunia & Akhirat</span>
 				</h1>
 
 				<p in:fly={{ y: 20, duration: 800, delay: 200, easing: quintOut }} class="text-xl text-base-content/70 max-w-2xl mx-auto mb-10 leading-relaxed">
-					YaaQeen helps you build consistent habits, track your worship, and achieve your worldly goals without compromising your spiritual values.
+					YaaQeen membantu Anda membangun kebiasaan istiqomah, memantau ibadah, dan mencapai tujuan duniawi tanpa mengorbankan nilai-nilai spiritual.
 				</p>
 
 				<div in:fly={{ y: 20, duration: 800, delay: 300, easing: quintOut }} class="flex flex-col sm:flex-row items-center justify-center gap-4">
 					<Button onclick={() => goto('/register')} variant="primary" size="lg" class="rounded-full px-8 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all hover:scale-105">
-						Start Your Journey
+						Mulai Perjalanan Hijrah
 						<ArrowRight class="ml-2 size-5" />
 					</Button>
 					<Button onclick={() => goto('/register')} variant="ghost" size="lg" class="rounded-full px-8">
-						Learn More
+						Pelajari Lebih Lanjut
 					</Button>
 				</div>
 			{/if}
@@ -105,8 +105,8 @@
 	<section id="features" class="py-24 bg-base-200/50 relative">
 		<div class="container mx-auto px-4">
 			<div class="text-center mb-16">
-				<h2 class="text-3xl md:text-4xl font-bold mb-4">Designed for Every Journey</h2>
-				<p class="text-base-content/60 max-w-2xl mx-auto">Whether you're a busy professional, a dedicated student, or starting your hijrah, YaaQeen adapts to your needs.</p>
+				<h2 class="text-3xl md:text-4xl font-bold mb-4">Dirancang untuk Setiap Perjalanan</h2>
+				<p class="text-base-content/60 max-w-2xl mx-auto">Baik Anda profesional sibuk, pelajar, atau baru memulai hijrah, YaaQeen beradaptasi dengan kebutuhan Anda.</p>
 			</div>
 
 			<div class="grid md:grid-cols-3 gap-8">
@@ -138,15 +138,15 @@
 		<div class="container mx-auto px-4">
 			<div class="grid lg:grid-cols-2 gap-16 items-center">
 				<div class="space-y-8">
-					<h2 class="text-3xl md:text-4xl font-bold">Why Choose YaaQeen?</h2>
+					<h2 class="text-3xl md:text-4xl font-bold">Mengapa Memilih YaaQeen?</h2>
 					<div class="space-y-6">
 						<div class="flex gap-4">
 							<div class="mt-1 size-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
 								<Star class="size-5 text-primary" />
 							</div>
 							<div>
-								<h3 class="font-bold text-lg mb-1">Gamified Istiqomah</h3>
-								<p class="text-base-content/70">Build streaks and earn badges that encourage consistency without trivializing worship.</p>
+								<h3 class="font-bold text-lg mb-1">Istiqomah yang Menyenangkan</h3>
+								<p class="text-base-content/70">Bangun streak dan raih lencana yang memotivasi konsistensi tanpa mengurangi esensi ibadah.</p>
 							</div>
 						</div>
 						<div class="flex gap-4">
@@ -154,8 +154,8 @@
 								<Shield class="size-5 text-secondary" />
 							</div>
 							<div>
-								<h3 class="font-bold text-lg mb-1">Privacy First</h3>
-								<p class="text-base-content/70">Your spiritual journey is personal. We ensure your data is secure and private.</p>
+								<h3 class="font-bold text-lg mb-1">Privasi Adalah Amanah</h3>
+								<p class="text-base-content/70">Perjalanan spiritual Anda adalah privasi. Kami menjamin keamanan data Anda dengan standar tertinggi.</p>
 							</div>
 						</div>
 						<div class="flex gap-4">
@@ -163,8 +163,8 @@
 								<Smartphone class="size-5 text-accent" />
 							</div>
 							<div>
-								<h3 class="font-bold text-lg mb-1">Cross-Platform Sync</h3>
-								<p class="text-base-content/70">Access your tracker on any device. Seamlessly sync between mobile and desktop.</p>
+								<h3 class="font-bold text-lg mb-1">Sinkronisasi Tanpa Batas</h3>
+								<p class="text-base-content/70">Akses pelacak Anda di mana saja. Sinkronisasi mulus antara ponsel dan desktop.</p>
 							</div>
 						</div>
 					</div>
@@ -195,8 +195,8 @@
 	<section id="pricing" class="py-24 bg-base-200/50">
 		<div class="container mx-auto px-4">
 			<div class="text-center mb-16">
-				<h2 class="text-3xl md:text-4xl font-bold mb-4">Simple, Transparent Pricing</h2>
-				<p class="text-base-content/60 max-w-2xl mx-auto">Invest in your personal growth and spiritual well-being.</p>
+				<h2 class="text-3xl md:text-4xl font-bold mb-4">Investasi Terbaik untuk Diri Sendiri</h2>
+				<p class="text-base-content/60 max-w-2xl mx-auto">Pilih paket yang sesuai untuk mendukung pertumbuhan pribadi dan spiritual Anda.</p>
 			</div>
 
 			<div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -204,7 +204,7 @@
 					<div class="card bg-base-100 shadow-xl border {plan.popular ? 'border-primary ring-2 ring-primary/20' : 'border-base-content/5'} relative hover:-translate-y-1 transition-transform duration-300">
 						{#if plan.popular}
 							<div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-primary-content text-xs font-bold rounded-full uppercase tracking-wider">
-								Most Popular
+								Paling Populer
 							</div>
 						{/if}
 						<div class="card-body p-8">
@@ -241,12 +241,12 @@
 				<div class="inline-flex items-center justify-center size-16 rounded-full bg-base-200 mb-4">
 					<Heart class="size-8 text-primary" />
 				</div>
-				<h2 class="text-3xl md:text-4xl font-bold">Built with Love & Iman</h2>
+				<h2 class="text-3xl md:text-4xl font-bold">Dibuat dengan Cinta & Iman</h2>
 				<p class="text-lg text-base-content/70 leading-relaxed">
-					YaaQeen was born from a simple realization: in our fast-paced modern world, it's easy to lose track of what truly matters. We wanted to create a tool that doesn't just help you get things done, but helps you become the person you want to be—both in this life and the next.
+					YaaQeen lahir dari kesadaran sederhana: di dunia yang serba cepat, mudah untuk kehilangan arah. Kami menciptakan alat yang tidak hanya membantu Anda menyelesaikan tugas, tetapi membantu Anda menjadi pribadi yang lebih baik—di dunia dan akhirat.
 				</p>
 				<p class="text-lg text-base-content/70 leading-relaxed">
-					Our mission is to empower Muslims worldwide to achieve <span class="font-medium text-primary">Istiqomah</span> (consistency) through technology that respects our values and enhances our productivity.
+					Misi kami adalah memberdayakan Muslim di seluruh dunia untuk mencapai <span class="font-medium text-primary">Istiqomah</span> melalui teknologi yang menghargai nilai-nilai kita.
 				</p>
 			</div>
 		</div>
@@ -258,10 +258,10 @@
 			<div class="bg-linear-to-r from-primary to-secondary rounded-3xl p-12 text-center text-primary-content relative overflow-hidden">
 				<div class="absolute top-0 left-0 w-full h-full bg-grid-pattern opacity-10"></div>
 				<div class="relative z-10 max-w-2xl mx-auto space-y-8">
-					<h2 class="text-3xl md:text-5xl font-bold">Ready to Transform Your Habits?</h2>
-					<p class="text-lg opacity-90">Join thousands of Muslims who are building a better version of themselves, one day at a time.</p>
+					<h2 class="text-3xl md:text-5xl font-bold">Siap Mengubah Hidup Anda?</h2>
+					<p class="text-lg opacity-90">Bergabunglah dengan ribuan Muslim yang sedang membangun versi terbaik diri mereka, satu hari demi satu hari.</p>
 					<Button onclick={() => goto('/register')} variant="secondary" size="lg" class="rounded-full px-10 shadow-xl hover:scale-105 transition-transform bg-white text-primary border-none hover:bg-base-100">
-						Get Started for Free
+						Mulai Sekarang, Gratis!
 					</Button>
 				</div>
 			</div>

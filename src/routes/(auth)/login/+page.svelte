@@ -47,7 +47,8 @@
 			<form method="POST" use:enhance={() => {
 				isLoading = true;
 				return async ({ result, update }) => {
-					if (result.type === 'success') {
+					console.log("Login result:", result);
+					if (result.status === 302) {
 						isLoading = false;
 						await update();
 						goto('/dashboard')

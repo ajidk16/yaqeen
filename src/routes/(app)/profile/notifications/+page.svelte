@@ -9,7 +9,9 @@
 	import confetti from 'canvas-confetti';
 	import { page } from '$app/state';
 
-	const profile = $derived(page.data.user)
+	const profile = $derived(page?.data?.user??	null)
+
+	console.log('Profile data:', profile);
 
 	let isSaving = $state(false);
 
@@ -55,7 +57,6 @@
 			class="space-y-6" 
 			in:fly={{ y: 20, duration: 800, delay: 100 }}
 		>
-			<!-- Global Toggle -->
 			<Card class="bg-base-100 shadow-sm border border-base-content/10">
 				<div class="p-6 flex items-center justify-between">
 					<div class="flex items-center gap-3">
@@ -73,16 +74,10 @@
 						class="toggle toggle-primary" 
 						bind:checked={profile.preferences.notifications} 
 					/>
-					<!-- Auto-submit on global toggle change? Or just keep the save button? 
-						 The previous design didn't have a save button, it implied auto-save or needed one.
-						 Let's add a save button for consistency with other forms, or auto-submit.
-						 Given the user request "ketika berhasil simpan muncul toast", a save button is clearer.
-					-->
 				</div>
 			</Card>
 
-			{#if profile.preferences.notifications}
-				<!-- Prayer Times -->
+			{#if profile?.preferences.notifications}
 				<div class="bg-base-100 shadow-sm border border-base-content/10 rounded-box" transition:fade>
 					<div class="p-6 space-y-4">
 						<h3 class="font-bold text-lg flex items-center gap-2">
@@ -91,7 +86,7 @@
 						</h3>
 						
 						<div class="space-y-3">
-							{#each Object.entries(profile.preferences.notificationSettings.prayers) as [prayer, enabled]}
+							{#each Object.entries(profile?.preferences?.notificationSettings?.prayers??[]) as [prayer, enabled]}
 								<div class="flex items-center justify-between p-2 hover:bg-base-200/50 rounded-lg transition-colors">
 									<span class="capitalize font-medium text-base-content/80">{prayer}</span>
 									<input 
@@ -106,7 +101,6 @@
 					</div>
 				</div>
 
-				<!-- Other Notifications -->
 				<div class="bg-base-100 shadow-sm border border-base-content/10 rounded-box" transition:fade>
 					<div class="p-6 space-y-4">
 						<h3 class="font-bold text-lg flex items-center gap-2">
@@ -137,7 +131,7 @@
 									type="checkbox" 
 									name="updates"
 									class="toggle toggle-accent" 
-									bind:checked={profile.preferences.notificationSettings.updates} 
+									bind:checked={profile.preferences.notificationSettings.updates}
 								/>
 							</div>
 						</div>

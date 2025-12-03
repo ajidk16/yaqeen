@@ -51,7 +51,7 @@
 			</Button>
 			<div>
 				<h1 class="text-2xl font-bold">Edit Profil</h1>
-				<p class="text-base-content/60 text-sm">Update your personal information</p>
+				<p class="text-base-content/60 text-sm">Perbarui informasi pribadi Anda</p>
 			</div>
 		</header>
 
@@ -63,11 +63,11 @@
 				return async ({ result, update }) => {
 					isSaving = false;
 					if (result.type === 'success') {
-						toast.add('Profile updated successfully!', 'success');
+						toast.add('Profil berhasil diperbarui!', 'success');
 						triggerConfetti();
 						await update();
 					} else {
-						toast.add('Failed to update profile.', 'error');
+						toast.add('Gagal memperbarui profil.', 'error');
 					}
 				};
 			}}
@@ -84,7 +84,7 @@
 						<input type="file" accept="image/*" name='image' class="hidden" onchange={handleAvatarChange} />
 					</label>
 				</div>
-				<p class="text-xs text-base-content/40">Tap icon to change photo</p>
+				<p class="text-xs text-base-content/40">Ketuk ikon untuk mengubah foto</p>
 			</div>
 
 			<!-- Form Section -->
@@ -94,15 +94,15 @@
 					<div class="p-6 space-y-4">
 						<h3 class="font-bold text-lg flex items-center gap-2 mb-2">
 							<User class="size-5 text-primary" />
-							Personal Info
+							Informasi Pribadi
 						</h3>
 						
 						<div class="grid gap-4">
 							<div class="form-control w-full">
 								<label class="label" for="fullName">
-									<span class="label-text font-medium">Full Name</span>
+									<span class="label-text font-medium">Nama Lengkap</span>
 								</label>
-								<Input name="fullName" placeholder="Enter your full name" bind:value={profile.name} class="bg-base-200/50" />
+								<Input name="fullName" placeholder="Masukkan nama lengkap Anda" bind:value={profile.name} class="bg-base-200/50" />
 							</div>
 
 							<div class="form-control w-full">
@@ -116,19 +116,19 @@
 								<label class="label" for="bio">
 									<span class="label-text font-medium">Bio</span>
 								</label>
-								<Textarea name="bio" placeholder="Tell us about yourself..." bind:value={profile.bio} class="bg-base-200/50 min-h-[100px]" />
+								<Textarea name="bio" placeholder="Ceritakan tentang diri Anda..." bind:value={profile.bio} class="bg-base-200/50 min-h-[100px]" />
 							</div>
 
 							<div class="form-control w-full">
 								<label class="label" for="location">
-									<span class="label-text font-medium">Location</span>
+									<span class="label-text font-medium">Lokasi</span>
 								</label>
 								<div class="relative">
 									<MapPin class="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-base-content/40" />
-									<Input name="location" placeholder="City, Country" bind:value={profile.location.city} class="pl-10 bg-base-200/50" />
+									<Input name="location" placeholder="Kota, Negara" bind:value={profile.location.city} class="pl-10 bg-base-200/50" />
 								</div>
 								<label class="label" for="">
-									<span class="label-text-alt text-base-content/40">Used for prayer times calculation</span>
+									<span class="label-text-alt text-base-content/40">Digunakan untuk perhitungan waktu sholat</span>
 								</label>
 							</div>
 						</div>
@@ -140,7 +140,7 @@
 					<div class="p-6 space-y-4">
 						<h3 class="font-bold text-lg flex items-center gap-2 mb-2">
 							<Smartphone class="size-5 text-secondary" />
-							App Preferences
+							Preferensi Aplikasi
 						</h3>
 
 						<div class="space-y-4">
@@ -154,8 +154,8 @@
 										{/if}
 									</div>
 									<div>
-										<p class="font-medium">Dark Mode</p>
-										<p class="text-xs text-base-content/40">Adjust app appearance</p>
+										<p class="font-medium">Mode Gelap</p>
+										<p class="text-xs text-base-content/40">Sesuaikan tampilan aplikasi</p>
 									</div>
 								</div>
 								<input type="hidden" name="theme" value={profile.preferences.theme} />
@@ -173,8 +173,8 @@
 										<Bell class="size-5" />
 									</div>
 									<div>
-										<p class="font-medium">Push Notifications</p>
-										<p class="text-xs text-base-content/40">Reminders for prayers & habits</p>
+										<p class="font-medium">Notifikasi Push</p>
+										<p class="text-xs text-base-content/40">Pengingat untuk sholat & kebiasaan</p>
 									</div>
 								</div>
 								<input 
@@ -191,7 +191,7 @@
 
 			<!-- Actions -->
 			<div class="sticky bottom-6 flex gap-3 pt-4" in:fly={{ y: 20, duration: 800, delay: 300 }}>
-				<Button variant="ghost" class="flex-1" onclick={()=>goto('/profile')}>Cancel</Button>
+				<Button variant="ghost" class="flex-1" onclick={()=>goto('/profile')}>Batal</Button>
 				<Button 
 					type="submit"
 					variant="primary" 
@@ -200,10 +200,10 @@
 				>
 					{#if isSaving}
 						<span class="loading loading-spinner loading-sm"></span>
-						Saving...
+						Menyimpan...
 					{:else}
 						<Save class="size-4" />
-						Save Changes
+						Simpan Perubahan
 					{/if}
 				</Button>
 			</div>
