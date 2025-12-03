@@ -30,7 +30,7 @@
 		{/if}
 	</label>
 	{#if error}
-		<label class="label">
+		<label class="label" for={rest.id}>
 			<span class="label-text-alt text-error">{error}</span>
 		</label>
 	{/if}

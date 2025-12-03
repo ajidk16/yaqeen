@@ -238,10 +238,12 @@
 								<div class="flex items-start justify-between gap-4">
 									<div class="flex items-start gap-4">
 										<div class="mt-1 p-2 rounded-xl bg-base-200/50">
+											<!-- svelte-ignore svelte_component_deprecated -->
 											<svelte:component 
 												this={getMoodIcon(log.mood)} 
 												class="size-6 {getMoodColor(log.mood)}" 
 											/>
+											
 										</div>
 										<div class="space-y-1">
 											<p class="text-base-content/80 leading-relaxed whitespace-pre-wrap">{log.gratitude}</p>

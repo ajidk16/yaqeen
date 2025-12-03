@@ -28,7 +28,7 @@
 
 <div class="form-control {containerClass}">
 	{#if label}
-		<label class="label">
+		<label class="label" for={name}>
 			<span class="label-text font-medium">{label}</span>
 		</label>
 	{/if}
@@ -48,7 +48,7 @@
 		{/each}
 	</div>
 	{#if error}
-		<label class="label">
+		<label class="label" for={name}>
 			<span class="label-text-alt text-error">{error}</span>
 		</label>
 	{/if}

@@ -3,6 +3,7 @@
 	import { quintOut } from 'svelte/easing';
 	import { ArrowRight, Sparkles, Briefcase, BookOpen, Heart, CheckCircle2, Star, Shield, Smartphone, Check } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui';
+	import { goto } from '$app/navigation';
 
 	let visible = $state(false);
 
@@ -80,7 +81,7 @@
 				</div>
 
 				<h1 in:fly={{ y: 20, duration: 800, delay: 100, easing: quintOut }} class="text-5xl md:text-7xl font-bold tracking-tight mb-6">
-					Balance Your <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Deen & Dunia</span>
+					Balance Your <span class="text-transparent bg-clip-text bg-linear-to-r from-primary to-secondary">Deen & Dunia</span>
 				</h1>
 
 				<p in:fly={{ y: 20, duration: 800, delay: 200, easing: quintOut }} class="text-xl text-base-content/70 max-w-2xl mx-auto mb-10 leading-relaxed">
@@ -88,11 +89,11 @@
 				</p>
 
 				<div in:fly={{ y: 20, duration: 800, delay: 300, easing: quintOut }} class="flex flex-col sm:flex-row items-center justify-center gap-4">
-					<Button href="/register" variant="primary" size="lg" class="rounded-full px-8 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all hover:scale-105">
+					<Button onclick={() => goto('/register')} variant="primary" size="lg" class="rounded-full px-8 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all hover:scale-105">
 						Start Your Journey
 						<ArrowRight class="ml-2 size-5" />
 					</Button>
-					<Button href="#features" variant="ghost" size="lg" class="rounded-full px-8">
+					<Button onclick={() => goto('/register')} variant="ghost" size="lg" class="rounded-full px-8">
 						Learn More
 					</Button>
 				</div>
@@ -112,8 +113,8 @@
 				{#each personas as persona, i}
 					<div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 border border-base-content/5 hover:-translate-y-1 group">
 						<div class="card-body items-center text-center p-8">
-							<div class="size-16 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-								<svelte:component this={persona.icon} class="size-8 text-primary" />
+							<div class="size-16 rounded-2xl bg-linear-to-br from-primary/10 to-secondary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+								<persona.icon class="size-8 text-primary" />
 							</div>
 							<h3 class="card-title text-xl mb-3">{persona.title}</h3>
 							<p class="text-base-content/70 mb-6 text-sm leading-relaxed">{persona.description}</p>
@@ -169,7 +170,7 @@
 					</div>
 				</div>
 				<div class="relative">
-					<div class="absolute inset-0 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-3xl blur-3xl -z-10"></div>
+					<div class="absolute inset-0 bg-linear-to-tr from-primary/20 to-secondary/20 rounded-3xl blur-3xl -z-10"></div>
 					<div class="bg-base-100 rounded-3xl shadow-2xl border border-base-content/5 p-8 rotate-3 hover:rotate-0 transition-transform duration-500">
 						<!-- Mockup Content -->
 						<div class="space-y-4">
@@ -223,7 +224,7 @@
 								{/each}
 							</ul>
 
-							<Button href="/register" variant={plan.variant as any} block class="rounded-full">
+							<Button onclick={() => goto('/register')} variant={plan.variant as any} block class="rounded-full">
 								{plan.cta}
 							</Button>
 						</div>
@@ -259,7 +260,7 @@
 				<div class="relative z-10 max-w-2xl mx-auto space-y-8">
 					<h2 class="text-3xl md:text-5xl font-bold">Ready to Transform Your Habits?</h2>
 					<p class="text-lg opacity-90">Join thousands of Muslims who are building a better version of themselves, one day at a time.</p>
-					<Button href="/register" variant="secondary" size="lg" class="rounded-full px-10 shadow-xl hover:scale-105 transition-transform bg-white text-primary border-none hover:bg-base-100">
+					<Button onclick={() => goto('/register')} variant="secondary" size="lg" class="rounded-full px-10 shadow-xl hover:scale-105 transition-transform bg-white text-primary border-none hover:bg-base-100">
 						Get Started for Free
 					</Button>
 				</div>

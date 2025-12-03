@@ -52,13 +52,13 @@
 		<h2 class="text-2xl font-semibold">Dropdowns</h2>
 		<div class="flex gap-4 h-32">
 			<Dropdown label="Click Me">
-				<li><a>Item 1</a></li>
-				<li><a>Item 2</a></li>
+				<li><a href='#12'>Item 1</a></li>
+				<li><a href='#12'>Item 2</a></li>
 			</Dropdown>
 			
 			<Dropdown label="Hover Me" hover variant="accent">
-				<li><a>Item A</a></li>
-				<li><a>Item B</a></li>
+				<li><a href='#12'>Item A</a></li>
+				<li><a href='#12'>Item B</a></li>
 			</Dropdown>
 		</div>
 	</section>
@@ -182,8 +182,8 @@
 					</div>
 				{/snippet}
 				{#snippet sidebar()}
-					<li><a>Sidebar Item 1</a></li>
-					<li><a>Sidebar Item 2</a></li>
+					<li><a href="#ba1">Sidebar Item 1</a></li>
+					<li><a href="#ba2">Sidebar Item 2</a></li>
 				{/snippet}
 			</Drawer>
 		</div>

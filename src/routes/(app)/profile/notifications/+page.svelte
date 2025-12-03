@@ -7,18 +7,9 @@
 	import { enhance } from '$app/forms';
 	import { toast } from '$lib/stores/toast';
 	import confetti from 'canvas-confetti';
-	import type { PageData } from './$types';
 	import { page } from '$app/state';
 
 	const profile = $derived(page.data.user)
-	
-	let prayerSettings = $state(profile.preferences.notificationSettings?.prayers ?? {
-		fajr: true,
-		dhuhr: true,
-		asr: true,
-		maghrib: true,
-		isha: true
-	});
 
 	let isSaving = $state(false);
 
@@ -100,14 +91,14 @@
 						</h3>
 						
 						<div class="space-y-3">
-							{#each Object.entries(prayerSettings) as [prayer, enabled]}
+							{#each Object.entries(profile.preferences.notificationSettings.prayers) as [prayer, enabled]}
 								<div class="flex items-center justify-between p-2 hover:bg-base-200/50 rounded-lg transition-colors">
 									<span class="capitalize font-medium text-base-content/80">{prayer}</span>
 									<input 
 										type="checkbox" 
 										name={prayer}
 										class="toggle toggle-sm toggle-secondary" 
-										bind:checked={prayerSettings[prayer as keyof typeof prayerSettings]}
+										bind:checked={profile.preferences.notificationSettings.prayers[prayer as keyof typeof profile.preferences.notificationSettings.prayers]}
 									/>
 								</div>
 							{/each}

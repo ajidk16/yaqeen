@@ -162,14 +162,14 @@
 
 		<!-- Progress Overview -->
 		<div class="grid grid-cols-2 gap-4" in:fly={{ y: 20, duration: 800, delay: 100, easing: quintOut }}>
-			<Card class="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
+			<Card class="bg-linear-to-br from-primary/10 to-primary/5 border-primary/20">
 				<div class="p-4 text-center">
 					<h3 class="text-sm font-medium text-base-content/70 mb-2">Fardhu Completion</h3>
 					<div class="text-3xl font-bold text-primary">{Math.round(fardhuProgress)}%</div>
 					<progress class="progress progress-primary w-full mt-2" value={fardhuProgress} max="100"></progress>
 				</div>
 			</Card>
-			<Card class="bg-gradient-to-br from-secondary/10 to-secondary/5 border-secondary/20">
+			<Card class="bg-linear-to-br from-secondary/10 to-secondary/5 border-secondary/20">
 				<div class="p-4 text-center">
 					<h3 class="text-sm font-medium text-base-content/70 mb-2">Sunnah Completion</h3>
 					<div class="text-3xl font-bold text-secondary">{Math.round(sunnahProgress)}%</div>
@@ -202,7 +202,7 @@
 						<div class="card-body p-4 sm:p-6 flex-row flex-wrap items-center justify-between gap-4">
 							<div class="flex items-center gap-4">
 								<div class="size-12 rounded-xl bg-base-200 flex items-center justify-center text-base-content/70">
-									<svelte:component this={prayer.icon} class="size-6" />
+									<prayer.icon size="24" />
 								</div>
 								<div>
 									<h3 class="font-bold text-lg">{prayer.name}</h3>

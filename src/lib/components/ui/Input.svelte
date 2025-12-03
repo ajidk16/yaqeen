@@ -35,6 +35,7 @@
 	<div class="relative">
 		{#if startIcon}
 			<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10 text-base-content/50">
+				<!-- svelte-ignore svelte_component_deprecated -->
 				<svelte:component this={startIcon} class="size-5" />
 			</div>
 		{/if}
@@ -51,6 +52,7 @@
 
 		{#if endIcon}
 			<button type="button" class="absolute right-0 pr-3 flex items-center inset-y-0 z-10 cursor-pointer text-base-content/50 hover:text-base-content transition-colors" onclick={onendIconClick}>
+				<!-- svelte-ignore svelte_component_deprecated -->
 				<svelte:component this={endIcon} class="size-5" />
 			</button>
 		{/if}

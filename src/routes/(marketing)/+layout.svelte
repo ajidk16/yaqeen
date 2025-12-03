@@ -36,9 +36,9 @@
 					<p class="mt-2 text-sm text-slate-500">Building habits for Dunia & Akhirat.</p>
 				</div>
 				<div class="flex gap-8 text-sm font-medium text-slate-500">
-					<a href="#" class="hover:text-primary transition-colors">Privacy</a>
-					<a href="#" class="hover:text-primary transition-colors">Terms</a>
-					<a href="#" class="hover:text-primary transition-colors">Contact</a>
+					<a href="#privacy" class="hover:text-primary transition-colors">Privacy</a>
+					<a href="#terms" class="hover:text-primary transition-colors">Terms</a>
+					<a href="#contact" class="hover:text-primary transition-colors">Contact</a>
 				</div>
 				<p class="text-sm text-slate-400">&copy; {new Date().getFullYear()} HabbiTrax.</p>
 			</div>

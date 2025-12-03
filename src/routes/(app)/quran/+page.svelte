@@ -188,14 +188,14 @@
 
 		<div class="grid md:grid-cols-2 gap-6">
 			<!-- Tilawah Tracker -->
-			<div class="card border border-primary/20 bg-gradient-to-br from-base-100 to-primary/5 overflow-visible shadow-sm" in:fly={{ x: -20, duration: 800, delay: 100 }}>
+			<div class="card border border-primary/20 bg-linear-to-br from-base-100 to-primary/5 overflow-visible shadow-sm" in:fly={{ x: -20, duration: 800, delay: 100 }}>
 				<div class="card-body p-6 space-y-6">
 					<div class="flex items-center justify-between">
 						<h2 class="text-xl font-bold flex items-center gap-2">
 							<Target class="size-5 text-primary" />
 							Daily Tilawah
 						</h2>
-						<Badge variant="outline" class="font-mono">Target: {tilawahTarget} Pages</Badge>
+						<Badge class="font-mono">Target: {tilawahTarget} Pages</Badge>
 					</div>
 
 					<!-- Circular Progress -->
@@ -225,7 +225,7 @@
 					<!-- Controls -->
 					<div class="flex gap-3">
 						<Button 
-							variant="outline" 
+						 
 							class="flex-1" 
 							onclick={decrementTilawah}
 							disabled={currentEntry.tilawahProgress === 0}
@@ -245,7 +245,7 @@
 			</div>
 
 			<!-- Hafalan Tracker -->
-			<div class="card border border-secondary/20 bg-gradient-to-br from-base-100 to-secondary/5 shadow-sm" in:fly={{ x: 20, duration: 800, delay: 200 }}>
+			<div class="card border border-secondary/20 bg-linear-to-br from-base-100 to-secondary/5 shadow-sm" in:fly={{ x: 20, duration: 800, delay: 200 }}>
 				<div class="card-body p-6 space-y-6">
 					<div class="flex items-center justify-between">
 						<h2 class="text-xl font-bold flex items-center gap-2">
@@ -257,7 +257,7 @@
 
 					<div class="space-y-4">
 						<div class="form-control">
-							<label class="label">
+							<label class="label" for="">
 								<span class="label-text font-medium">Surah</span>
 							</label>
 							<select 
@@ -273,7 +273,7 @@
 
 						<div class="flex gap-4">
 							<div class="form-control flex-1">
-								<label class="label">
+								<label class="label" for="">
 									<span class="label-text text-xs">Start Ayah</span>
 								</label>
 								<input 
@@ -285,7 +285,7 @@
 								/>
 							</div>
 							<div class="form-control flex-1">
-								<label class="label">
+								<label class="label" for="">
 									<span class="label-text text-xs">End Ayah</span>
 								</label>
 								<input 
