@@ -44,7 +44,7 @@
 					<UserPlus class="size-6" />
 				</div>
 				<h1 class="text-3xl font-bold tracking-tight">Create an account</h1>
-				<p class="text-base-content/60 mt-2">Join HabbiTrax and start your journey today</p>
+				<p class="text-base-content/60 mt-2">Join YaaQeen and start your journey today</p>
 			</div>
 
 			{#if error}
@@ -167,7 +167,7 @@
 			<div class="space-y-4">
 				<h2 class="text-4xl font-bold tracking-tight">Join the Community</h2>
 				<p class="text-lg text-base-content/70">
-					Connect with thousands of others who are building better habits and transforming their lives with HabbiTrax.
+					Connect with thousands of others who are building better habits and transforming their lives with YaaQeen.
 				</p>
 			</div>
 

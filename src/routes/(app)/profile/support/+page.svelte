@@ -126,8 +126,8 @@
 				</div>
 				
 				<div class="text-xs text-base-content/40">
-					<p>HabbiTrax v1.0.0 (Beta)</p>
-					<p>&copy; 2025 HabbiTrax Team</p>
+					<p>YaaQeen v1.0.0 (Beta)</p>
+					<p>&copy; 2025 YaaQeen Team</p>
 				</div>
 			</div>
 		</div>

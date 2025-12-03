@@ -1,4 +1,4 @@
-# Blueprint Produk: HabbiTrax (Habit Tracker Syariah)
+# Blueprint Produk: YaaQeen (YaaQeen Syariah)
 
 ## 1. Masalah yang Diselesaikan (The Problem)
 - **Disconnect Spiritual & Produktivitas**: Aplikasi produktivitas mainstream sering memisahkan kehidupan duniawi dan ukhrawi.

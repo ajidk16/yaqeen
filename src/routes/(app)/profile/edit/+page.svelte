@@ -81,7 +81,7 @@
 					</div>
 					<label class="absolute bottom-0 right-0 p-2 bg-primary text-white rounded-full shadow-lg cursor-pointer hover:bg-primary-focus transition-colors transform hover:scale-105 active:scale-95">
 						<Camera class="size-5" />
-						<input type="file" accept="image/*" class="hidden" onchange={handleAvatarChange} />
+						<input type="file" accept="image/*" name='image' class="hidden" onchange={handleAvatarChange} />
 					</label>
 				</div>
 				<p class="text-xs text-base-content/40">Tap icon to change photo</p>

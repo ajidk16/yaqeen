@@ -32,7 +32,7 @@
 			class="text-xs font-medium transition-all duration-300 {isActive(item.path) ? 'text-primary active bg-primary/5' : 'text-base-content/50 hover:text-base-content/80'}"
 		>
 			<div class="relative">
-				<svelte:component this={item.icon} size={20} class="mb-0.5 transition-transform duration-300 {isActive(item.path) ? 'scale-110' : ''}" />
+				<!-- <svelte:component this={item.icon} size={20} class="mb-0.5 transition-transform duration-300 {isActive(item.path) ? 'scale-110' : ''}" /> -->
 				{#if isActive(item.path)}
 					<span class="absolute -bottom-2 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-primary" in:scale></span>
 				{/if}

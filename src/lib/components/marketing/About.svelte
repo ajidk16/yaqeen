@@ -31,7 +31,7 @@
 					</p>
 					
 					<p class="text-lg text-slate-600 mb-8 leading-relaxed">
-						HabbiTrax was built to solve this. We believe that true success (Falah) comes from balancing your worldly ambitions with your spiritual obligations.
+						YaaQeen was built to solve this. We believe that true success (Falah) comes from balancing your worldly ambitions with your spiritual obligations.
 					</p>
 
 					<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">

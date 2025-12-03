@@ -2,6 +2,7 @@
 	import { House, Calendar, ChartBar, User, LogOut, Plus, AlarmClock, Flame,BookOpenText, Heart } from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import { isAddHabitModalOpen } from '$lib/stores/ui';
+	import { enhance } from '$app/forms';
 
 	// Helper to check active state
 	const isActive = (path: string) => $page.url.pathname.startsWith(path);
@@ -73,9 +74,11 @@
 	</nav>
 
 	<div class="mt-auto">
-		<button class="group relative flex h-12 w-12 items-center justify-center rounded-2xl text-slate-400 transition-all duration-300 hover:bg-red-50 hover:text-red-500 hover:shadow-sm">
-			<LogOut size={22} class="transition-transform group-hover:scale-110" />
-			<span class="absolute left-16 rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-medium text-white opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2 shadow-xl">Logout</span>
-		</button>
+		<form action="/logout" method="POST" use:enhance>
+			<button class="group relative flex h-12 w-12 items-center justify-center rounded-2xl text-slate-400 transition-all duration-300 hover:bg-red-50 hover:text-red-500 hover:shadow-sm">
+				<LogOut size={22} class="transition-transform group-hover:scale-110" />
+				<span class="absolute left-16 rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-medium text-white opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2 shadow-xl">Logout</span>
+			</button>
+		</form>
 	</div>
 </aside>

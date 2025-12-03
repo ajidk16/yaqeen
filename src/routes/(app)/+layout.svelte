@@ -14,7 +14,7 @@
 		{@render children()}
 	</main>
 
-	<BottomNav />
+	<BottomNav class="md:hidden" />
 	
 	<AddHabitModal />
 </div>

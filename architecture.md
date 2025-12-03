@@ -1,4 +1,4 @@
-# Architecture: HabbiTrax (Habit Tracker Syariah)
+# Architecture: YaaQeen (YaaQeen Syariah)
 
 ## 1. High-Level Architecture
 

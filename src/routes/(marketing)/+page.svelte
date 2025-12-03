@@ -77,7 +77,7 @@
 			{#if visible}
 				<div in:fly={{ y: 20, duration: 800, delay: 0, easing: quintOut }} class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-base-200/50 backdrop-blur-sm border border-base-content/5 mb-8">
 					<Sparkles class="size-4 text-primary" />
-					<span class="text-sm font-medium text-base-content/70">The Modern Muslim Habit Tracker</span>
+					<span class="text-sm font-medium text-base-content/70">The Modern Muslim YaaQeen</span>
 				</div>
 
 				<h1 in:fly={{ y: 20, duration: 800, delay: 100, easing: quintOut }} class="text-5xl md:text-7xl font-bold tracking-tight mb-6">
@@ -85,7 +85,7 @@
 				</h1>
 
 				<p in:fly={{ y: 20, duration: 800, delay: 200, easing: quintOut }} class="text-xl text-base-content/70 max-w-2xl mx-auto mb-10 leading-relaxed">
-					HabbiTrax helps you build consistent habits, track your worship, and achieve your worldly goals without compromising your spiritual values.
+					YaaQeen helps you build consistent habits, track your worship, and achieve your worldly goals without compromising your spiritual values.
 				</p>
 
 				<div in:fly={{ y: 20, duration: 800, delay: 300, easing: quintOut }} class="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -106,7 +106,7 @@
 		<div class="container mx-auto px-4">
 			<div class="text-center mb-16">
 				<h2 class="text-3xl md:text-4xl font-bold mb-4">Designed for Every Journey</h2>
-				<p class="text-base-content/60 max-w-2xl mx-auto">Whether you're a busy professional, a dedicated student, or starting your hijrah, HabbiTrax adapts to your needs.</p>
+				<p class="text-base-content/60 max-w-2xl mx-auto">Whether you're a busy professional, a dedicated student, or starting your hijrah, YaaQeen adapts to your needs.</p>
 			</div>
 
 			<div class="grid md:grid-cols-3 gap-8">
@@ -138,7 +138,7 @@
 		<div class="container mx-auto px-4">
 			<div class="grid lg:grid-cols-2 gap-16 items-center">
 				<div class="space-y-8">
-					<h2 class="text-3xl md:text-4xl font-bold">Why Choose HabbiTrax?</h2>
+					<h2 class="text-3xl md:text-4xl font-bold">Why Choose YaaQeen?</h2>
 					<div class="space-y-6">
 						<div class="flex gap-4">
 							<div class="mt-1 size-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
@@ -243,7 +243,7 @@
 				</div>
 				<h2 class="text-3xl md:text-4xl font-bold">Built with Love & Iman</h2>
 				<p class="text-lg text-base-content/70 leading-relaxed">
-					HabbiTrax was born from a simple realization: in our fast-paced modern world, it's easy to lose track of what truly matters. We wanted to create a tool that doesn't just help you get things done, but helps you become the person you want to be—both in this life and the next.
+					YaaQeen was born from a simple realization: in our fast-paced modern world, it's easy to lose track of what truly matters. We wanted to create a tool that doesn't just help you get things done, but helps you become the person you want to be—both in this life and the next.
 				</p>
 				<p class="text-lg text-base-content/70 leading-relaxed">
 					Our mission is to empower Muslims worldwide to achieve <span class="font-medium text-primary">Istiqomah</span> (consistency) through technology that respects our values and enhances our productivity.

@@ -16,7 +16,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const { session, user } = await lucia.validateSession(sessionId);
 
 	if (session && (event.route.id?.startsWith('/(auth)'))) {
-		throw redirect(302, '/');
+		throw redirect(302, '/dashboard');
 	}
 
 	if (session && session.fresh) {

@@ -1,10 +1,9 @@
 <script>
 	import { page } from '$app/state';
 	import { User, Settings, Bell, Shield, HelpCircle, LogOut, ChevronRight, Camera, Activity } from 'lucide-svelte';
+	import { enhance } from '$app/forms';
 
-	const handleLogout = async () => {
-		console.log('Logging out...');
-	};
+
 
 	const listProfile = [
 		{
@@ -92,11 +91,13 @@
 	</section>
 
 	<!-- Logout Button -->
-	<button 
-		onclick={handleLogout}
-		class="flex w-full items-center justify-center gap-2 rounded-xl border border-red-100 bg-red-50 p-4 font-bold text-red-500 transition-all hover:bg-red-100 active:scale-95"
-	>
-		<LogOut size={20} />
-		Keluar Aplikasi
-	</button>
+	<form action="/logout" method="POST" use:enhance class="w-full">
+		<button 
+			type="submit"
+			class="flex w-full items-center justify-center gap-2 rounded-xl border border-red-100 bg-red-50 p-4 font-bold text-red-500 transition-all hover:bg-red-100 active:scale-95"
+		>
+			<LogOut size={20} />
+			Keluar Aplikasi
+		</button>
+	</form>
 </div>

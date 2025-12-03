@@ -139,7 +139,7 @@
 			<div class="space-y-4">
 				<h2 class="text-4xl font-bold tracking-tight">Build Better Habits</h2>
 				<p class="text-lg text-base-content/70">
-					Track your progress, stay consistent, and achieve your goals with HabbiTrax's intelligent tracking system.
+					Track your progress, stay consistent, and achieve your goals with YaaQeen's intelligent tracking system.
 				</p>
 			</div>
 			<!-- Feature List -->
