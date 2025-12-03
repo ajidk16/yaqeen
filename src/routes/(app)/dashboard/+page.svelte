@@ -21,7 +21,7 @@
 	// Merge server data with local state for nextPrayer
 	let user = $derived({
 		...data.user,
-		nextPrayer: timer.nextPrayer ? { ...timer.nextPrayer } : { name: 'All Done', time: 'See you tomorrow' }
+		nextPrayer: timer.nextPrayer ? { ...timer.nextPrayer } : { name: 'Semua Selesai', time: 'Sampai jumpa besok' }
 	});
 
 	function getGreeting() {
@@ -50,8 +50,8 @@
 					<div class="absolute inset-0 bg-orange-500/20 blur-lg rounded-full animate-pulse"></div>
 				</div>
 				<div>
-					<span class="font-bold text-lg">{user.streak}</span>
-					<span class="text-xs text-base-content/60 ml-1">Day Streak</span>
+					<span class="font-bold text-lg">{data.user.streak}</span>
+					<span class="text-xs text-base-content/60 ml-1">Hari Beruntun</span>
 				</div>
 			</div>
 		</header>
@@ -66,7 +66,7 @@
 					<div>
 						<div class="flex items-center gap-2 mb-2 text-primary-content/80">
 							<Clock class="size-4" />
-							<span class="text-sm font-medium uppercase tracking-wider">Next Prayer</span>
+							<span class="text-sm font-medium uppercase tracking-wider">Sholat Berikutnya</span>
 						</div>
 						<h2 class="text-4xl font-bold mb-1">{user.nextPrayer.name}</h2>
 						
@@ -85,7 +85,7 @@
 					
 					<div class="flex flex-col gap-2">
 						<Button variant="ghost" class="bg-white/20 hover:bg-white/30 text-white border-none gap-2" onclick={() => goto('/jadwal-solat')}>
-							View Schedule
+							Lihat Jadwal
 							<ArrowRight class="size-4" />
 						</Button>
 					</div>
@@ -97,7 +97,7 @@
 				<div class="card-body p-6">
 					<h3 class="font-bold text-lg mb-4 flex items-center gap-2">
 						<Activity class="size-5 text-secondary" />
-						Daily Progress
+						Progres Harian
 					</h3>
 					
 					<div class="space-y-4">
@@ -110,7 +110,7 @@
 						</div>
 						<div>
 							<div class="flex justify-between text-sm mb-1">
-								<span>Habits</span>
+								<span>Kebiasaan</span>
 								<span class="font-bold text-secondary">{user.progress.habits}%</span>
 							</div>
 							<progress class="progress progress-secondary w-full" value={user.progress.habits} max="100"></progress>
@@ -132,9 +132,9 @@
 			<div class="flex items-center justify-between">
 				<h2 class="text-xl font-bold flex items-center gap-2">
 					<Calendar class="size-5 text-base-content/60" />
-					Recent Activity
+					Aktivitas Terkini
 				</h2>
-				<Button variant="link" class="text-primary no-underline hover:underline p-0 h-auto" onclick={() => goto('/ibadah')}>See All</Button>
+				<Button variant="link" class="text-primary no-underline hover:underline p-0 h-auto" onclick={() => goto('/ibadah')}>Lihat Semua</Button>
 			</div>
 
 			<div class="grid gap-3">
@@ -168,19 +168,19 @@
 		<div class="grid grid-cols-2 sm:grid-cols-4 gap-4" in:fly={{ y: 20, duration: 800, delay: 500 }}>
 			<Button  class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-primary hover:text-primary transition-all" onclick={()=> goto('/stats')}>
 				<Heart class="size-6" />
-				<span class="text-xs font-medium">Log Mood</span>
+				<span class="text-xs font-medium">Catat Mood</span>
 			</Button>
-			<Button  class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-secondary hover:text-secondary transition-all" onclick={()=> goto('/habits')}>
+			<Button  class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-secondary hover:text-secondary transition-all" onclick={()=> goto('/ibadah')}>
 				<Sparkles class="size-6" />
-				<span class="text-xs font-medium">New Habit</span>
+				<span class="text-xs font-medium">Kebiasaan Baru</span>
 			</Button>
 			<Button  class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-accent hover:text-accent transition-all" onclick={()=> goto('/quran')}>
 				<BookOpen class="size-6" />
-				<span class="text-xs font-medium">Read Quran</span>
+				<span class="text-xs font-medium">Baca Quran</span>
 			</Button>
 			<Button  class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-info hover:text-info transition-all" onclick={()=> goto('/journal')}>
 				<Calendar class="size-6" />
-				<span class="text-xs font-medium">Journal</span>
+				<span class="text-xs font-medium">Jurnal</span>
 			</Button>
 		</div>
 	</div>

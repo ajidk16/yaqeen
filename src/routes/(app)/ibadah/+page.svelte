@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fade, fly, scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
-	import { Sun, Moon, Users, User, Check, Calendar, ChevronLeft, ChevronRight, Star, MapPin, Loader2 } from 'lucide-svelte';
+	import { Sun, Moon, Users, User, Check, Calendar, ChevronLeft, ChevronRight, Star, MapPin, Loader2, Plus } from 'lucide-svelte';
 	import { Card, Button, Badge } from '$lib/components/ui';
 	import { onMount } from 'svelte';
 	import { goto, invalidateAll } from '$app/navigation';
@@ -12,7 +12,6 @@
 	let selectedDate = $state(new Date(data.date));
 	let isLoadingTimes = $state(false);
 	let locationName = $state('Jakarta, ID');
-	const ibadahHabits = $derived(data.ibadahHabits);
 	
 	// Fardhu Prayers State
 	type PrayerStatus = 'none' | 'munfarid' | 'jamaah';
@@ -283,10 +282,16 @@
 
 		<!-- Sunnah Prayers (Dynamic Habits) -->
 		<section class="space-y-6">
-			<h2 class="text-xl font-bold flex items-center gap-2">
-				<div class="size-2 rounded-full bg-secondary"></div>
-				Ibadah Lainnya
-			</h2>
+			<div class="flex items-center justify-between">
+				<h2 class="text-xl font-bold flex items-center gap-2">
+					<div class="size-2 rounded-full bg-secondary"></div>
+					Ibadah Lainnya
+				</h2>
+				<Button variant="info" size="xs" onclick={() => goto('/ibadah/habits')}>
+					<Plus class="size-4 mr-1" />
+					Kelola Habits
+				</Button>
+			</div>
 
 			<div class="grid md:grid-cols-2 gap-6">
 				<!-- Sunnah -->

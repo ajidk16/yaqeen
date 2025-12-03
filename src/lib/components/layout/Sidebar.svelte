@@ -18,8 +18,8 @@
 			path: '/dashboard'
 		},
 		{
-			icon: AlarmClock,
-			label: 'Ibadah',
+			icon: Flame,
+			label: 'Kebiasaan',
 			path: '/ibadah'
 		},
 		{
@@ -27,11 +27,11 @@
 			label: 'Quran',
 			path: '/quran'
 		},
-		{
-			icon: Flame,
-			label: 'Kebiasaan',
-			path: '/habits'
-		},
+		// {
+		// 	icon: Flame,
+		// 	label: 'Kebiasaan',
+		// 	path: '/habits'
+		// },
 		{
 			icon: Heart,
 			label: 'Jurnal',
@@ -55,7 +55,7 @@
 	<a href="/" class="mb-6">
 		<!-- Logo Placeholder -->
 		<div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br from-primary to-purple-600 text-white font-bold shadow-lg shadow-primary/30 transition-transform hover:scale-110">
-			H
+			YQ
 		</div>
 	</a>
 

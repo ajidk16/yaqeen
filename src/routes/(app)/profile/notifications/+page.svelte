@@ -46,11 +46,11 @@
 				return async ({ result, update }) => {
 					isSaving = false;
 					if (result.type === 'success') {
-						toast.add('Notification settings saved!', 'success');
+						toast.add('Pengaturan notifikasi berhasil disimpan!', 'success');
 						triggerConfetti();
 						update();
 					} else {
-						toast.add('Failed to save settings.', 'error');
+						toast.add('Gagal menyimpan pengaturan.', 'error');
 					}
 				};
 			}}

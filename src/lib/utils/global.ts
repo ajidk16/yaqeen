@@ -4,19 +4,19 @@ export type Category = 'Wajib' | 'Sunnah' | 'Mubah';
 
 
 export	const categories: { label: Category; color: string; description: string }[] = [
-		{ label: 'Wajib', color: 'primary', description: 'Obligatory acts that must be done.' },
-		{ label: 'Sunnah', color: 'secondary', description: 'Recommended acts for extra reward.' },
-		{ label: 'Mubah', color: 'accent', description: 'Permissible daily activities.' }
+		{ label: 'Wajib', color: 'primary', description: 'Ibadah wajib yang harus ditunaikan.' },
+		{ label: 'Sunnah', color: 'secondary', description: 'Amalan sunnah untuk pahala tambahan.' },
+		{ label: 'Mubah', color: 'accent', description: 'Aktivitas harian yang bermanfaat.' }
 	];
 
 export const icons = [
-		{ component: Dumbbell, label: 'Exercise' },
-		{ component: BookOpen, label: 'Read' },
-		{ component: GlassWater, label: 'Drink' },
-		{ component: Coffee, label: 'Relax' },
-		{ component: Briefcase, label: 'Work' },
-		{ component: Heart, label: 'Health' },
-		{ component: Star, label: 'Goal' },
-		{ component: Zap, label: 'Energy' }
+		{ component: Dumbbell, label: 'Olahraga' },
+		{ component: BookOpen, label: 'Membaca' },
+		{ component: GlassWater, label: 'Minum' },
+		{ component: Coffee, label: 'Santai' },
+		{ component: Briefcase, label: 'Bekerja' },
+		{ component: Heart, label: 'Kesehatan' },
+		{ component: Star, label: 'Target' },
+		{ component: Zap, label: 'Energi' }
 	];
 

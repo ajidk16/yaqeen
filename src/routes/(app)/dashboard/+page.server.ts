@@ -2,7 +2,7 @@ import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import { prayerLogs, habits, habitLogs, quranProgress } from '$lib/server/db/schema';
-import { eq, and, desc} from 'drizzle-orm';
+import { eq, and, desc, count} from 'drizzle-orm';
 import { lucia } from '$lib/server/auth.js';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -11,7 +11,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	}
 
 	const userId = locals.user.id;
-	const today = new Date().toISOString().split('T')[0];
+	const todayStr = new Date().toISOString().split('T')[0];
 
 	// Fetch data in parallel
 	const [
@@ -21,11 +21,12 @@ export const load: PageServerLoad = async ({ locals }) => {
 		todaysQuranProgress,
 		recentPrayers,
 		recentHabits,
-		recentQuran
+		recentQuran,
+		allPrayerDates
 	] = await Promise.all([
 		// 1. Ibadah Progress
 		db.query.prayerLogs.findMany({
-			where: and(eq(prayerLogs.userId, userId), eq(prayerLogs.date, today))
+			where: and(eq(prayerLogs.userId, userId), eq(prayerLogs.date, todayStr))
 		}),
 		// 2. Habits Progress (Active habits)
 		db.query.habits.findMany({
@@ -33,11 +34,11 @@ export const load: PageServerLoad = async ({ locals }) => {
 		}),
 		// 3. Habits Logs
 		db.query.habitLogs.findMany({
-			where: and(eq(habitLogs.userId, userId), eq(habitLogs.date, today))
+			where: and(eq(habitLogs.userId, userId), eq(habitLogs.date, todayStr))
 		}),
 		// 4. Quran Progress
 		db.query.quranProgress.findFirst({
-			where: and(eq(quranProgress.userId, userId), eq(quranProgress.date, today))
+			where: and(eq(quranProgress.userId, userId), eq(quranProgress.date, todayStr))
 		}),
 		// 5. Recent Activity - Prayers
 		db.query.prayerLogs.findMany({
@@ -57,7 +58,12 @@ export const load: PageServerLoad = async ({ locals }) => {
 			where: eq(quranProgress.userId, userId),
 			orderBy: [desc(quranProgress.createdAt)],
 			limit: 5
-		})
+		}),
+		// 8. Streak Data
+		db.selectDistinct({ date: prayerLogs.date })
+			.from(prayerLogs)
+			.where(eq(prayerLogs.userId, userId))
+			.orderBy(desc(prayerLogs.date))
 	]);
 
 	// --- Calculate Stats ---
@@ -71,10 +77,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const completedHabits = todaysHabitLogs.filter(l => l.status === 'completed').length;
 	const habitsProgress = totalHabits > 0 ? Math.round((completedHabits / totalHabits) * 100) : 0;
 
-
 	// Quran
 	const pagesRead = todaysQuranProgress?.pagesRead || 0;
-	const quranTarget = locals.user.settings.quranTarget; // Default target, ideally fetch from settings
+	const quranTarget = locals.user.settings.quranTarget;
 	const quranProgressVal = Math.min(Math.round((pagesRead / quranTarget) * 100), 100);
 
 	// --- Process Recent Activity ---
@@ -85,7 +90,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 			type: 'prayer',
 			title: `Completed ${p.prayerName}`,
 			time: p.createdAt,
-			originalTime: p.createdAt // Keep date object for sorting
+			originalTime: p.createdAt
 		})),
 		...recentHabits.map(h => ({
 			id: h.id,
@@ -115,11 +120,53 @@ export const load: PageServerLoad = async ({ locals }) => {
 			...a,
 			time: new Date(a.originalTime || 0).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
 		}));
+	
+	// --- Calculate Streak ---
+	let streakCount = 0;
+	if (allPrayerDates.length > 0) {
+		const today = new Date();
+		today.setHours(0, 0, 0, 0);
+
+		let expectedDate = new Date(today);
+		let hasLogToday = false;
+
+		// Check if the most recent log is today
+		const latestLogDate = new Date(allPrayerDates[0].date);
+		latestLogDate.setHours(0, 0, 0, 0);
+
+		if (latestLogDate.getTime() === today.getTime()) {
+			hasLogToday = true;
+		} else {
+			// Check if it was yesterday
+			const yesterday = new Date(today);
+			yesterday.setDate(today.getDate() - 1);
+			if (latestLogDate.getTime() === yesterday.getTime()) {
+				expectedDate = yesterday;
+			} else {
+				// Streak broken
+				expectedDate = null as any; 
+			}
+		}
+
+		if (expectedDate) {
+			for (const logDateObj of allPrayerDates) {
+				const logDate = new Date(logDateObj.date);
+				logDate.setHours(0, 0, 0, 0);
+
+				if (logDate.getTime() === expectedDate.getTime()) {
+					streakCount++;
+					expectedDate.setDate(expectedDate.getDate() - 1);
+				} else if (logDate.getTime() < expectedDate.getTime()) {
+					break;
+				}
+			}
+		}
+	}
 
 	return {
 		user: {
 			name: locals.user.name,
-			streak: 0, // Placeholder for now, needs complex calculation
+			streak: streakCount,
 			progress: {
 				ibadah: ibadahProgress,
 				habits: habitsProgress,
