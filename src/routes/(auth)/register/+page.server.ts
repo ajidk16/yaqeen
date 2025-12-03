@@ -8,12 +8,14 @@ import { eq } from "drizzle-orm";
 import type { Actions } from "./$types";
 
 export const actions: Actions = {
-	default: async ({ request, cookies }) => {
+	default: async ({ request, cookies, getClientAddress }) => {
 		const formData = await request.formData();
 		const email = formData.get("email");
 		const password = formData.get("password");
 		const name = formData.get("name");
-		const agreeTerms = formData.get("agreeTerms"); // Checkbox might be "on" or null
+		// const agreeTerms = formData.get("agreeTerms"); // Checkbox might be "on" or null
+		const userAgent = request.headers.get('user-agent');
+		const ipAddress = getClientAddress();
 
 		// console.log("Register attempt:", { email, name, agreeTerms });
 		// return
@@ -80,7 +82,12 @@ export const actions: Actions = {
                 updatedAt: new Date()
             });
 
-			const session = await lucia.createSession(userId, {});
+			const session = await lucia.createSession(userId, {
+				idlePeriod: 1000 * 60 * 60 * 24 * 7, // 7 days
+				activePeriod: 1000 * 60 * 60 * 24 * 30, // 30 days
+				ipAddress: ipAddress,
+				userAgent: userAgent
+			});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			cookies.set(sessionCookie.name, sessionCookie.value, {
 				path: ".",

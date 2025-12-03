@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { fade, fly, scale, slide } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
-	import { BookOpen, Bookmark, Award, CheckCircle, ChevronRight, ChevronLeft, Trophy, Target, Sparkles, Calendar } from 'lucide-svelte';
-	import { Card, Button, Input, Badge } from '$lib/components/ui';
+	import { BookOpen, ChevronRight, ChevronLeft, Trophy, Target, Sparkles, Calendar } from 'lucide-svelte';
+	import { Button, Badge } from '$lib/components/ui';
 	import confetti from 'canvas-confetti';
 	import { onMount } from 'svelte';
 

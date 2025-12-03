@@ -46,10 +46,14 @@
 			{/if}
 			<form method="POST" use:enhance={() => {
 				isLoading = true;
-				return async ({ update }) => {
-					isLoading = false;
-					await update();
-					// goto('/dashboard')
+				return async ({ result, update }) => {
+					if (result.type === 'success') {
+						isLoading = false;
+						await update();
+						goto('/dashboard')
+					} else {
+						isLoading = false;
+					}
 				};
 			}} class="space-y-6">
 				<div class="space-y-4">
