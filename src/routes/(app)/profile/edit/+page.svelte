@@ -195,7 +195,7 @@
 				<Button 
 					type="submit"
 					variant="primary" 
-					class="flex-[2] gap-2 shadow-lg shadow-primary/20" 
+					class="flex-2 gap-2 shadow-lg shadow-primary/20" 
 					disabled={isSaving}
 				>
 					{#if isSaving}

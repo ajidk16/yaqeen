@@ -148,7 +148,7 @@
 	<!-- Right Side: Decorative/Branding (Hidden on Mobile) -->
 	<div class="hidden lg:flex relative flex-col justify-center items-center bg-base-200 text-base-content p-12 overflow-hidden">
 		<!-- Animated Background -->
-		<div class="absolute inset-0 w-full h-full bg-gradient-to-bl from-secondary/10 to-primary/10 z-0"></div>
+		<div class="absolute inset-0 w-full h-full bg-linear-to-bl from-secondary/10 to-primary/10 z-0"></div>
 		<div class="absolute -top-[20%] -left-[20%] w-[80%] h-[80%] rounded-full bg-secondary/10 blur-[120px] animate-pulse"></div>
 		<div class="absolute -bottom-[20%] -right-[20%] w-[80%] h-[80%] rounded-full bg-primary/10 blur-[120px] animate-pulse delay-1000"></div>
 
@@ -156,7 +156,7 @@
 		<div class="relative z-10 max-w-lg text-center space-y-8" in:fly={{ x: -20, duration: 1000, delay: 200, easing: quintOut }}>
 			<div class="relative">
 				<!-- Abstract Illustration Placeholder -->
-				<div class="w-64 h-64 mx-auto bg-gradient-to-tl from-secondary to-primary rounded-3xl -rotate-3 shadow-2xl flex items-center justify-center mb-12 group transition-transform hover:-rotate-6 duration-500">
+				<div class="w-64 h-64 mx-auto bg-linear-to-tl from-secondary to-primary rounded-3xl -rotate-3 shadow-2xl flex items-center justify-center mb-12 group transition-transform hover:-rotate-6 duration-500">
 					<div class="w-[98%] h-[98%] bg-base-100 rounded-[22px] flex items-center justify-center overflow-hidden relative">
 						<div class="absolute inset-0 bg-grid-pattern opacity-5"></div>
 						<UserPlus class="size-24 text-secondary group-hover:scale-110 transition-transform duration-500" />

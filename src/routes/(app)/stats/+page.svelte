@@ -72,7 +72,7 @@
 		</header>
 
 		<!-- Personalized Feedback Card -->
-		<div class="card bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 shadow-lg overflow-visible" in:scale={{ duration: 600, start: 0.95, delay: 100 }}>
+		<div class="card bg-linear-to-br from-primary/10 to-primary/5 border border-primary/20 shadow-lg overflow-visible" in:scale={{ duration: 600, start: 0.95, delay: 100 }}>
 			<div class="card-body p-6 relative">
 				<!-- Decorative Icon -->
 				<div class="absolute -top-6 -right-6 size-24 bg-primary/10 rounded-full blur-2xl"></div>
@@ -133,7 +133,7 @@
 			</div>
 
 			<!-- Contextual Wisdom -->
-			<div class="card bg-gradient-to-br from-secondary/10 to-secondary/5 border border-secondary/20 shadow-sm" in:fly={{ x: 20, duration: 800, delay: 300 }}>
+			<div class="card bg-linear-to-br from-secondary/10 to-secondary/5 border border-secondary/20 shadow-sm" in:fly={{ x: 20, duration: 800, delay: 300 }}>
 				<div class="card-body p-6 flex flex-col justify-center text-center space-y-4">
 					<Quote class="size-8 text-secondary/40 mx-auto" />
 					<p class="text-lg font-serif italic text-base-content/80 leading-relaxed">
