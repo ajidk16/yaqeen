@@ -25,7 +25,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		device: s.userAgent || 'Unknown Device',
 		location: s.ipAddress || 'Unknown Location',
 		active: s.id === locals.session?.id,
-		lastActive: s.updatedAt.toLocaleDateString() + ' ' + s.updatedAt.toLocaleTimeString()
+		lastActive: s.updatedAt.toLocaleDateString() + ' ' + s.updatedAt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: true })
 	}));
 
 	return {

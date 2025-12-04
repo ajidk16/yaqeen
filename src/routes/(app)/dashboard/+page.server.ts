@@ -2,7 +2,7 @@ import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import { prayerLogs, habits, habitLogs, quranProgress } from '$lib/server/db/schema';
-import { eq, and, desc, count} from 'drizzle-orm';
+import { eq, and, desc} from 'drizzle-orm';
 import { lucia } from '$lib/server/auth.js';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -118,7 +118,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.slice(0, 5)
 		.map(a => ({
 			...a,
-			time: new Date(a.originalTime || 0).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+			time: new Date(a.originalTime || 0).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: true })
 		}));
 	
 	// --- Calculate Streak ---
@@ -142,11 +142,10 @@ export const load: PageServerLoad = async ({ locals }) => {
 			yesterday.setDate(today.getDate() - 1);
 			if (latestLogDate.getTime() === yesterday.getTime()) {
 				expectedDate = yesterday;
-			} else {
-				// Streak broken
-				expectedDate = null as any; 
 			}
 		}
+
+		console.log('Has log today:', hasLogToday);	
 
 		if (expectedDate) {
 			for (const logDateObj of allPrayerDates) {
