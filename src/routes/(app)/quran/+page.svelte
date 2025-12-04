@@ -7,6 +7,7 @@
 	import { onMount } from 'svelte';
 
 	import { goto } from '$app/navigation';
+	import { formatDate, hijriDate } from '$lib/utils/format.js';
 
 	let { data } = $props();
 
@@ -43,20 +44,6 @@
 
 	// Derived State for Current Date
 	let dateKey = $derived(currentDate.toISOString().split('T')[0]);
-
-	// Date Formatters
-	let formattedDate = $derived(new Intl.DateTimeFormat('id-ID', { 
-		weekday: 'long', 
-		day: 'numeric', 
-		month: 'long', 
-		year: 'numeric' 
-	}).format(currentDate));
-
-	let hijriDate = $derived(new Intl.DateTimeFormat('id-ID-u-ca-islamic', { 
-		day: 'numeric',
-		month: 'long',
-		year: 'numeric'
-	}).format(currentDate));
 
 	// Derived Metrics
 	let tilawahPercentage = $derived(Math.min((currentEntry.tilawahProgress / tilawahTarget) * 100, 100));
@@ -214,8 +201,8 @@
 					</button>
 				</div>
 				<div class="flex flex-col items-end">
-					<span class="font-bold text-sm">{formattedDate}</span>
-					<span class="text-xs text-primary font-medium">{hijriDate}</span>
+					<span class="font-bold text-sm">{formatDate(currentDate)}</span>
+					<span class="text-xs text-primary font-medium">{hijriDate(currentDate)}</span>
 				</div>
 			</div>
 		</div>
@@ -355,10 +342,10 @@
 						<div class="grid grid-cols-5 sm:grid-cols-6 gap-2 max-h-[180px] overflow-y-auto pr-2 custom-scrollbar">
 							{#each Array(hafalanTotalAyahs) as _, i}
 								{@const ayahNum = currentEntry.hafalanAyahStart + i}
-								<button 
+								<button
 									class="aspect-square rounded-lg border-2 flex items-center justify-center text-sm font-medium transition-all duration-200
-									{currentEntry.hafalanProgress.includes(ayahNum ?? 0) 
-										? 'bg-secondary border-secondary text-white scale-95' 
+									{Array.isArray(currentEntry.hafalanProgress) && currentEntry.hafalanProgress.includes(ayahNum)
+										? 'bg-secondary border-secondary text-white scale-95'
 										: 'border-base-content/10 hover:border-secondary/50 text-base-content/60'}"
 									onclick={() => toggleAyah(ayahNum)}
 								>

@@ -2,10 +2,12 @@
 	import { fade, fly, scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 	import { Sun, Moon, Users, User, Check, Calendar, ChevronLeft, ChevronRight, Star, MapPin, Loader2, Plus } from 'lucide-svelte';
-	import { Card, Button, Badge } from '$lib/components/ui';
+	import { Card, Button, Badge, Loading } from '$lib/components/ui';
 	import { onMount } from 'svelte';
 	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { formatDate } from '$lib/utils/format.js';
+	import { is } from 'drizzle-orm';
 
 	let { data } = $props();
 
@@ -141,6 +143,8 @@
 					...p,
 					time: timeMap[p.id] || p.time
 				}));
+
+				isLoadingTimes = false;
 			}
 		} catch (e) {
 			console.error("Failed to fetch prayer times", e);
@@ -167,10 +171,6 @@
 			? (sunnahPrayers.filter(p => p.completed).length / sunnahPrayers.length) * 100
 			: 0
 	);
-
-	const formatDate = (date: Date) => {
-		return new Intl.DateTimeFormat('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(date);
-	};
 	
 </script>
 
@@ -227,7 +227,7 @@
 				</h2>
 				{#if isLoadingTimes}
 					<div class="flex items-center gap-2 text-xs text-base-content/50">
-						<Loader2 class="size-3 animate-spin" />
+						<Loading variant='spinner' />
 						Memperbarui waktu...
 					</div>
 				{/if}

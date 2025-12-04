@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { fade, fly, scale, slide } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
-	import { Smile, Frown, Meh, Heart, Coffee, Calendar, Plus, Save, Trash2, Sparkles, BookHeart, ChevronLeft, ChevronRight, Pencil } from 'lucide-svelte';
-	import { Card, Button, Textarea, Modal, Input, Loading } from '$lib/components/ui';
+	import { Smile, Frown, Meh, Heart, Coffee, Calendar,  Save, Trash2, Sparkles, BookHeart, ChevronLeft, ChevronRight, Pencil } from 'lucide-svelte';
+	import { Card, Button, Textarea, Modal, Loading } from '$lib/components/ui';
 	import confetti from 'canvas-confetti';
 	import { enhance } from '$app/forms';
 	import { toast } from '$lib/stores/toast';
 	import { page } from '$app/state';
+	import { formatDate, formatTime } from '$lib/utils/format';
 
 
 
@@ -36,13 +37,6 @@
 			logDate.getFullYear() === currentDate.getFullYear();
 		})
 	);
-
-	let formattedDate = $derived(new Intl.DateTimeFormat('id-ID', { 
-		weekday: 'long', 
-		day: 'numeric', 
-		month: 'long', 
-		year: 'numeric' 
-	}).format(currentDate));
 
 	// Constants
 	const moods: { type: MoodType; icon: any; label: string; color: string, bg: string }[] = [
@@ -88,13 +82,6 @@
 		const mood = moods.find(m => m.type === type);
 		return mood ? mood.icon : Smile;
 	}
-
-	function formatTime(date: Date | string) {
-		return new Intl.DateTimeFormat('id-ID', { 
-			hour: '2-digit',
-			minute: '2-digit'
-		}).format(new Date(date));
-	}
 </script>
 
 <div class="min-h-screen bg-base-100 p-4 pb-24 lg:p-8">
@@ -119,7 +106,7 @@
 						<ChevronRight class="size-5" />
 					</button>
 				</div>
-				<span class="font-bold text-sm min-w-[120px] text-center">{formattedDate}</span>
+				<span class="font-bold text-sm min-w-[120px] text-center">{formatDate(currentDate)}</span>
 			</div>
 		</div>
 
@@ -218,7 +205,7 @@
 		<div class="space-y-4">
 			<h2 class="text-xl font-bold flex items-center gap-2 px-1" in:fly={{ y: 20, duration: 600, delay: 200 }}>
 				<Calendar class="size-5 text-base-content/60" />
-				Catatan untuk {formattedDate}
+				Catatan untuk {formatDate(currentDate)}
 			</h2>
 
 			<div class="space-y-4">

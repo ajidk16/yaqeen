@@ -118,7 +118,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.slice(0, 5)
 		.map(a => ({
 			...a,
-			time: new Date(a.originalTime || 0).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: true })
+			time: new Date(a.originalTime || 0).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false })
 		}));
 	
 	// --- Calculate Streak ---

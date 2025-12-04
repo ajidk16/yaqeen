@@ -30,10 +30,10 @@ export class PrayerTimer {
 	}
 
 	private hydrateTimestamps(prayers: PrayerTime[]): PrayerTime[] {
-		const now = new Date();
+		const now = new SvelteDate();
 		return prayers.map(p => {
 			const [hours, minutes] = p.time.split(':').map(Number);
-			const date = new Date(now);
+			const date = new SvelteDate(now);
 			date.setHours(hours, minutes, 0, 0);
 			
 			return {
