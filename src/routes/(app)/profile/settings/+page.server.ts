@@ -38,9 +38,18 @@ export const actions: Actions = {
 		const latitude = formData.get("latitude") as string;
 
 		try {
+			const openStreet = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&zoom=10&addressdetails=1`, {
+				headers: {
+					'User-Agent': 'YaaQeen/1.0 (https://yaaqeen.dkaji.my.id/jadwal-solat)'
+				}
+			});
 
-			const openStreet = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&zoom=10&addressdetails=1`)
-			const openStreetData = await openStreet.json()
+			if (!openStreet.ok) {
+				console.error('OpenStreetMap API error:', openStreet.status, await openStreet.text());
+				return fail(500, { message: "Failed to fetch location data from OpenStreetMap" });
+			}
+
+			const openStreetData = await openStreet.json();
 
 			const currentUser = await db.query.user.findFirst({
 				where: eq(user.id, locals.user.id)
@@ -93,8 +102,18 @@ export const actions: Actions = {
 		const latitude = formData.get("latitude") as string;
 
 		try {
-			const openStreet = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&zoom=10&addressdetails=1`)
-			const openStreetData = await openStreet.json()
+			const openStreet = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&zoom=10&addressdetails=1`, {
+				headers: {
+					'User-Agent': 'YaaQeen/1.0 (https://yaaqeen.dkaji.my.id/jadwal-solat)'
+				}
+			});
+
+			if (!openStreet.ok) {
+				console.error('OpenStreetMap API error:', openStreet.status, await openStreet.text());
+				return fail(500, { message: "Failed to fetch location data from OpenStreetMap" });
+			}
+
+			const openStreetData = await openStreet.json();
 
 
 			const currentUser = await db.query.user.findFirst({
