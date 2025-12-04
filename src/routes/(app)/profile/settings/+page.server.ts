@@ -96,7 +96,6 @@ export const actions: Actions = {
 			const openStreet = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&zoom=10&addressdetails=1`)
 			const openStreetData = await openStreet.json()
 
-			console.log('openStreetData:', formData);
 
 			const currentUser = await db.query.user.findFirst({
 				where: eq(user.id, locals.user.id)

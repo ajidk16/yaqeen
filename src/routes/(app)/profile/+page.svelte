@@ -91,7 +91,7 @@
 	</section>
 
 	<!-- Logout Button -->
-	<form action="/logout" method="POST" use:enhance class="w-full">
+	<form action="/dashboard/?/logout" method="POST" use:enhance class="w-full">
 		<button 
 			type="submit"
 			class="flex w-full items-center justify-center gap-2 rounded-xl border border-red-100 bg-red-50 p-4 font-bold text-red-500 transition-all hover:bg-red-100 active:scale-95"

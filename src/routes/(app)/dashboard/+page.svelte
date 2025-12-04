@@ -63,11 +63,13 @@
 		);
 	}
 
-	$effect(() => {
-		if (!timer.nextPrayer && !isLoading) {
-			refreshLocation();
-		}
-	});
+	// $effect(() => {
+	// 	if (!timer.nextPrayer && !isLoading) {
+	// 		refreshLocation();
+	// 	}
+	// });
+
+	console.log('Dashboard data:', timer);
 </script>
 
 <div class="min-h-screen bg-base-100 p-4 pb-24 lg:p-8">
