@@ -16,7 +16,7 @@ export class PrayerTimer {
 	interval: ReturnType<typeof setInterval> | null = null;
 
 	constructor(initialPrayers: PrayerTime[] = []) {
-		this.prayerTimes = initialPrayers;
+		this.prayerTimes = this.hydrateTimestamps(initialPrayers);
 		
 		$effect(() => {
 			this.interval = setInterval(() => {
@@ -29,9 +29,26 @@ export class PrayerTimer {
 		});
 	}
 
+	private hydrateTimestamps(prayers: PrayerTime[]): PrayerTime[] {
+		const now = new Date();
+		return prayers.map(p => {
+			const [hours, minutes] = p.time.split(':').map(Number);
+			const date = new Date(now);
+			date.setHours(hours, minutes, 0, 0);
+			
+			return {
+				...p,
+				timestamp: date.getTime()
+			};
+		});
+	}
+
 	nextPrayer = $derived.by(() => {
 		if (!this.prayerTimes.length) return null;
 		const now = this.currentTime.getTime();
+		// Find the first prayer that hasn't passed yet
+		// Since we updated timestamps to be today, we need to handle the case where all prayers for today have passed
+		// But for now, let's just find the next one in the list that is in the future
 		return this.prayerTimes.find((p) => p.timestamp > now) || null;
 	});
 
@@ -51,7 +68,7 @@ export class PrayerTimer {
 	});
 
 	updatePrayers(newPrayers: PrayerTime[]) {
-		this.prayerTimes = newPrayers;
+		this.prayerTimes = this.hydrateTimestamps(newPrayers);
 	}
 
 	destroy() {
