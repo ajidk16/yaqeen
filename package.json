@@ -33,6 +33,7 @@
 		"@tailwindcss/vite": "^4.1.17",
 		"@types/canvas-confetti": "^1.9.0",
 		"@types/node": "^22",
+		"@types/nodemailer": "^7.0.4",
 		"@types/pg": "^8.15.6",
 		"@types/ws": "^8.18.1",
 		"@vitest/browser-playwright": "^4.0.10",

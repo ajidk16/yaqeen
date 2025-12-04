@@ -5,6 +5,7 @@
 	import { Input, Button, Alert } from '$lib/components/ui';
 	import { enhance } from '$app/forms';
 	import type { ActionData } from './$types';
+	import { goto } from '$app/navigation';
 
 	let { form } = $props<{ form: ActionData }>();
 
@@ -59,6 +60,7 @@
 				return async ({ result, update }) => {
 					isLoading = false;
 					await update();
+					goto('/verify');
 				};
 			}} class="space-y-6">
 				<div class="space-y-4">
