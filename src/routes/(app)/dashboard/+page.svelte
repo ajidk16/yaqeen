@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { fly, scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
-	import { Flame, Clock, Calendar, CheckCircle, BookOpen, Activity, ArrowRight, Sparkles, Heart } from 'lucide-svelte';
+	import { Flame, Clock, Calendar, Check, BookOpen, Activity, ArrowRight, Sparkles, Heart } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui';
 	import { goto } from '$app/navigation';
 	import { PrayerTimer } from '$lib/runes/prayer.svelte';
+	import { formatTime } from '$lib/utils/format.js';
 
 	let { data } = $props();
 	
@@ -136,7 +137,7 @@
 
 			<div class="grid gap-3">
 				{#each profile.recentActivity as activity, i}
-					{@const Icon = activity.type === 'prayer' ? CheckCircle : activity.type === 'quran' ? BookOpen : Activity}
+					{@const Icon = activity.type === 'prayer' ? Check : activity.type === 'quran' ? BookOpen : Activity}
 					{@const color = activity.type === 'prayer' ? 'text-success' : activity.type === 'quran' ? 'text-primary' : 'text-warning'}
 					<div 
 						class="card bg-base-100 shadow-sm border border-base-content/5 hover:shadow-md transition-all duration-300"
@@ -148,7 +149,7 @@
 							</div>
 							<div class="flex-1">
 								<h4 class="font-bold text-sm">{activity.title}</h4>
-								<p class="text-xs text-base-content/60">{activity.time}</p>
+								<p class="text-xs text-base-content/60">{activity.originalTime ? formatTime(activity.originalTime) : ''}</p>
 							</div>
 						</div>
 					</div>

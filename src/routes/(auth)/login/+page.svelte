@@ -6,6 +6,7 @@
 	import { enhance } from '$app/forms';
 	import type { ActionData } from './$types';
 	import { goto } from '$app/navigation';
+	import { toast } from '$lib/stores/toast';
 
 	let { form } = $props<{ form: ActionData }>();
 
@@ -48,12 +49,15 @@
 				isLoading = true;
 				return async ({ result, update }) => {
 					console.log("Login result:", result);
-					if (result.status === 302) {
-						isLoading = false;
+					isLoading = false;
+					if (result.type === 'redirect') {
 						await update();
 						goto('/dashboard')
+					} else if (result.type === 'failure' || result.type === 'error') {
+						const message = result.type === 'failure' ? result.data?.message : 'Login failed. Please try again.';
+						error = message
 					} else {
-						isLoading = false;
+						await update();
 					}
 				};
 			}} class="space-y-6">

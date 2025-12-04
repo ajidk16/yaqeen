@@ -34,14 +34,15 @@ export const actions: Actions = {
 		const mazhab = formData.get("mazhab") as string;
 		const locationMethod = formData.get("locationMethod") as string;
 		const manualLocation = formData.get("manualLocation") as string;
+		const longitude = formData.get("longitude") as string;
+		const latitude = formData.get("latitude") as string;
 
 		try {
-			// Fetch current user to merge jsonb fields if needed, 
-			// but for now we might just overwrite or merge carefully.
-			// Drizzle's update for jsonb usually overwrites the whole object if we pass a new object.
-			// So we should probably fetch first or use sql operators if we want partial updates.
-			// For simplicity, let's fetch current user first to preserve other keys if any.
-			
+
+			const openStreet = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&zoom=10&addressdetails=1`)
+			const openStreetData = await openStreet.json()
+			console.log(openStreetData)
+
 			const currentUser = await db.query.user.findFirst({
 				where: eq(user.id, locals.user.id)
 			});
@@ -50,9 +51,9 @@ export const actions: Actions = {
 				return fail(404, { message: "User not found" });
 			}
 
-			const currentPreferences = currentUser.preferences as Record<string, any> || {};
-			const currentSettings = currentUser.settings as Record<string, any> || {};
-			const currentLocation = currentUser.location as Record<string, any> || {};
+			const currentPreferences = currentUser.preferences as Record<string, string> || {};
+			const currentSettings = currentUser.settings as Record<string, string> || {};
+			const currentLocation = currentUser.location as Record<string, string> || {};
 
 			await db.update(user)
 				.set({
@@ -68,7 +69,10 @@ export const actions: Actions = {
 					location: {
 						...currentLocation,
 						method: locationMethod,
-						city: manualLocation
+						city: manualLocation ? manualLocation : openStreetData.address.city || openStreetData.address.town || openStreetData.address.village || '',
+						lat: latitude,
+						lng: longitude,
+						displayName: openStreetData.display_name
 					},
 					updatedAt: new Date()
 				})
@@ -76,6 +80,43 @@ export const actions: Actions = {
 		} catch (e) {
 			console.error(e);
 			return fail(500, { message: "Failed to update settings" });
+		}
+
+		return { success: true };
+	},
+	updateLatLong: async ({ request, locals }) => {
+		if (!locals.user) {
+			return fail(401);
+		}
+
+		const formData = await request.formData();
+		const longitude = formData.get("longitude") as string;
+		const latitude = formData.get("latitude") as string;
+
+		try {
+			const currentUser = await db.query.user.findFirst({
+				where: eq(user.id, locals.user.id)
+			});
+
+			if (!currentUser) {
+				return fail(404, { message: "User not found" });
+			}
+
+			const currentLocation = currentUser.location as Record<string, string> || {};
+
+			await db.update(user)
+				.set({
+					location: {
+						...currentLocation,
+						lat: latitude,
+						lng: longitude
+					},
+					updatedAt: new Date()
+				})
+				.where(eq(user.id, locals.user.id));
+		} catch (e) {
+			console.error(e);
+			return fail(500, { message: "Failed to update location" });
 		}
 
 		return { success: true };

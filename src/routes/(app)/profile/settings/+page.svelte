@@ -9,7 +9,7 @@
 	import confetti from 'canvas-confetti';
 	import { page } from '$app/state';
 
-	const profile = $derived(page.data.user)
+	const profile = page.data.user
 
 	let isSaving = $state(false);
 
@@ -20,6 +20,28 @@
 			origin: { y: 0.6 },
 			colors: ['#10B981', '#34D399', '#FBBF24', '#F472B6']
 		});
+	}
+
+	let location = $state(profile?.location.method ?? false)
+	let longitude = $state(profile?.location.longitude ?? null)
+	let latitude = $state(profile?.location.latitude ?? null)
+
+	const handleLocationToggle = () => {
+		location = !location;
+
+		if (location) {
+			navigator.geolocation.getCurrentPosition(
+				(position) => {
+					longitude = position.coords.longitude;
+					latitude = position.coords.latitude;
+				},
+				(err) => {
+					console.error(err);
+					toast.add("Gagal mengambil lokasi otomatis.", "error");
+					location = false;
+				}
+			);
+		}
 	}
 </script>
 
@@ -126,21 +148,23 @@
 										<p class="text-xs text-base-content/40">Untuk jadwal sholat akurat</p>
 									</div>
 								</div>
-								<input type="hidden" name="method" value={profile.location.method} />
+								<input type="hidden" name="locationMethod" value={location ? true : false} />
+								<input type="hidden" name="longitude" value={longitude} />
+								<input type="hidden" name="latitude" value={latitude} />
 								<input 
 									type="checkbox" 
 									class="toggle toggle-secondary" 
-									checked={profile.location.method === 'auto'} 
-									onclick={() => profile.location.method = profile.location.method === 'auto' ? 'manual' : 'auto'}
+									checked={location} 
+									onclick={handleLocationToggle}
 								/>
 							</div>
 
-							{#if profile.location.method === 'manual'}
+							{#if location === false}
 								<div class="form-control w-full" transition:fade>
 									<label class="label" for="manualLocation">
 										<span class="label-text font-medium">Kota Manual</span>
 									</label>
-									<Input name="manualLocation" placeholder="Masukkan nama kota..." bind:value={profile.location.manualLocation} class="bg-base-200/50" />
+									<Input name="manualLocation" placeholder="Masukkan nama kota..." bind:value={profile.location.city} class="bg-base-200/50" />
 								</div>
 							{/if}
 						</div>

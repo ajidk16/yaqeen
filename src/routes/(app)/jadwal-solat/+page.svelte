@@ -4,6 +4,7 @@
 	import { Button, Badge } from '$lib/components/ui';
 	import { invalidateAll } from '$app/navigation';
 	import { PrayerTimer } from '$lib/runes/prayer.svelte';
+	import { page } from '$app/state';
 
 	let { data } = $props();
 
@@ -16,8 +17,10 @@
 		}
 	});
 
+	const user = $derived(page.data.user);
+	console.log('User data in prayer times page:', user);	
+
 	// State
-	let locationName = $derived(data.locationName);
 	let isLoading = $state(false);
 	let error = $state<string | null>(null);
 
@@ -32,10 +35,17 @@
 		navigator.geolocation.getCurrentPosition(
 			async (position) => {
 				// Set cookie via client-side JS
-				document.cookie = `user-location=${JSON.stringify({
-					lat: position.coords.latitude,
-					lng: position.coords.longitude
-				})}; path=/; max-age=2592000`; // 30 days
+				// document.cookie = `user-location=${JSON.stringify({
+				// 	lat: position.coords.latitude,
+				// 	lng: position.coords.longitude
+				// })}; path=/; max-age=2592000`; // 30 days
+				const formData = new FormData();
+				formData.append('latitude', position.coords.latitude.toString());
+				formData.append('longitude', position.coords.longitude.toString());
+				await fetch('/profile/settings?/updateLatLong', {
+					method: 'POST',
+					body: formData
+				});
 				
 				// Clear prayer-times cookie to force refetch
 				document.cookie = 'prayer-times=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
@@ -69,7 +79,7 @@
 				<h1 class="text-2xl font-bold">Jadwal Sholat</h1>
 				<div class="flex items-center gap-2 text-base-content/60 mt-1">
 					<MapPin class="size-4 text-primary" />
-					<span class="text-sm font-medium">{locationName}</span>
+					<span class="text-sm font-medium">{user.location.city}</span>
 				</div>
 			</div>
 			<Button variant="ghost" size="sm" circle onclick={refreshLocation} disabled={isLoading}>

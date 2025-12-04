@@ -1,7 +1,7 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { db } from "$lib/server/db";
-import { user, session } from "$lib/server/db/schema";
-import { eq, and, ne } from "drizzle-orm";
+import { user, session, account } from "$lib/server/db/schema";
+import { eq } from "drizzle-orm";
 import { hash, verify } from "@node-rs/argon2";
 import { lucia } from "$lib/server/auth";
 import type { PageServerLoad, Actions } from "./$types";
@@ -25,7 +25,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		device: s.userAgent || 'Unknown Device',
 		location: s.ipAddress || 'Unknown Location',
 		active: s.id === locals.session?.id,
-		lastActive: s.updatedAt.toLocaleDateString() + ' ' + s.updatedAt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false })
+		lastActive: s.updatedAt
 	}));
 
 	return {
@@ -61,12 +61,14 @@ export const actions: Actions = {
 			// Assuming email/password provider is used and stored in account table
 			// We need to find the account linked to this user with password
 			const userAccount = await db.query.account.findFirst({
-				where: eq(user.id, locals.user.id) // This might need refinement if multiple accounts exist
+				where: eq(account.userId, locals.user.id) // This might need refinement if multiple accounts exist
 			});
 
 			if (!userAccount || !userAccount.password) {
 				return fail(400, { message: "No password set for this account" });
 			}
+
+
 
 			const validPassword = await verify(userAccount.password, currentPassword, {
 				memoryCost: 19456,
@@ -87,15 +89,19 @@ export const actions: Actions = {
 				parallelism: 1
 			});
 
+
+
 			// Update password in account table
 			// We need to update the specific account entry
 			// Assuming we update the one we found
-			await db.update(db.query.account.table) // Using table reference from query builder or schema
+			const result = await db.update(account) // Using table reference from query builder or schema
 				.set({
 					password: passwordHash,
 					updatedAt: new Date()
 				})
-				.where(eq(db.query.account.table.id, userAccount.id)); // Use schema export if possible, but here using query result id
+				.where(eq(account.id, userAccount.id));
+
+			console.log("Password update result:", result);
 
 		} catch (e) {
 			console.error(e);
@@ -119,7 +125,7 @@ export const actions: Actions = {
 		try {
 			await lucia.invalidateSession(sessionId);
 		} catch (e) {
-			return fail(500, { message: "Failed to revoke session" });
+			return fail(500, { message: `Failed to revoke session ${e}` });
 		}
 
 		return { success: true };

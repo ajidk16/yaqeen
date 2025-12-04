@@ -1,18 +1,14 @@
 <script lang="ts">
-	import { fade, fly, scale } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
-	import { Sun, Moon, Users, User, Check, Calendar, ChevronLeft, ChevronRight, Star, MapPin, Loader2, Plus } from 'lucide-svelte';
-	import { Card, Button, Badge, Loading } from '$lib/components/ui';
-	import { onMount } from 'svelte';
+	import { Sun, Moon, Users, User, Check, Calendar, ChevronLeft, ChevronRight, Star, MapPin, Plus } from 'lucide-svelte';
+	import { Card, Button } from '$lib/components/ui';
 	import { goto, invalidateAll } from '$app/navigation';
-	import { page } from '$app/stores';
 	import { formatDate } from '$lib/utils/format.js';
-	import { is } from 'drizzle-orm';
 
 	let { data } = $props();
 
 	let selectedDate = $state(new Date(data.date));
-	let isLoadingTimes = $state(false);
 	let locationName = $state('Jakarta, ID');
 	
 	// Fardhu Prayers State
@@ -26,13 +22,7 @@
 		icon: any;
 	}
 
-	let fardhuPrayers = $state<FardhuPrayer[]>([
-		{ id: 'subuh', name: 'Subuh', time: '--:--', status: 'none', icon: Moon },
-		{ id: 'dzuhur', name: 'Dzuhur', time: '--:--', status: 'none', icon: Sun },
-		{ id: 'ashar', name: 'Ashar', time: '--:--', status: 'none', icon: Sun },
-		{ id: 'maghrib', name: 'Maghrib', time: '--:--', status: 'none', icon: Moon },
-		{ id: 'isya', name: 'Isya', time: '--:--', status: 'none', icon: Moon }
-	]);
+	let fardhuPrayers = $state<FardhuPrayer[]>([]);
 
 	// Sunnah Prayers State (Habits)
 	interface SunnahPrayer {
@@ -45,15 +35,34 @@
 
 	let sunnahPrayers = $state<SunnahPrayer[]>([]);
 
-	// Initialize from data
+	// Initialize and Sync from data
 	$effect(() => {
-		if (data.prayerLogs) {
-			fardhuPrayers.forEach(prayer => {
-				const log = data.prayerLogs.find((l: any) => l.prayerName === prayer?.id);
-				prayer.status = (log?.status as PrayerStatus) || 'none';
+		selectedDate = new Date(data.date);
+
+		// Sync Fardhu Prayers
+		if (data.prayerTimes) {
+			fardhuPrayers = data.prayerTimes.map((pt: any) => {
+				const log = data.prayerLogs?.find((l: any) => l.prayerName === pt.name);
+				return {
+					id: pt.name,
+					name: pt.name,
+					time: pt.time,
+					status: log ? (log.status as PrayerStatus) : 'none',
+					icon: (() => {
+						switch (pt.name) {
+							case 'subuh': return Moon;
+							case 'dzuhur': return Sun;
+							case 'ashar': return Sun;
+							case 'maghrib': return Moon;
+							case 'isya': return Moon;
+							default: return Sun;
+						}
+					})()
+				};
 			});
 		}
 		
+		// Sync Sunnah Prayers
 		if (data.sunnahPrayers) {
 			sunnahPrayers = data.sunnahPrayers.map((h: any) => ({
 				id: h.id,
@@ -63,8 +72,6 @@
 				time: h.time
 			}));
 		}
-
-		selectedDate = new Date(data.date);
 	});
 
 	async function updateFardhuStatus(id: string, status: PrayerStatus) {
@@ -83,7 +90,6 @@
 			body: formData
 		});
 		
-		// Ideally handle error and revert if needed
 		invalidateAll();
 	}
 
@@ -112,52 +118,6 @@
 		const dateStr = newDate.toISOString().split('T')[0];
 		goto(`?date=${dateStr}`);
 	}
-
-	// Fetch Prayer Times
-	async function fetchPrayerTimes() {
-		isLoadingTimes = true;
-		try {
-			// Jakarta Coordinates
-			const lat = -6.2088;
-			const lng = 106.8456;
-			const method = 20; // Kemenag RI
-			
-			const dateStr = `${selectedDate.getDate()}-${selectedDate.getMonth() + 1}-${selectedDate.getFullYear()}`;
-			
-			const response = await fetch(`https://api.aladhan.com/v1/timings/${dateStr}?latitude=${lat}&longitude=${lng}&method=${method}`);
-			const resData = await response.json();
-			
-			if (resData.code === 200) {
-				const timings = resData.data.timings;
-				
-				// Update Fardhu times
-				const timeMap: Record<string, string> = {
-					'subuh': timings.Fajr,
-					'dzuhur': timings.Dhuhr,
-					'ashar': timings.Asr,
-					'maghrib': timings.Maghrib,
-					'isya': timings.Isha
-				};
-
-				fardhuPrayers = fardhuPrayers.map(p => ({
-					...p,
-					time: timeMap[p.id] || p.time
-				}));
-
-				isLoadingTimes = false;
-			}
-		} catch (e) {
-			console.error("Failed to fetch prayer times", e);
-		} finally {
-			isLoadingTimes = false;
-		}
-	}
-
-	// Reactivity
-	$effect(() => {
-		// Re-fetch times whenever date changes
-		fetchPrayerTimes();
-	});
 
 	// Progress Calculation
 	let fardhuProgress = $derived(
@@ -225,12 +185,6 @@
 					<div class="size-2 rounded-full bg-primary"></div>
 					Sholat Wajib
 				</h2>
-				{#if isLoadingTimes}
-					<div class="flex items-center gap-2 text-xs text-base-content/50">
-						<Loading variant='spinner' />
-						Memperbarui waktu...
-					</div>
-				{/if}
 			</div>
 			
 			<div class="grid gap-4">

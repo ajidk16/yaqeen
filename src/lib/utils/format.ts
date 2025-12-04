@@ -20,5 +20,9 @@ export const formatTime = (date: Date, locale: string = 'id-ID'): string => {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
-  }).format(date);
+  }).format(date).replace('.', ':');
 };
+
+export const formatDateTime = (date: Date, locale: string = 'id-ID'): string => {
+  return `${formatDate(date, locale)} ${formatTime(date, locale)}`;
+}

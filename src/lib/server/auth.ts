@@ -18,7 +18,8 @@ export const lucia = new Lucia(adapter, {
 			email: attributes.email,
 			name: attributes.name,
 			image: attributes.image,
-			settings: attributes.settings ?? {}
+			settings: attributes.settings ?? {},
+			location: attributes.location ?? {}
 		};
 	}
 });
@@ -37,5 +38,9 @@ interface DatabaseUserAttributes {
 	settings: {
 		darkMode: boolean;
 		quranTarget: number;
+	},
+	location: {
+		lat: number | null;
+		lng: number | null;
 	}
 }

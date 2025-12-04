@@ -1,40 +1,23 @@
 import type { LayoutServerLoad } from './$types';
 
-export const load: LayoutServerLoad = async ({ cookies, fetch }) => {
+export const load: LayoutServerLoad = async ({ cookies, fetch, locals }) => {
 	let prayerTimes = null;
-	let locationName = 'Jakarta, ID'; // Default
 
-	// 1. Try to get location from cookie
-	const locationCookie = cookies.get('user-location');
-	let lat = -6.2088;
-	let lng = 106.8456;
-
-	if (locationCookie) {
-		try {
-			const loc = JSON.parse(locationCookie);
-			lat = loc.lat;
-			lng = loc.lng;
-		} catch (e) {
-			// ignore
-		}
-	}
+	const profile = locals.user
 
 	// 2. Try to get cached prayer times
 	const cachedPrayers = cookies.get('prayer-times');
 	if (cachedPrayers) {
-		try {
-			const parsed = JSON.parse(cachedPrayers);
-			const today = new Date().toDateString();
-			const cachedDate = new Date(parsed.timestamp).toDateString();
-			
-			// Check if data is for today
-			if (today === cachedDate) {
-				prayerTimes = parsed.data;
-				locationName = parsed.locationName;
-			}
-		} catch (e) {
-			// ignore
+
+		const parsed = JSON.parse(cachedPrayers);
+		const today = new Date().toDateString();
+		const cachedDate = new Date(parsed.timestamp).toDateString();
+
+		// Check if data is for today
+		if (today === cachedDate) {
+			prayerTimes = parsed.data;
 		}
+
 	}
 
 	// 3. If no valid cache, fetch from API
@@ -42,13 +25,14 @@ export const load: LayoutServerLoad = async ({ cookies, fetch }) => {
 		try {
 			const date = new Date();
 			const method = 20; // Kemenag RI
-			const response = await fetch(`https://api.aladhan.com/v1/timings/${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}?latitude=${lat}&longitude=${lng}&method=${method}`);
+			const response = await fetch(`https://api.aladhan.com/v1/timings/${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}?latitude=${profile?.location.lat}&longitude=${profile?.location.lng}&method=${method}`);
 			const data = await response.json();
+
+			console.log('Fetched prayer times from API', data);
 
 			if (data.code === 200) {
 				const timings = data.data.timings;
 				const meta = data.data.meta;
-				locationName = meta.timezone;
 
 				const PRAYER_NAMES = {
 					Fajr: 'Subuh',
@@ -84,8 +68,8 @@ export const load: LayoutServerLoad = async ({ cookies, fetch }) => {
 					data: prayerList,
 					locationName: meta.timezone,
 					timestamp: new Date().getTime(),
-					lat,
-					lng
+					lat: profile?.location.lat,
+					lng: profile?.location.lng
 				}), {
 					path: '/',
 					maxAge: 60 * 60 * 24 * 30, // 30 days
@@ -99,6 +83,6 @@ export const load: LayoutServerLoad = async ({ cookies, fetch }) => {
 
 	return {
 		prayerTimes: prayerTimes || [],
-		locationName
+		user: profile
 	};
 };
