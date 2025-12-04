@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
 	import {  fly, scale, slide } from 'svelte/transition';
 	import { MapPin, Bell, BellOff, Clock, Loader2, RefreshCw } from 'lucide-svelte';
 	import { Button, Badge } from '$lib/components/ui';
@@ -56,9 +55,7 @@
 		// Local toggle for now
 		const index = timer.prayerTimes.findIndex(p => p.id === id);
 		if (index !== -1) {
-			// Note: This mutation might not persist if timer.prayerTimes is treated as immutable from server
-			// But for UI toggle it works if PrayerTimer uses $state
-			// Ideally this should call a server action
+			timer.prayerTimes[index].notificationEnabled = !timer.prayerTimes[index].notificationEnabled;
 		}
 	}
 </script>

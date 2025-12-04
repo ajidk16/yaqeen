@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
-	import { fade, fly, scale, slide } from 'svelte/transition';
+	import { fly, scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 	import { Flame, Clock, Calendar, CheckCircle, BookOpen, Activity, ArrowRight, Sparkles, Heart } from 'lucide-svelte';
-	import { Card, Button, Badge } from '$lib/components/ui';
+	import { Button } from '$lib/components/ui';
 	import { goto } from '$app/navigation';
 	import { PrayerTimer } from '$lib/runes/prayer.svelte';
 
@@ -18,11 +17,7 @@
 		}
 	});
 
-	// Merge server data with local state for nextPrayer
-	let user = $derived({
-		...data.user,
-		nextPrayer: timer.nextPrayer ? { ...timer.nextPrayer } : { name: 'Semua Selesai', time: 'Sampai jumpa besok' }
-	});
+	const profile = $derived(data.user);
 
 	function getGreeting() {
 		const hour = timer.currentTime.getHours();
@@ -39,7 +34,7 @@
 		<header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4" in:fly={{ y: -20, duration: 800, easing: quintOut }}>
 			<div>
 				<h1 class="text-3xl font-bold">
-					{getGreeting()}, <span class="text-primary capitalize">{user.name}!</span> 👋
+					{getGreeting()}, <span class="text-primary capitalize">{profile.name}!</span> 👋
 				</h1>
 				<p class="text-base-content/60 mt-1">"Mulai harimu dengan Bismillah."</p>
 			</div>
@@ -50,7 +45,7 @@
 					<div class="absolute inset-0 bg-orange-500/20 blur-lg rounded-full animate-pulse"></div>
 				</div>
 				<div>
-					<span class="font-bold text-lg">{data.user.streak}</span>
+					<span class="font-bold text-lg">{profile.streak}</span>
 					<span class="text-xs text-base-content/60 ml-1">Hari Beruntun</span>
 				</div>
 			</div>
@@ -68,7 +63,8 @@
 							<Clock class="size-4" />
 							<span class="text-sm font-medium uppercase tracking-wider">Sholat Berikutnya</span>
 						</div>
-						<h2 class="text-4xl font-bold mb-1">{user.nextPrayer.name}</h2>
+						<h2 class="text-4xl font-bold mb-1">{timer.nextPrayer?.name}</h2>
+						
 						
 						{#if timer.nextPrayer}
 							<div class="text-5xl font-black font-mono tracking-tighter my-2 tabular-nums">
@@ -76,10 +72,11 @@
 							</div>
 							<div class="inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">
 								<Clock class="size-3" />
-								<span>{user.nextPrayer.time}</span>
+								<span>{timer.nextPrayer?.time}</span>
 							</div>
 						{:else}
-							<p class="text-2xl font-mono opacity-90">{user.nextPrayer.time}</p>
+						
+							<p class="text-2xl font-mono opacity-90">{timer.nextPrayer ? timer.nextPrayer : 'Sampai jumpa besok'}</p>
 						{/if}
 					</div>
 					
@@ -104,23 +101,23 @@
 						<div>
 							<div class="flex justify-between text-sm mb-1">
 								<span>Ibadah</span>
-								<span class="font-bold text-primary">{user.progress.ibadah}%</span>
+								<span class="font-bold text-primary">{profile.progress.ibadah}%</span>
 							</div>
-							<progress class="progress progress-primary w-full" value={user.progress.ibadah} max="100"></progress>
+							<progress class="progress progress-primary w-full" value={profile.progress.ibadah} max="100"></progress>
 						</div>
 						<div>
 							<div class="flex justify-between text-sm mb-1">
 								<span>Kebiasaan</span>
-								<span class="font-bold text-secondary">{user.progress.habits}%</span>
+								<span class="font-bold text-secondary">{profile.progress.habits}%</span>
 							</div>
-							<progress class="progress progress-secondary w-full" value={user.progress.habits} max="100"></progress>
+							<progress class="progress progress-secondary w-full" value={profile.progress.habits} max="100"></progress>
 						</div>
 						<div>
 							<div class="flex justify-between text-sm mb-1">
 								<span>Quran</span>
-								<span class="font-bold text-accent">{user.progress.quran}%</span>
+								<span class="font-bold text-accent">{profile.progress.quran}%</span>
 							</div>
-							<progress class="progress progress-accent w-full" value={user.progress.quran} max="100"></progress>
+							<progress class="progress progress-accent w-full" value={profile.progress.quran} max="100"></progress>
 						</div>
 					</div>
 				</div>
@@ -138,7 +135,7 @@
 			</div>
 
 			<div class="grid gap-3">
-				{#each user.recentActivity as activity, i}
+				{#each profile.recentActivity as activity, i}
 					{@const Icon = activity.type === 'prayer' ? CheckCircle : activity.type === 'quran' ? BookOpen : Activity}
 					{@const color = activity.type === 'prayer' ? 'text-success' : activity.type === 'quran' ? 'text-primary' : 'text-warning'}
 					<div 
@@ -156,7 +153,7 @@
 						</div>
 					</div>
 				{/each}
-				{#if user.recentActivity.length === 0}
+				{#if profile.recentActivity.length === 0}
 					<div class="text-center py-8 text-base-content/40 italic">
 						Belum ada aktivitas hari ini.
 					</div>
