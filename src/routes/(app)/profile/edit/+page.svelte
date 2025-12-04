@@ -6,19 +6,16 @@
 	import { enhance } from '$app/forms';
 	import { toast } from '$lib/stores/toast';
 	import confetti from 'canvas-confetti';
-	import type { PageData } from './$types';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-
-	let { data } = $props<{ data: PageData }>();
 
 	const profile = $derived(page.data.user)
 
 	let isSaving = $state(false);
 
-	let theme = $state(data.user.preferences?.theme || 'light');
+	let theme = $state(page.data.user.preferences?.theme || 'light');
 	
-	let avatar = $state(data.user.image || 'https://i.pravatar.cc/150?u=' + data.user.id);
+	let avatar = $state(page.data.user.image || 'https://i.pravatar.cc/150?u=' + page.data.user.id);
 
 	function handleAvatarChange(e: Event) {
 		const input = e.target as HTMLInputElement;
@@ -72,6 +69,7 @@
 				};
 			}}
 			class="space-y-8"
+			enctype="multipart/form-data"
 		>
 			<!-- Avatar Section -->
 			<div class="flex flex-col items-center gap-4" in:scale={{ duration: 600, start: 0.95, delay: 100 }}>
@@ -166,24 +164,6 @@
 									onclick={() => profile.preferences.theme = profile.preferences.theme === 'dark' ? 'light' : 'dark'}
 								/>
 							</div>
-
-							<div class="flex items-center justify-between">
-								<div class="flex items-center gap-3">
-									<div class="p-2 rounded-lg bg-base-200 text-base-content/60">
-										<Bell class="size-5" />
-									</div>
-									<div>
-										<p class="font-medium">Notifikasi Push</p>
-										<p class="text-xs text-base-content/40">Pengingat untuk sholat & kebiasaan</p>
-									</div>
-								</div>
-								<input 
-									type="checkbox" 
-									name="notifications"
-									class="toggle toggle-secondary" 
-									bind:checked={profile.preferences.notifications} 
-								/>
-							</div>
 						</div>
 					</div>
 				</Card>
@@ -191,7 +171,7 @@
 
 			<!-- Actions -->
 			<div class="sticky bottom-6 flex gap-3 pt-4" in:fly={{ y: 20, duration: 800, delay: 300 }}>
-				<Button variant="ghost" class="flex-1" onclick={()=>goto('/profile')}>Batal</Button>
+				<Button type='button' variant="ghost" class="flex-1" onclick={()=>goto('/profile')}>Batal</Button>
 				<Button 
 					type="submit"
 					variant="primary" 

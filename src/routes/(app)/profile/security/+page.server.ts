@@ -1,6 +1,6 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { db } from "$lib/server/db";
-import { user, session, account } from "$lib/server/db/schema";
+import { user, session, account, habitLogs } from "$lib/server/db/schema";
 import { eq } from "drizzle-orm";
 import { hash, verify } from "@node-rs/argon2";
 import { lucia } from "$lib/server/auth";
@@ -141,6 +141,11 @@ export const actions: Actions = {
 			// Drizzle doesn't cascade automatically unless defined in DB
 			// We should delete related records first or rely on DB cascade
 			// Let's assume DB cascade is set up or we delete user which cascades
+
+			await db.delete(habitLogs).where(eq(habitLogs.userId, locals.user.id));
+			await db.delete(account).where(eq(account.userId, locals.user.id));
+			await db.delete(session).where(eq(session.userId, locals.user.id));
+			await db.delete(user).where(eq(user.id, locals.user.id));
 			
 			// Invalidate all sessions first
 			await lucia.invalidateUserSessions(locals.user.id);

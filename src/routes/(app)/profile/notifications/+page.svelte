@@ -11,8 +11,6 @@
 
 	const profile = $derived(page?.data?.user??	null)
 
-	console.log('Profile data:', profile);
-
 	let isSaving = $state(false);
 
 	function triggerConfetti() {

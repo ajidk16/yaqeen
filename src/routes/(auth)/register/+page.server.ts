@@ -16,9 +16,6 @@ export const actions: Actions = {
 		// const agreeTerms = formData.get("agreeTerms"); // Checkbox might be "on" or null
 		const userAgent = request.headers.get('user-agent');
 		const ipAddress = getClientAddress();
-
-		// console.log("Register attempt:", { email, name, agreeTerms });
-		// return
 		// Basic validation
 		if (
 			typeof email !== "string" ||
@@ -100,6 +97,6 @@ export const actions: Actions = {
 			});
 		}
 
-		redirect(302, "/");
+		redirect(302, "/dashboard");
 	}
 };

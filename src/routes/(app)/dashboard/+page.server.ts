@@ -69,28 +69,28 @@ export const load: PageServerLoad = async ({ locals }) => {
 	// --- Calculate Stats ---
 
 	// Ibadah (Fardhu)
-	const completedPrayers = todaysPrayerLogs.filter(p => p.status === 'jamaah' || p.status === 'munfarid').length;
-	const ibadahProgress = Math.round((completedPrayers / 5) * 100);
+	const completedPrayers = todaysPrayerLogs?.filter(p => p?.status === 'jamaah' || p?.status === 'munfarid').length;
+	const ibadahProgress = Math?.round((completedPrayers / 5) * 100);
 
 	// Habits
 	const totalHabits = activeHabits.length;
-	const completedHabits = todaysHabitLogs.filter(l => l.status === 'completed').length;
-	const habitsProgress = totalHabits > 0 ? Math.round((completedHabits / totalHabits) * 100) : 0;
+	const completedHabits = todaysHabitLogs?.filter(l => l?.status === 'completed').length;
+	const habitsProgress = totalHabits > 0 ? Math?.round((completedHabits / totalHabits) * 100) : 0;
 
 	// Quran
 	const pagesRead = todaysQuranProgress?.pagesRead || 0;
 	const quranTarget = locals.user.settings.quranTarget;
-	const quranProgressVal = Math.min(Math.round((pagesRead / quranTarget) * 100), 100);
+	const quranProgressVal = Math?.min(Math?.round((pagesRead / quranTarget) * 100), 100);
 
 	// --- Process Recent Activity ---
 	
 	const activities = [
 		...recentPrayers.map(p => ({
-			id: p.id,
+			id: p?.id,
 			type: 'prayer',
-			title: `Completed ${p.prayerName}`,
-			time: p.createdAt,
-			originalTime: p.createdAt
+			title: `Completed ${p?.prayerName}`,
+			time: p?.createdAt,
+			originalTime: p?.createdAt
 		})),
 		...recentHabits.map(h => ({
 			id: h.id,
@@ -169,7 +169,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 			progress: {
 				ibadah: ibadahProgress,
 				habits: habitsProgress,
-				quran: quranProgressVal
+				quran: quranProgressVal || 0
 			},
 			recentActivity: sortedActivity
 		}

@@ -48,7 +48,6 @@
 			<form method="POST" use:enhance={() => {
 				isLoading = true;
 				return async ({ result, update }) => {
-					console.log("Login result:", result);
 					isLoading = false;
 					if (result.type === 'redirect') {
 						await update();

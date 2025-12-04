@@ -41,7 +41,6 @@ export const actions: Actions = {
 
 			const openStreet = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&zoom=10&addressdetails=1`)
 			const openStreetData = await openStreet.json()
-			console.log(openStreetData)
 
 			const currentUser = await db.query.user.findFirst({
 				where: eq(user.id, locals.user.id)
@@ -94,6 +93,11 @@ export const actions: Actions = {
 		const latitude = formData.get("latitude") as string;
 
 		try {
+			const openStreet = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&zoom=10&addressdetails=1`)
+			const openStreetData = await openStreet.json()
+
+			console.log('openStreetData:', formData);
+
 			const currentUser = await db.query.user.findFirst({
 				where: eq(user.id, locals.user.id)
 			});
@@ -109,7 +113,9 @@ export const actions: Actions = {
 					location: {
 						...currentLocation,
 						lat: latitude,
-						lng: longitude
+						lng: longitude,
+						city: openStreetData.address.city || openStreetData.address.town || openStreetData.address.village || '',
+						displayName: openStreetData.display_name,
 					},
 					updatedAt: new Date()
 				})

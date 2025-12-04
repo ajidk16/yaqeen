@@ -28,8 +28,6 @@ export const load: LayoutServerLoad = async ({ cookies, fetch, locals }) => {
 			const response = await fetch(`https://api.aladhan.com/v1/timings/${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}?latitude=${profile?.location.lat}&longitude=${profile?.location.lng}&method=${method}`);
 			const data = await response.json();
 
-			console.log('Fetched prayer times from API', data);
-
 			if (data.code === 200) {
 				const timings = data.data.timings;
 				const meta = data.data.meta;

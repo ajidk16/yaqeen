@@ -18,7 +18,6 @@
 	});
 
 	const user = $derived(page.data.user);
-	console.log('User data in prayer times page:', user);	
 
 	// State
 	let isLoading = $state(false);
@@ -34,11 +33,6 @@
 
 		navigator.geolocation.getCurrentPosition(
 			async (position) => {
-				// Set cookie via client-side JS
-				// document.cookie = `user-location=${JSON.stringify({
-				// 	lat: position.coords.latitude,
-				// 	lng: position.coords.longitude
-				// })}; path=/; max-age=2592000`; // 30 days
 				const formData = new FormData();
 				formData.append('latitude', position.coords.latitude.toString());
 				formData.append('longitude', position.coords.longitude.toString());

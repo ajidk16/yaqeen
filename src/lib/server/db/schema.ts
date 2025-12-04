@@ -11,10 +11,10 @@ export const user = pgTable('user', {
 	image: text('image'),
 	createdAt: timestamp('created_at').notNull(),
 	updatedAt: timestamp('updated_at').notNull(),
-	preferences: jsonb('preferences'), // theme, notifications, etc.
-	settings: jsonb('settings'), // periodMode, dataSaver, etc.
+	preferences: jsonb('preferences').default({ theme: 'light', notifications: false }), // theme, notifications, etc.
+	settings: jsonb('settings').default({  dataSaver: false, periodMode: false }), // periodMode, dataSaver, etc.
 	mazhab: text('mazhab').default('shafi'),
-	location: jsonb('location') // { city: string, lat: number, lng: number, method: 'auto' | 'manual' }
+	location: jsonb('location').default({ city: '', lat:0, lng: 0, method: 'false' }) // { city: string, lat: number, lng: number, method: 'auto' | 'manual' }
 });
 
 export const session = pgTable('session', {
