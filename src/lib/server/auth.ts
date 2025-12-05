@@ -19,7 +19,8 @@ export const lucia = new Lucia(adapter, {
 			name: attributes.name,
 			image: attributes.image,
 			settings: attributes.settings ?? {},
-			location: attributes.location ?? {}
+			location: attributes.location ?? {},
+			preferences: attributes.preferences ?? {}
 		};
 	}
 });
@@ -42,5 +43,19 @@ interface DatabaseUserAttributes {
 	location: {
 		lat: number | null;
 		lng: number | null;
+	},
+	preferences: {
+		notifications: boolean;
+		notificationSettings: {
+			sound: string;
+			habits: boolean;
+			prayers: {
+				asr: boolean;
+				fajr: boolean;
+				isha: boolean;
+				dhuhr: boolean;
+				maghrib: boolean;
+			}
+		}
 	}
 }

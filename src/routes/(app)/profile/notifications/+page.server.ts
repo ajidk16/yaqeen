@@ -36,7 +36,7 @@ export const actions: Actions = {
 		const maghrib = formData.get("maghrib") === 'on';
 		const isha = formData.get("isha") === 'on';
 		const habits = formData.get("habits") === 'on';
-		const updates = formData.get("updates") === 'on';
+		const sound = formData.get("sound");
 
 		try {
 			const currentUser = await db.query.user.findFirst({
@@ -47,7 +47,7 @@ export const actions: Actions = {
 				return fail(404, { message: "User not found" });
 			}
 
-			const currentPreferences = currentUser.preferences as Record<string, any> || {};
+			const currentPreferences = currentUser.preferences as Record<string, string> || {};
 
 			await db.update(user)
 				.set({
@@ -63,7 +63,7 @@ export const actions: Actions = {
 								isha
 							},
 							habits,
-							updates
+							sound
 						}
 					},
 					updatedAt: new Date()

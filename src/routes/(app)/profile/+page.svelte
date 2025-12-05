@@ -75,8 +75,8 @@
 	</Card>
 
 	<!-- Settings List -->
-	<Card class="border-base-content/5 overflow-hidden p-0!">
-		<div class="divide-y divide-base-content/5">
+	<Card class="border-base-content/5 overflow-hidden">
+		<div class="divide-y divide-base-content/5 p-0">
 			{#each listProfile as item}
 			<a href={item.path} class="flex w-full items-center justify-between py-4 transition-colors hover:bg-base-200/50 group">
 				<div class="flex items-center gap-3">

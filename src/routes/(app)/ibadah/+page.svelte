@@ -5,6 +5,7 @@
 	import { Card, Button } from '$lib/components/ui';
 	import { goto, invalidateAll } from '$app/navigation';
 	import { formatDate } from '$lib/utils/format.js';
+	import { page } from '$app/state';
 
 	let { data } = $props();
 
@@ -131,6 +132,8 @@
 			? (sunnahPrayers.filter(p => p.completed).length / sunnahPrayers.length) * 100
 			: 0
 	);
+
+	const profile = $derived(page?.data?.user || {});
 	
 </script>
 
@@ -142,7 +145,7 @@
 				<h1 class="text-3xl font-bold">Pantau Ibadah</h1>
 				<div class="flex items-center gap-2 text-base-content/60 mt-1">
 					<MapPin class="size-4" />
-					<span class="text-sm">{locationName}</span>
+					<span class="text-sm">{profile?.location?.city}</span>
 				</div>
 			</div>
 			

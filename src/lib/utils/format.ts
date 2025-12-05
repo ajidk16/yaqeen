@@ -26,3 +26,10 @@ export const formatTime = (date: Date, locale: string = 'id-ID'): string => {
 export const formatDateTime = (date: Date, locale: string = 'id-ID'): string => {
   return `${formatDate(date, locale)} ${formatTime(date, locale)}`;
 }
+
+export const formatTimeDiff = (diff: number): string => {
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+};
