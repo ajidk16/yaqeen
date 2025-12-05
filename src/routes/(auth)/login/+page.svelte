@@ -7,6 +7,7 @@
 	import type { ActionData } from './$types';
 	import { goto } from '$app/navigation';
 	import { toast } from '$lib/stores/toast';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { form } = $props<{ form: ActionData }>();
 
@@ -15,57 +16,83 @@
 	let rememberMe = $state(false);
 	let showPassword = $state(false);
 	let isLoading = $state(false);
-	
+
 	let error = $derived(form?.message || null);
+
+	const features = $derived([
+		m.loginFeatureSmartTracking(),
+		m.loginFeatureDailyAnalytics(),
+		m.loginFeatureWorshipTarget(),
+		m.loginFeatureProgressInsight()
+	]);
 
 	function togglePasswordVisibility() {
 		showPassword = !showPassword;
 	}
 </script>
+
 <div class="min-h-screen w-full grid lg:grid-cols-2">
 	<!-- Left Side: Login Form -->
-	<div class="flex flex-col justify-center items-center p-4 sm:p-8 lg:p-12 bg-base-100 relative overflow-hidden">
+	<div
+		class="flex flex-col justify-center items-center p-4 sm:p-8 lg:p-12 bg-base-100 relative overflow-hidden"
+	>
 		<!-- Mobile Background Decoration -->
-		<div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0 lg:hidden">
-			<div class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-primary/5 blur-[100px] animate-pulse"></div>
-			<div class="absolute top-[40%] -right-[10%] w-[40%] h-[40%] rounded-full bg-secondary/5 blur-[100px] animate-pulse delay-700"></div>
+		<div
+			class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0 lg:hidden"
+		>
+			<div
+				class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-primary/5 blur-[100px] animate-pulse"
+			></div>
+			<div
+				class="absolute top-[40%] -right-[10%] w-[40%] h-[40%] rounded-full bg-secondary/5 blur-[100px] animate-pulse delay-700"
+			></div>
 		</div>
+
 		<div class="w-full max-w-md z-10 space-y-8" in:fly={{ y: 20, duration: 800, easing: quintOut }}>
 			<div class="text-center lg:text-left">
-				<div class="inline-flex items-center justify-center size-12 rounded-xl bg-primary/10 text-primary mb-6 lg:mb-8">
+				<div
+					class="inline-flex items-center justify-center size-12 rounded-xl bg-primary/10 text-primary mb-6 lg:mb-8"
+				>
 					<LogIn class="size-6" />
 				</div>
-				<h1 class="text-3xl font-bold tracking-tight">Selamat Datang Kembali</h1>
-				<p class="text-base-content/60 mt-2">Masuk untuk melanjutkan perjalanan ibadahmu.</p>
+				<h1 class="text-3xl font-bold tracking-tight">{m.loginTitle()}</h1>
+				<p class="text-base-content/60 mt-2">{m.loginSubtitle()}</p>
 			</div>
+
 			{#if error}
 				<div in:fade>
-					<Alert variant="error" title="Gagal Masuk">
+					<Alert variant="error" title={m.loginErrorTitle()}>
 						{error}
 					</Alert>
 				</div>
 			{/if}
-			<form method="POST" use:enhance={() => {
-				isLoading = true;
-				return async ({ result, update }) => {
-					isLoading = false;
-					if (result.type === 'redirect') {
-						await update();
-						goto('/dashboard')
-					} else if (result.type === 'failure' || result.type === 'error') {
-						const message = result.type === 'failure' ? result.data?.message : 'Login failed. Please try again.';
-						error = message
-					} else {
-						await update();
-					}
-				};
-			}} class="space-y-6">
+
+			<form
+				method="POST"
+				use:enhance={() => {
+					isLoading = true;
+					return async ({ result, update }) => {
+						isLoading = false;
+						if (result.type === 'redirect') {
+							await update();
+							goto('/dashboard');
+						} else if (result.type === 'failure' || result.type === 'error') {
+							const message =
+								result.type === 'failure' ? result.data?.message : m.loginErrorDefault();
+							error = message;
+						} else {
+							await update();
+						}
+					};
+				}}
+				class="space-y-6"
+			>
 				<div class="space-y-4">
 					<Input
-						label="Email"
+						label={m.loginEmailLabel()}
 						type="email"
 						name="email"
-						placeholder="nama@contoh.com"
+						placeholder={m.loginEmailPlaceholder()}
 						bind:value={email}
 						startIcon={Mail}
 						required
@@ -73,10 +100,10 @@
 					/>
 					<div class="relative">
 						<Input
-							label="Kata Sandi"
+							label={m.loginPasswordLabel()}
 							type={showPassword ? 'text' : 'password'}
 							name="password"
-							placeholder="••••••••"
+							placeholder={m.loginPasswordPlaceholder()}
 							bind:value={password}
 							startIcon={Lock}
 							endIcon={showPassword ? EyeOff : Eye}
@@ -86,12 +113,14 @@
 						/>
 					</div>
 				</div>
+
 				<div class="flex items-center justify-between">
-					<Checkbox label="Ingat Saya" bind:checked={rememberMe} />
+					<Checkbox label={m.loginRememberMe()} bind:checked={rememberMe} />
 					<a href="/forgot-password" class="link link-primary link-hover text-sm font-medium">
-						Lupa Kata Sandi?
+						{m.loginForgotPassword()}
 					</a>
 				</div>
+
 				<Button
 					type="submit"
 					variant="primary"
@@ -100,44 +129,62 @@
 					loading={isLoading}
 					class="shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all duration-300"
 				>
-					Masuk
+					{m.loginSubmit()}
 				</Button>
 			</form>
+
 			<div class="text-center text-sm text-base-content/60">
-				Belum punya akun? 
+				{m.loginNoAccount()}
 				<a href="/register" class="link link-primary link-hover font-medium ml-1">
-					Daftar Sekarang
+					{m.loginRegisterLink()}
 				</a>
 			</div>
 		</div>
 	</div>
-	<!-- Right Side: Decorative/Branding (Hidden on Mobile) -->
-	<div class="hidden lg:flex relative flex-col justify-center items-center bg-base-200 text-base-content p-12 overflow-hidden">
-		<!-- Animated Background -->
-		<div class="absolute inset-0 w-full h-full bg-linear-to-br from-primary/10 to-secondary/10 z-0"></div>
-		<div class="absolute -top-[20%] -right-[20%] w-[80%] h-[80%] rounded-full bg-primary/10 blur-[120px] animate-pulse"></div>
-		<div class="absolute -bottom-[20%] -left-[20%] w-[80%] h-[80%] rounded-full bg-secondary/10 blur-[120px] animate-pulse delay-1000"></div>
-		<!-- Content -->
-		<div class="relative z-10 max-w-lg text-center space-y-8" in:fly={{ x: 20, duration: 1000, delay: 200, easing: quintOut }}>
+
+	<!-- Right Side: Decorative/Branding -->
+	<div
+		class="hidden lg:flex relative flex-col justify-center items-center bg-base-200 text-base-content p-12 overflow-hidden"
+	>
+		<div
+			class="absolute inset-0 w-full h-full bg-linear-to-br from-primary/10 to-secondary/10 z-0"
+		></div>
+		<div
+			class="absolute -top-[20%] -right-[20%] w-[80%] h-[80%] rounded-full bg-primary/10 blur-[120px] animate-pulse"
+		></div>
+		<div
+			class="absolute -bottom-[20%] -left-[20%] w-[80%] h-[80%] rounded-full bg-secondary/10 blur-[120px] animate-pulse delay-1000"
+		></div>
+
+		<div
+			class="relative z-10 max-w-lg text-center space-y-8"
+			in:fly={{ x: 20, duration: 1000, delay: 200, easing: quintOut }}
+		>
 			<div class="relative">
-				<!-- Abstract Illustration Placeholder -->
-				<div class="w-64 h-64 mx-auto bg-linear-to-tr from-primary to-secondary rounded-3xl rotate-3 shadow-2xl flex items-center justify-center mb-12 group transition-transform hover:rotate-6 duration-500">
-					<div class="w-[98%] h-[98%] bg-base-100 rounded-[22px] flex items-center justify-center overflow-hidden relative">
+				<div
+					class="w-64 h-64 mx-auto bg-linear-to-tr from-primary to-secondary rounded-3xl rotate-3 shadow-2xl flex items-center justify-center mb-12 group transition-transform hover:rotate-6 duration-500"
+				>
+					<div
+						class="w-[98%] h-[98%] bg-base-100 rounded-[22px] flex items-center justify-center overflow-hidden relative"
+					>
 						<div class="absolute inset-0 bg-grid-pattern opacity-5"></div>
-						<LogIn class="size-24 text-primary group-hover:scale-110 transition-transform duration-500" />
+						<LogIn
+							class="size-24 text-primary group-hover:scale-110 transition-transform duration-500"
+						/>
 					</div>
 				</div>
 			</div>
+
 			<div class="space-y-4">
-				<h2 class="text-4xl font-bold tracking-tight">Bangun Kebiasaan Baik</h2>
-				<p class="text-lg text-base-content/70">
-					Pantau progresmu, tetap istiqomah, dan capai target ibadah dengan sistem tracking cerdas YaaQeen.
-				</p>
+				<h2 class="text-4xl font-bold tracking-tight">{m.loginBrandTitle()}</h2>
+				<p class="text-lg text-base-content/70">{m.loginBrandDescription()}</p>
 			</div>
-			<!-- Feature List -->
+
 			<div class="grid grid-cols-2 gap-4 text-left pt-8">
-				{#each ['Tracking Cerdas', 'Analitik Harian', 'Target Ibadah', 'Insight Progres'] as feature}
-					<div class="flex items-center gap-2 bg-base-100/50 backdrop-blur-sm p-3 rounded-lg border border-base-content/5">
+				{#each features as feature}
+					<div
+						class="flex items-center gap-2 bg-base-100/50 backdrop-blur-sm p-3 rounded-lg border border-base-content/5"
+					>
 						<CheckCircle2 class="size-5 text-primary" />
 						<span class="font-medium text-sm">{feature}</span>
 					</div>

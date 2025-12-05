@@ -5,6 +5,7 @@
 	import { Input } from '../ui';
 	import Button from '../ui/Button.svelte';
 	import { categories, icons, type Category } from '$lib/utils/global';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let selectedCategory = $state<Category>('Mubah');
 	let selectedIcon = $state<any>(Dumbbell);
@@ -14,11 +15,17 @@
 	};
 </script>
 
-<dialog class="modal modal-bottom sm:modal-end" class:modal-open={$isAddHabitModalOpen} transition:fade>
+<dialog
+	class="modal modal-bottom sm:modal-end"
+	class:modal-open={$isAddHabitModalOpen}
+	transition:fade
+>
 	<div class="modal-box w-full sm:max-w-xl p-0 overflow-hidden bg-base-100">
 		<!-- Modal Header -->
-		<div class="p-4 sm:p-6 border-b border-base-content/10 flex justify-between items-center bg-base-100/50 backdrop-blur-sm sticky top-0 z-10">
-			<h3 class="font-bold text-xl">Tambah Kebiasaan</h3>
+		<div
+			class="p-4 sm:p-6 border-b border-base-content/10 flex justify-between items-center bg-base-100/50 backdrop-blur-sm sticky top-0 z-10"
+		>
+			<h3 class="font-bold text-xl">{m.habit_add_title()}</h3>
 			<button class="btn btn-sm btn-circle btn-ghost" onclick={onClose}>
 				<X class="size-5" />
 			</button>
@@ -28,67 +35,68 @@
 			<!-- Name Input -->
 			<div class="form-control w-full">
 				<label class="label" for="habit-name">
-					<span class="label-text font-medium">Nama Kebiasaan</span>
+					<span class="label-text font-medium">{m.habit_name_label()}</span>
 				</label>
-				<Input 
-					id="habit-name"
-					placeholder="Contoh: Baca Surah Al-Kahfi" 
-					class="input-lg"
-				/>
+				<Input id="habit-name" placeholder={m.habit_name_placeholder()} class="input-lg" />
 			</div>
 
 			<!-- Category Selection -->
 			<div class="space-y-3">
-				<span class="label-text font-medium block">Kategori</span>
+				<span class="label-text font-medium block">{m.habit_category_label()}</span>
 				<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
 					{#each categories as cat}
-						<button 
+						<button
 							class="relative p-3 sm:p-4 rounded-xl border-2 text-left transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] h-full flex flex-col
-							{selectedCategory === cat.label 
-								? `border-${cat.color} bg-${cat.color}/5 ring-1 ring-${cat.color}/20` 
+							{selectedCategory === cat.label
+								? `border-${cat.color} bg-${cat.color}/5 ring-1 ring-${cat.color}/20`
 								: 'border-base-content/10 hover:border-base-content/20'}"
-							onclick={() => selectedCategory = cat.label}
+							onclick={() => (selectedCategory = cat.label)}
 						>
 							<div class="flex items-center justify-between mb-1">
-								<span class="font-bold {selectedCategory === cat.label ? `text-${cat.color}` : ''}">{cat.label}</span>
+								<span class="font-bold {selectedCategory === cat.label ? `text-${cat.color}` : ''}"
+									>{m[cat.labelKey]()}</span
+								>
 								{#if selectedCategory === cat.label}
-									<div class="size-5 rounded-full bg-{cat.color} text-white flex items-center justify-center" in:scale>
+									<div
+										class="size-5 rounded-full bg-{cat.color} text-white flex items-center justify-center"
+										in:scale
+									>
 										<Check class="size-3" />
 									</div>
 								{/if}
 							</div>
-							<p class="text-xs text-base-content/60 leading-tight">{cat.description}</p>
+							<p class="text-xs text-base-content/60 leading-tight">{m[cat.descKey]()}</p>
 						</button>
 					{/each}
 				</div>
 			</div>
 
 			<!-- Icon Selection -->
-            <div class="space-y-3">
-                <span class="label-text font-medium block">Ikon</span>
-                <div class="flex flex-wrap gap-3">
-                    {#each icons as icon}
-                        <button 
-                            class="size-12 rounded-xl flex items-center justify-center border-2 transition-all duration-200
-                            {selectedIcon === icon.component 
-                                ? `border-primary bg-primary text-primary-content scale-110 shadow-lg shadow-primary/20` 
-                                : 'border-base-content/10 hover:border-base-content/30 text-base-content/60'}"
-                            onclick={() => selectedIcon = icon.component}
-                            title={icon.label}
-                        >
-							<icon.component size='24' />
-                        </button>
-                    {/each}
-                </div>
-            </div>
+			<div class="space-y-3">
+				<span class="label-text font-medium block">{m.habit_icon_label()}</span>
+				<div class="flex flex-wrap gap-3">
+					{#each icons as icon}
+						<button
+							class="size-12 rounded-xl flex items-center justify-center border-2 transition-all duration-200
+                            {selectedIcon === icon.component
+								? `border-primary bg-primary text-primary-content scale-110 shadow-lg shadow-primary/20`
+								: 'border-base-content/10 hover:border-base-content/30 text-base-content/60'}"
+							onclick={() => (selectedIcon = icon.component)}
+							title={m[icon.labelKey]()}
+						>
+							<icon.component size="24" />
+						</button>
+					{/each}
+				</div>
+			</div>
 		</div>
 
 		<!-- Modal Actions -->
 		<div class="p-4 sm:p-6 border-t border-base-content/10 bg-base-100 flex justify-end gap-3">
-			<Button variant="ghost" onclick={onClose}>Batal</Button>
-			<Button variant="primary" >
+			<Button variant="ghost" onclick={onClose}>{m.habit_cancel()}</Button>
+			<Button variant="primary">
 				<Check class="size-4" />
-				Simpan Kebiasaan
+				{m.habit_save()}
 			</Button>
 		</div>
 	</div>

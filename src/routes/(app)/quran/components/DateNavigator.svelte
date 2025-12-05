@@ -3,6 +3,7 @@
 	import { formatDate, hijriDate } from '$lib/utils/format.js';
 	import { fly } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { date, onDateChange, children } = $props<{
 		date: Date;
@@ -18,7 +19,7 @@
 		<h1 class="text-3xl font-bold flex items-center gap-3">
 			{@render children?.()}
 		</h1>
-		<p class="text-base-content/60">Pantau perjalanan tilawah dan hafalanmu.</p>
+		<p class="text-base-content/60">{m.quran_subtitle()}</p>
 	</div>
 
 	<div
@@ -27,7 +28,7 @@
 		<button
 			class="btn btn-circle btn-sm btn-ghost"
 			onclick={() => onDateChange(-1)}
-			aria-label="Hari sebelumnya"
+			aria-label={m.quran_prev_day()}
 		>
 			<ChevronLeft class="size-5" />
 		</button>
@@ -39,7 +40,7 @@
 		<button
 			class="btn btn-circle btn-sm btn-ghost"
 			onclick={() => onDateChange(1)}
-			aria-label="Hari selanjutnya"
+			aria-label={m.quran_next_day()}
 		>
 			<ChevronRight class="size-5" />
 		</button>

@@ -4,7 +4,9 @@
 	import { onMount } from 'svelte';
 	import { Menu, X } from 'lucide-svelte';
 	import ToggleTheme from './ToggleTheme.svelte';
+	import ToggleLanguage from './ToggleLanguage.svelte';
 	import { goto } from '$app/navigation';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let isMenuOpen = $state(false);
 
@@ -31,9 +33,10 @@
 	});
 
 	const navLinks = [
-		{ href: '#features', label: 'Fitur Unggulan' },
+		{ href: '#features', label: m.nav_features() },
 		// { href: '#pricing', label: 'Investasi' },
-		{ href: '#about', label: 'Tentang Kami' }
+		{ href: '#about', label: m.nav_about() },
+		{ href: '#cta', label: m.nav_cta() }
 	];
 </script>
 
@@ -65,30 +68,36 @@
 
 			<!-- Actions -->
 			<div class="hidden md:flex md:items-center md:gap-4">
+				<ToggleLanguage />
 				<ToggleTheme />
 				{#if page.data.user}
 					<a
 						href="/dashboard"
 						class="rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/25 transition-all hover:scale-105 hover:bg-primary-600 hover:shadow-primary/40 active:scale-95"
 					>
-						Dashboard Saya
+						{m.nav_dashboard()}
 					</a>
 				{:else}
-					<a
-						href="/login"
-						class="text-sm font-bold text-slate-600 transition-colors hover:text-primary">Masuk</a
+					<Button
+						onclick={() => goto('/login')}
+						variant="primary"
+						class="rounded-full px-6 py-2.5 text-sm font-bold"
+						size="sm"
 					>
-					<a
+						{m.nav_login()}
+					</Button>
+					<!-- <a
 						href="#cta"
 						class="rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/25 transition-all hover:scale-105 hover:bg-primary-600 hover:shadow-primary/40 active:scale-95"
 					>
-						Mulai Hijrah
-					</a>
+						{m.nav_cta()}
+					</a> -->
 				{/if}
 			</div>
 
 			<!-- Mobile Menu Button -->
 			<div class="flex md:hidden gap-2">
+				<ToggleLanguage />
 				<ToggleTheme />
 				<Button variant="ghost" size="sm" circle onclick={toggleMenu}>
 					{#if isMenuOpen}
@@ -128,7 +137,7 @@
 							}}
 							class="block w-full rounded-full bg-primary px-6 py-2.5 text-center text-sm font-bold text-white shadow-lg shadow-primary/25 transition-all hover:scale-105 hover:bg-primary-600 hover:shadow-primary/40 active:scale-95"
 						>
-							Dashboard Saya
+							{m.nav_dashboard()}
 						</Button>
 					{:else}
 						<Button
@@ -138,7 +147,7 @@
 								isMenuOpen = false;
 							}}
 						>
-							Masuk
+							{m.nav_login()}
 						</Button>
 					{/if}
 					<Button
@@ -148,7 +157,7 @@
 						}}
 						variant="primary"
 						block
-						class="rounded-full">Mulai Hijrah</Button
+						class="rounded-full">{m.nav_cta()}</Button
 					>
 				</div>
 			</div>

@@ -18,6 +18,7 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import { formatDate } from '$lib/utils/format.js';
 	import { page } from '$app/state';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { data } = $props();
 
@@ -162,7 +163,7 @@
 			in:fly={{ y: -20, duration: 800, easing: quintOut }}
 		>
 			<div>
-				<h1 class="text-3xl font-bold">Pantau Ibadah</h1>
+				<h1 class="text-3xl font-bold">{m.ibadah_title()}</h1>
 				<div class="flex items-center gap-2 text-base-content/60 mt-1">
 					<MapPin class="size-4" />
 					<span class="text-sm">{profile?.location?.city}</span>
@@ -190,7 +191,7 @@
 		>
 			<Card class="bg-linear-to-br from-primary/10 to-primary/5 border-primary/20">
 				<div class="p-4 text-center">
-					<h3 class="text-sm font-medium text-base-content/70 mb-2">Ibadah Wajib</h3>
+					<h3 class="text-sm font-medium text-base-content/70 mb-2">{m.ibadah_fardhu_title()}</h3>
 					<div class="text-3xl font-bold text-primary">{Math.round(fardhuProgress)}%</div>
 					<progress class="progress progress-primary w-full mt-2" value={fardhuProgress} max="100"
 					></progress>
@@ -198,7 +199,7 @@
 			</Card>
 			<Card class="bg-linear-to-br from-secondary/10 to-secondary/5 border-secondary/20">
 				<div class="p-4 text-center">
-					<h3 class="text-sm font-medium text-base-content/70 mb-2">Ibadah Sunnah</h3>
+					<h3 class="text-sm font-medium text-base-content/70 mb-2">{m.ibadah_sunnah_title()}</h3>
 					<div class="text-3xl font-bold text-secondary">{Math.round(sunnahProgress)}%</div>
 					<progress class="progress progress-secondary w-full mt-2" value={sunnahProgress} max="100"
 					></progress>
@@ -211,7 +212,7 @@
 			<div class="flex items-center justify-between">
 				<h2 class="text-xl font-bold flex items-center gap-2">
 					<div class="size-2 rounded-full bg-primary"></div>
-					Sholat Wajib
+					{m.ibadah_fardhu_section()}
 				</h2>
 			</div>
 
@@ -243,7 +244,7 @@
 										: 'btn-ghost'}"
 									onclick={() => updateFardhuStatus(prayer?.id, 'none')}
 								>
-									Belum
+									{m.ibadah_status_none()}
 								</button>
 								<button
 									class="btn btn-sm border-none shadow-none gap-2 {prayer?.status === 'munfarid'
@@ -252,7 +253,7 @@
 									onclick={() => updateFardhuStatus(prayer?.id, 'munfarid')}
 								>
 									<User class="size-4" />
-									Sendiri
+									{m.ibadah_status_munfarid()}
 								</button>
 								<button
 									class="btn btn-sm border-none shadow-none gap-2 {prayer?.status === 'jamaah'
@@ -261,7 +262,7 @@
 									onclick={() => updateFardhuStatus(prayer?.id, 'jamaah')}
 								>
 									<Users class="size-4" />
-									Berjamaah
+									{m.ibadah_status_jamaah()}
 								</button>
 							</div>
 						</div>
@@ -275,11 +276,11 @@
 			<div class="flex items-center justify-between">
 				<h2 class="text-xl font-bold flex items-center gap-2">
 					<div class="size-2 rounded-full bg-secondary"></div>
-					Ibadah Lainnya
+					{m.ibadah_others_section()}
 				</h2>
 				<Button variant="info" size="xs" onclick={() => goto('/ibadah/habits')}>
 					<Plus class="size-4 mr-1" />
-					Kelola Habits
+					{m.ibadah_manage_habits()}
 				</Button>
 			</div>
 
@@ -287,7 +288,7 @@
 				<!-- Sunnah -->
 				<div class="space-y-4">
 					<h3 class="text-sm font-medium text-base-content/60 uppercase tracking-wider ml-1">
-						Sunnah
+						{m.ibadah_category_sunnah()}
 					</h3>
 					{#each sunnahPrayers.filter((p) => p.category === 'Sunnah') as prayer, i}
 						<button
@@ -316,14 +317,14 @@
 						</button>
 					{/each}
 					{#if sunnahPrayers.filter((p) => p.category === 'Sunnah').length === 0}
-						<div class="text-sm text-base-content/40 italic ml-1">Belum ada target Sunnah</div>
+						<div class="text-sm text-base-content/40 italic ml-1">{m.ibadah_no_sunnah()}</div>
 					{/if}
 				</div>
 
 				<!-- Mubah / Extra -->
 				<div class="space-y-4">
 					<h3 class="text-sm font-medium text-base-content/60 uppercase tracking-wider ml-1">
-						Mubah
+						{m.ibadah_category_mubah()}
 					</h3>
 					{#each sunnahPrayers.filter((p) => p.category === 'Mubah') as prayer, i}
 						<div
@@ -343,7 +344,9 @@
 										</div>
 										<div>
 											<h3 class="font-bold">{prayer.title}</h3>
-											<p class="text-xs text-base-content/60 mt-1">{prayer.time || 'Kapan saja'}</p>
+											<p class="text-xs text-base-content/60 mt-1">
+												{prayer.time || m.ibadah_anytime()}
+											</p>
 										</div>
 									</div>
 
@@ -361,7 +364,7 @@
 						</div>
 					{/each}
 					{#if sunnahPrayers.filter((p) => p.category === 'Mubah').length === 0}
-						<div class="text-sm text-base-content/40 italic ml-1">Belum ada target Mubah</div>
+						<div class="text-sm text-base-content/40 italic ml-1">{m.ibadah_no_mubah()}</div>
 					{/if}
 				</div>
 			</div>

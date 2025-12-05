@@ -2,6 +2,7 @@
 	import { Target } from 'lucide-svelte';
 	import { Button, Card } from '$lib/components/ui';
 	import { fly } from 'svelte/transition';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { progress, target, onUpdate, onUpdateTarget } = $props<{
 		progress: number;
@@ -39,7 +40,7 @@
 		<div class="flex items-center justify-between">
 			<h2 class="text-xl font-bold flex items-center gap-2">
 				<Target class="size-5 text-primary" />
-				Tilawah Harian
+				{m.quran_tilawah_title()}
 			</h2>
 			{#if isEditingTarget}
 				<div class="flex items-center gap-2">
@@ -49,10 +50,10 @@
 						bind:value={tempTarget}
 						onblur={handleSaveTarget}
 						onkeydown={handleKeyDown}
-						aria-label="Edit target tilawah"
+						aria-label={m.quran_tilawah_edit_aria()}
 						min="1"
 					/>
-					<span class="text-xs text-base-content/60">Halaman</span>
+					<span class="text-xs text-base-content/60">{m.quran_tilawah_pages()}</span>
 				</div>
 			{:else}
 				<button
@@ -61,9 +62,9 @@
 						tempTarget = target;
 						isEditingTarget = true;
 					}}
-					aria-label="Ubah target tilawah"
+					aria-label={m.quran_tilawah_change_aria()}
 				>
-					Target: {target} Halaman
+					{m.quran_tilawah_target_label({ count: target })}
 				</button>
 			{/if}
 		</div>
@@ -93,7 +94,9 @@
 				</svg>
 				<div class="absolute inset-0 flex flex-col items-center justify-center">
 					<span class="text-4xl font-bold">{progress}</span>
-					<span class="text-xs text-base-content/60 uppercase tracking-widest">Halaman</span>
+					<span class="text-xs text-base-content/60 uppercase tracking-widest"
+						>{m.quran_tilawah_pages()}</span
+					>
 				</div>
 			</div>
 		</div>
@@ -103,18 +106,18 @@
 				class="flex-1"
 				onclick={() => onUpdate(Math.max(0, progress - 1))}
 				disabled={progress === 0}
-				aria-label="Kurangi 1 halaman"
+				aria-label={m.quran_tilawah_decrease_aria()}
 			>
-				-1 Halaman
+				{m.quran_tilawah_decrease()}
 			</Button>
 			<Button
 				variant="primary"
 				class="flex-1"
 				onclick={() => onUpdate(progress + 1)}
 				disabled={progress >= target}
-				aria-label="Tambah 1 halaman"
+				aria-label={m.quran_tilawah_increase_aria()}
 			>
-				+1 Halaman
+				{m.quran_tilawah_increase()}
 			</Button>
 		</div>
 	</div>

@@ -6,6 +6,7 @@
 	import { enhance } from '$app/forms';
 	import { PrayerTimer } from '$lib/runes/prayer.svelte';
 	import { page } from '$app/state';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { data } = $props();
 
@@ -33,12 +34,12 @@
 	function refreshLocation() {
 		isLoading = true;
 
-		timer.playAudio();
-		isLoading = false;
-		return
+		// timer.playAudio();
+		// isLoading = false;
+		// return
 
 		if (!navigator.geolocation) {
-			error = 'Geolokasi tidak didukung';
+			error = m.prayer_geolocation_unsupported();
 			isLoading = false;
 			return;
 		}
@@ -61,7 +62,7 @@
 			},
 			(err) => {
 				console.error(err);
-				error = 'Gagal mengambil lokasi';
+				error = m.prayer_location_error();
 				isLoading = false;
 			}
 		);
@@ -73,7 +74,7 @@
 		<!-- Header / Location -->
 		<div class="flex items-center justify-between" in:fly={{ y: -20, duration: 800 }}>
 			<div>
-				<h1 class="text-2xl font-bold">Jadwal Sholat</h1>
+				<h1 class="text-2xl font-bold">{m.prayer_schedule_title()}</h1>
 				<div class="flex items-center gap-2 text-base-content/60 mt-1">
 					<MapPin class="size-4 text-primary" />
 					<span class="text-sm font-medium">{user.location.city}</span>
@@ -105,7 +106,7 @@
 
 			<div class="relative p-8 text-center space-y-2">
 				<p class="text-primary-content/80 font-medium tracking-wide text-sm uppercase">
-					Sholat Berikutnya
+					{m.prayer_next_label()}
 				</p>
 
 				{#if isLoading}
@@ -125,8 +126,8 @@
 					</div>
 				{:else}
 					<div class="py-8">
-						<h2 class="text-2xl font-bold">Semua sholat selesai</h2>
-						<p class="text-primary-content/80">Sampai jumpa besok!</p>
+						<h2 class="text-2xl font-bold">{m.prayer_all_completed()}</h2>
+						<p class="text-primary-content/80">{m.prayer_see_you_tomorrow()}</p>
 					</div>
 				{/if}
 			</div>
@@ -177,7 +178,7 @@
 
 							<div class="flex items-center gap-2">
 								{#if isNext}
-									<Badge variant="primary" class="animate-pulse">Berikutnya</Badge>
+									<Badge variant="primary" class="animate-pulse">{m.prayer_next_badge()}</Badge>
 								{/if}
 
 								<form
@@ -224,8 +225,8 @@
 
 		<!-- Footer Info -->
 		<div class="text-center text-xs text-base-content/40 pb-8">
-			<p>Data disediakan oleh Aladhan API</p>
-			<p>Metode Perhitungan: Kemenag RI</p>
+			<p>{m.prayer_source_data()}</p>
+			<p>{m.prayer_method()}</p>
 		</div>
 	</div>
 </div>

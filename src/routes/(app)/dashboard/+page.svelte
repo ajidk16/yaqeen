@@ -15,6 +15,7 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import { PrayerTimer } from '$lib/runes/prayer.svelte';
 	import { formatDate, formatTime } from '$lib/utils/format.js';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { data } = $props();
 
@@ -25,10 +26,10 @@
 
 	function getGreeting() {
 		const hour = timer?.currentTime.getHours();
-		if (hour < 12) return 'Selamat Pagi';
-		if (hour < 15) return 'Selamat Siang';
-		if (hour < 18) return 'Selamat Sore';
-		return 'Selamat Malam';
+		if (hour < 12) return m.greeting_morning();
+		if (hour < 15) return m.greeting_afternoon();
+		if (hour < 18) return m.greeting_evening();
+		return m.greeting_night();
 	}
 
 	let isLoading = $state(false);
@@ -83,7 +84,7 @@
 				<h1 class="text-3xl font-bold">
 					{getGreeting()}, <span class="text-primary capitalize">{profile?.name}!</span> 👋
 				</h1>
-				<p class="text-base-content/60 mt-1">"Mulai harimu dengan Bismillah."</p>
+				<p class="text-base-content/60 mt-1">"{m.dashboard_quote()}"</p>
 			</div>
 
 			<div
@@ -95,7 +96,7 @@
 				</div>
 				<div>
 					<span class="font-bold text-lg">{profile?.streak}</span>
-					<span class="text-xs text-base-content/60 ml-1">Hari Beruntun</span>
+					<span class="text-xs text-base-content/60 ml-1">{m.dashboard_streak_label()}</span>
 				</div>
 			</div>
 		</header>
@@ -118,7 +119,7 @@
 							<span>{formatDate(new Date())}</span>
 						</Badge>
 						<h2 class="text-4xl font-bold tracking-tight mt-2">
-							{timer.nextPrayer.name ?? 'Shubuh'}
+							{timer.nextPrayer.name ?? m.prayer_fajr()}
 						</h2>
 						<div class="text-6xl font-black font-mono tracking-tighter my-4 tabular-nums">
 							{timer.countdown}
@@ -138,7 +139,7 @@
 								}}
 								class="rounded-xl"
 								size="sm"
-								variant="primary">Jadwal Sholat</Button
+								variant="primary">{m.dashboard_prayer_schedule_button()}</Button
 							>
 						</div>
 					</div>
@@ -146,8 +147,8 @@
 					<div
 						class="p-8 text-center relative z-10 flex flex-col items-center h-full justify-center gap-4"
 					>
-						<h2 class="text-2xl font-bold">Semua sholat selesai</h2>
-						<p class="text-primary-content">Sampai jumpa besok!</p>
+						<h2 class="text-2xl font-bold">{m.dashboard_all_prayers_completed()}</h2>
+						<p class="text-primary-content">{m.dashboard_see_you_tomorrow()}</p>
 					</div>
 				{/if}
 			</div>
@@ -159,13 +160,13 @@
 				<div class="card-body p-6">
 					<h3 class="font-bold text-lg mb-4 flex items-center gap-2">
 						<Activity class="size-5 text-secondary" />
-						Progres Harian
+						{m.dashboard_daily_progress()}
 					</h3>
 
 					<div class="space-y-4">
 						<div>
 							<div class="flex justify-between text-sm mb-1">
-								<span>Ibadah</span>
+								<span>{m.dashboard_progress_worship()}</span>
 								<span class="font-bold text-primary">{profile?.progress?.ibadah ?? 0}%</span>
 							</div>
 							<progress
@@ -176,7 +177,7 @@
 						</div>
 						<div>
 							<div class="flex justify-between text-sm mb-1">
-								<span>Kebiasaan</span>
+								<span>{m.dashboard_progress_habits()}</span>
 								<span class="font-bold text-secondary">{profile?.progress?.habits ?? 0}%</span>
 							</div>
 							<progress
@@ -187,7 +188,7 @@
 						</div>
 						<div>
 							<div class="flex justify-between text-sm mb-1">
-								<span>Quran</span>
+								<span>{m.dashboard_progress_quran()}</span>
 								<span class="font-bold text-accent">{profile?.progress?.quran ?? 0}%</span>
 							</div>
 							<progress
@@ -205,12 +206,12 @@
 			<div class="flex items-center justify-between">
 				<h2 class="text-xl font-bold flex items-center gap-2">
 					<Calendar class="size-5 text-base-content/60" />
-					Aktivitas Terkini
+					{m.dashboard_recent_activity()}
 				</h2>
 				<Button
 					variant="link"
 					class="text-primary no-underline hover:underline p-0 h-auto"
-					onclick={() => goto('/ibadah')}>Lihat Semua</Button
+					onclick={() => goto('/ibadah')}>{m.dashboard_view_all()}</Button
 				>
 			</div>
 
@@ -245,7 +246,7 @@
 				{/each}
 				{#if profile?.recentActivity.length === 0}
 					<div class="text-center py-8 text-base-content/40 italic">
-						Belum ada aktivitas hari ini.
+						{m.dashboard_no_activity()}
 					</div>
 				{/if}
 			</div>
@@ -260,28 +261,28 @@
 				onclick={() => goto('/stats')}
 			>
 				<Heart class="size-6" />
-				<span class="text-xs font-medium">Catat Mood</span>
+				<span class="text-xs font-medium">{m.dashboard_quick_mood()}</span>
 			</Button>
 			<Button
 				class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-secondary hover:text-secondary transition-all"
 				onclick={() => goto('/ibadah')}
 			>
 				<Sparkles class="size-6" />
-				<span class="text-xs font-medium">Kebiasaan Baru</span>
+				<span class="text-xs font-medium">{m.dashboard_quick_habit()}</span>
 			</Button>
 			<Button
 				class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-accent hover:text-accent transition-all"
 				onclick={() => goto('/quran')}
 			>
 				<BookOpen class="size-6" />
-				<span class="text-xs font-medium">Baca Quran</span>
+				<span class="text-xs font-medium">{m.dashboard_quick_quran()}</span>
 			</Button>
 			<Button
 				class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-info hover:text-info transition-all"
 				onclick={() => goto('/journal')}
 			>
 				<Calendar class="size-6" />
-				<span class="text-xs font-medium">Jurnal</span>
+				<span class="text-xs font-medium">{m.dashboard_quick_journal()}</span>
 			</Button>
 		</div>
 	</div>

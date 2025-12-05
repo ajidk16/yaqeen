@@ -3,6 +3,7 @@
 	import confetti from 'canvas-confetti';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import * as m from '$lib/paraglide/messages.js';
 
 	// Components
 	import DateNavigator from './components/DateNavigator.svelte';
@@ -143,7 +144,7 @@
 	<div class="max-w-4xl mx-auto space-y-8">
 		<DateNavigator date={currentDate} onDateChange={changeDate}>
 			<BookOpen class="size-8 text-primary" />
-			Quran
+			{m.quran_title()}
 		</DateNavigator>
 
 		<div class="grid md:grid-cols-2 gap-6">

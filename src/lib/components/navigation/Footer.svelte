@@ -1,5 +1,5 @@
-<script lang="ts">
-	import { Button } from '$lib/components/ui';
+<script>
+	import * as m from '$lib/paraglide/messages.js';
 </script>
 
 <footer class="border-t border-base-200 bg-base-100 pt-16 pb-8">
@@ -8,56 +8,63 @@
 			<!-- Brand -->
 			<div class="space-y-4">
 				<a href="/" class="flex items-center gap-2 text-xl font-bold text-primary">
-					<div class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-content">
+					<div
+						class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-content"
+					>
 						YQ
 					</div>
 					<span>YaaQeen</span>
 				</a>
 				<p class="text-sm text-base-content/70">
-					Wujudkan kebiasaan baik menjadi pencapaian luar biasa. Bangun rutinitas positif, pantau perkembangan Anda, dan raih target dengan penuh keyakinan.
+					{m.footerBrandDescription()}
 				</p>
 			</div>
 
 			<!-- Product -->
 			<div>
-				<h4 class="mb-4 text-sm font-semibold uppercase tracking-wider text-base-content">Produk</h4>
+				<h4 class="mb-4 text-sm font-semibold uppercase tracking-wider text-base-content">
+					{m.footerProductTitle()}
+				</h4>
 				<ul class="space-y-2 text-sm text-base-content/70">
-					<li><a href="#features" class="hover:text-primary">Fitur Unggulan</a></li>
-					<li><a href="#pricing" class="hover:text-primary">Harga</a></li>
-					<li><a href="#changelog" class="hover:text-primary">Pembaruan</a></li>
-					<li><a href="#docs" class="hover:text-primary">Dokumentasi</a></li>
+					<li><a href="#features" class="hover:text-primary">{m.footerProductFeatures()}</a></li>
+					<li><a href="#pricing" class="hover:text-primary">{m.footerProductPricing()}</a></li>
+					<li><a href="#changelog" class="hover:text-primary">{m.footerProductChangelog()}</a></li>
+					<li><a href="#docs" class="hover:text-primary">{m.footerProductDocs()}</a></li>
 				</ul>
 			</div>
 
 			<!-- Company -->
 			<div>
-				<h4 class="mb-4 text-sm font-semibold uppercase tracking-wider text-base-content">Perusahaan</h4>
+				<h4 class="mb-4 text-sm font-semibold uppercase tracking-wider text-base-content">
+					{m.footerCompanyTitle()}
+				</h4>
 				<ul class="space-y-2 text-sm text-base-content/70">
-					<li><a href="#about" class="hover:text-primary">Tentang Kami</a></li>
-					<li><a href="#blog" class="hover:text-primary">Blog</a></li>
-					<li><a href="#careers" class="hover:text-primary">Karir</a></li>
-					<li><a href="#contact" class="hover:text-primary">Hubungi Kami</a></li>
+					<li><a href="#about" class="hover:text-primary">{m.footerCompanyAbout()}</a></li>
+					<li><a href="#blog" class="hover:text-primary">{m.footerCompanyBlog()}</a></li>
+					<li><a href="#careers" class="hover:text-primary">{m.footerCompanyCareers()}</a></li>
+					<li><a href="#contact" class="hover:text-primary">{m.footerCompanyContact()}</a></li>
 				</ul>
 			</div>
 
 			<!-- Legal -->
 			<div>
-				<h4 class="mb-4 text-sm font-semibold uppercase tracking-wider text-base-content">Legal</h4>
+				<h4 class="mb-4 text-sm font-semibold uppercase tracking-wider text-base-content">
+					{m.footerLegalTitle()}
+				</h4>
 				<ul class="space-y-2 text-sm text-base-content/70">
-					<li><a href="#privacy" class="hover:text-primary">Kebijakan Privasi</a></li>
-					<li><a href="#terms" class="hover:text-primary">Syarat & Ketentuan</a></li>
-					<li><a href="#cookies" class="hover:text-primary">Kebijakan Cookie</a></li>
+					<li><a href="#privacy" class="hover:text-primary">{m.footerLegalPrivacy()}</a></li>
+					<li><a href="#terms" class="hover:text-primary">{m.footerLegalTerms()}</a></li>
+					<li><a href="#cookies" class="hover:text-primary">{m.footerLegalCookies()}</a></li>
 				</ul>
 			</div>
 		</div>
 
-		<div class="mt-12 flex flex-col items-center justify-between gap-4 border-t border-base-200 pt-8 md:flex-row">
+		<div
+			class="mt-12 flex flex-col items-center justify-between gap-4 border-t border-base-200 pt-8 md:flex-row"
+		>
 			<p class="text-sm text-base-content/60">
-				© {new Date().getFullYear()} YaaQeen. Hak Cipta Dilindungi.
+				{m.footerCopyright({ year: new Date().getFullYear().toString() })}
 			</p>
-			<div class="flex gap-4">
-				<!-- Social Links could go here -->
-			</div>
 		</div>
 	</div>
 </footer>

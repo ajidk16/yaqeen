@@ -3,6 +3,7 @@
 	import { Badge, Card } from '$lib/components/ui';
 	import { fly } from 'svelte/transition';
 	import { surahs } from '$lib/utils/global.js';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type HafalanProps = {
 		surah: string;
@@ -26,15 +27,17 @@
 		<div class="flex items-center justify-between">
 			<h2 class="text-xl font-bold flex items-center gap-2">
 				<Trophy class="size-5 text-secondary" />
-				Progres Hafalan
+				{m.quran_hafalan_title()}
 			</h2>
-			<Badge variant="secondary" class="font-mono hidden lg:block">{percentage}% Selesai</Badge>
+			<Badge variant="secondary" class="font-mono hidden lg:block"
+				>{percentage}{m.quran_hafalan_completed()}</Badge
+			>
 		</div>
 
 		<div class="space-y-4">
 			<div class="form-control">
 				<label class="label" for="surah-select">
-					<span class="label-text font-medium">Surah</span>
+					<span class="label-text font-medium">{m.quran_hafalan_surah()}</span>
 				</label>
 				<select
 					id="surah-select"
@@ -51,7 +54,7 @@
 			<div class="flex gap-4">
 				<div class="form-control flex-1">
 					<label class="label" for="ayah-start">
-						<span class="label-text text-xs">Ayat Awal</span>
+						<span class="label-text text-xs">{m.quran_hafalan_ayah_start()}</span>
 					</label>
 					<input
 						id="ayah-start"
@@ -65,7 +68,7 @@
 				</div>
 				<div class="form-control flex-1">
 					<label class="label" for="ayah-end">
-						<span class="label-text text-xs">Ayat Akhir</span>
+						<span class="label-text text-xs">{m.quran_hafalan_ayah_end()}</span>
 					</label>
 					<input
 						id="ayah-end"
@@ -82,7 +85,7 @@
 
 		<div class="space-y-2">
 			<p class="text-xs font-medium text-base-content/60 uppercase tracking-wider">
-				Tandai Ayat Selesai
+				{m.quran_hafalan_mark_completed()}
 			</p>
 			<div
 				class="grid grid-cols-5 sm:grid-cols-6 gap-2 max-h-[180px] overflow-y-auto pr-2 custom-scrollbar"

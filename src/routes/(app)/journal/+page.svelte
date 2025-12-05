@@ -1,15 +1,28 @@
 <script lang="ts">
 	import { fade, fly, scale, slide } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
-	import { Smile, Frown, Meh, Heart, Coffee, Calendar,  Save, Trash2, Sparkles, BookHeart, ChevronLeft, ChevronRight, Pencil } from 'lucide-svelte';
+	import {
+		Smile,
+		Frown,
+		Meh,
+		Heart,
+		Coffee,
+		Calendar,
+		Save,
+		Trash2,
+		Sparkles,
+		BookHeart,
+		ChevronLeft,
+		ChevronRight,
+		Pencil
+	} from 'lucide-svelte';
 	import { Card, Button, Textarea, Modal, Loading } from '$lib/components/ui';
 	import confetti from 'canvas-confetti';
 	import { enhance } from '$app/forms';
 	import { toast } from '$lib/stores/toast';
 	import { page } from '$app/state';
 	import { formatDate, formatTime } from '$lib/utils/format';
-
-
+	import * as m from '$lib/paraglide/messages.js';
 
 	// Types
 	type MoodType = 'happy' | 'blessed' | 'neutral' | 'tired' | 'sad';
@@ -22,7 +35,7 @@
 
 	// Edit State
 	let isEditModalOpen = $state(false);
-	let editingLog = $state<{ id: string, mood: MoodType, gratitude: string } | null>(null);
+	let editingLog = $state<{ id: string; mood: MoodType; gratitude: string } | null>(null);
 
 	// Delete State
 	let isDeleteModalOpen = $state(false);
@@ -30,21 +43,53 @@
 
 	// Derived
 	let filteredLogs = $derived(
-		page?.data?.logs?.filter((log : {date:Date}) => {
+		page?.data?.logs?.filter((log: { date: Date }) => {
 			const logDate = new Date(log.date);
-			return logDate.getDate() === currentDate.getDate() &&
-			logDate.getMonth() === currentDate.getMonth() &&
-			logDate.getFullYear() === currentDate.getFullYear();
+			return (
+				logDate.getDate() === currentDate.getDate() &&
+				logDate.getMonth() === currentDate.getMonth() &&
+				logDate.getFullYear() === currentDate.getFullYear()
+			);
 		})
 	);
 
 	// Constants
-	const moods: { type: MoodType; icon: any; label: string; color: string, bg: string }[] = [
-		{ type: 'happy', icon: Smile, label: 'Senang', color: 'text-success', bg: 'bg-success/10 ring-2 ring-success ring-offset-2 ring-offset-base-100 text-success' },
-		{ type: 'blessed', icon: Heart, label: 'Berkah', color: 'text-error', bg: 'bg-error/10 ring-2 ring-error ring-offset-2 ring-offset-base-100 text-error' },
-		{ type: 'neutral', icon: Meh, label: 'Biasa', color: 'text-warning', bg: 'bg-warning/10 ring-2 ring-warning ring-offset-2 ring-offset-base-100 text-warning' },
-		{ type: 'tired', icon: Coffee, label: 'Lelah', color: 'text-gray-300', bg: 'bg-gray-300/10 ring-2 ring-gray-300 ring-offset-2 ring-offset-base-100 text-gray-300' },
-		{ type: 'sad', icon: Frown, label: 'Sedih', color: 'text-info', bg: 'bg-info/10 ring-2 ring-info ring-offset-2 ring-offset-base-100 text-info' }
+	const moods: { type: MoodType; icon: any; label: string; color: string; bg: string }[] = [
+		{
+			type: 'happy',
+			icon: Smile,
+			label: m.journal_mood_happy(),
+			color: 'text-success',
+			bg: 'bg-success/10 ring-2 ring-success ring-offset-2 ring-offset-base-100 text-success'
+		},
+		{
+			type: 'blessed',
+			icon: Heart,
+			label: m.journal_mood_blessed(),
+			color: 'text-error',
+			bg: 'bg-error/10 ring-2 ring-error ring-offset-2 ring-offset-base-100 text-error'
+		},
+		{
+			type: 'neutral',
+			icon: Meh,
+			label: m.journal_mood_neutral(),
+			color: 'text-warning',
+			bg: 'bg-warning/10 ring-2 ring-warning ring-offset-2 ring-offset-base-100 text-warning'
+		},
+		{
+			type: 'tired',
+			icon: Coffee,
+			label: m.journal_mood_tired(),
+			color: 'text-gray-300',
+			bg: 'bg-gray-300/10 ring-2 ring-gray-300 ring-offset-2 ring-offset-base-100 text-gray-300'
+		},
+		{
+			type: 'sad',
+			icon: Frown,
+			label: m.journal_mood_sad(),
+			color: 'text-info',
+			bg: 'bg-info/10 ring-2 ring-info ring-offset-2 ring-offset-base-100 text-info'
+		}
 	];
 
 	// Actions
@@ -74,12 +119,12 @@
 	}
 
 	function getMoodColor(type: string) {
-		const mood = moods.find(m => m.type === type);
+		const mood = moods.find((m) => m.type === type);
 		return mood ? mood.color : 'text-base-content';
 	}
 
 	function getMoodIcon(type: string) {
-		const mood = moods.find(m => m.type === type);
+		const mood = moods.find((m) => m.type === type);
 		return mood ? mood.icon : Smile;
 	}
 </script>
@@ -87,17 +132,22 @@
 <div class="min-h-screen bg-base-100 p-4 pb-24 lg:p-8">
 	<div class="max-w-2xl mx-auto space-y-8">
 		<!-- Header -->
-		<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4" in:fly={{ y: -20, duration: 800, easing: quintOut }}>
+		<div
+			class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+			in:fly={{ y: -20, duration: 800, easing: quintOut }}
+		>
 			<div>
 				<h1 class="text-3xl font-bold flex items-center gap-3">
 					<BookHeart class="size-8 text-primary" />
-					Jurnal Syukur
+					{m.journal_title()}
 				</h1>
-				<p class="text-base-content/60">Renungkan harimu dan hitung nikmat-Nya.</p>
+				<p class="text-base-content/60">{m.journal_subtitle()}</p>
 			</div>
 
 			<!-- Date Navigation -->
-			<div class="flex items-center gap-4 bg-base-100 shadow-sm border border-base-content/10 rounded-full p-1 pr-6">
+			<div
+				class="flex items-center gap-4 bg-base-100 shadow-sm border border-base-content/10 rounded-full p-1 pr-6"
+			>
 				<div class="flex gap-1">
 					<button class="btn btn-circle btn-sm btn-ghost" onclick={() => changeDate(-1)}>
 						<ChevronLeft class="size-5" />
@@ -111,23 +161,26 @@
 		</div>
 
 		<!-- Input Section -->
-		<div class="card bg-base-100 shadow-lg border border-primary/10 overflow-visible" in:scale={{ duration: 600, start: 0.95, delay: 100 }}>
+		<div
+			class="card bg-base-100 shadow-lg border border-primary/10 overflow-visible"
+			in:scale={{ duration: 600, start: 0.95, delay: 100 }}
+		>
 			<div class="card-body p-6 space-y-6">
-				<form 
-					method="POST" 
-					action="?/create" 
+				<form
+					method="POST"
+					action="?/create"
 					use:enhance={() => {
 						isSubmitting = true;
 						return async ({ result, update }) => {
 							isSubmitting = false;
 							if (result.type === 'success') {
-								toast.add('Catatan jurnal tersimpan!', 'success');
+								toast.add(m.journal_toast_saved(), 'success');
 								triggerConfetti();
 								gratitudeText = '';
 								selectedMood = 'happy';
 								await update();
 							} else {
-								toast.add('Gagal menyimpan catatan.', 'error');
+								toast.add(m.journal_toast_failed(), 'error');
 							}
 						};
 					}}
@@ -139,21 +192,34 @@
 					<!-- Mood Selector -->
 					<div class="space-y-3">
 						<label class="label" for="">
-							<span class="label-text font-medium text-base">Apa yang kamu rasakan?</span>
+							<span class="label-text font-medium text-base">{m.journal_mood_question()}</span>
 						</label>
 						<div class="flex justify-between overflow-x-auto p-2 gap-2">
 							{#each moods as mood}
-								<button 
+								<button
 									type="button"
 									class="flex flex-1 flex-col items-center gap-2 rounded-xl p-3 transition-all
 									{selectedMood === mood.type ? mood.bg : 'bg-base-200 hover:bg-base-300'}"
-									onclick={() => selectedMood = mood.type}
+									onclick={() => (selectedMood = mood.type)}
 								>
-									<div class="size-10 flex items-center justify-center transition-transform duration-300 {selectedMood === mood.type ? 'scale-110' : ''}">
-										<mood.icon class="size-8 {selectedMood === mood.type ? mood.color : 'text-base-content/30'}" 
-											strokeWidth={selectedMood === mood.type ? 2.5 : 2}/>
+									<div
+										class="size-10 flex items-center justify-center transition-transform duration-300 {selectedMood ===
+										mood.type
+											? 'scale-110'
+											: ''}"
+									>
+										<mood.icon
+											class="size-8 {selectedMood === mood.type
+												? mood.color
+												: 'text-base-content/30'}"
+											strokeWidth={selectedMood === mood.type ? 2.5 : 2}
+										/>
 									</div>
-									<span class="text-xs font-medium {selectedMood === mood.type ? mood.color : 'text-base-content/50'}">
+									<span
+										class="text-xs font-medium {selectedMood === mood.type
+											? mood.color
+											: 'text-base-content/50'}"
+									>
 										{mood.label}
 									</span>
 								</button>
@@ -164,12 +230,12 @@
 					<!-- Gratitude Input -->
 					<div class="space-y-3">
 						<label class="label" for="gratitude">
-							<span class="label-text font-medium text-base">Apa yang kamu syukuri hari ini?</span>
+							<span class="label-text font-medium text-base">{m.journal_gratitude_question()}</span>
 						</label>
 						<div class="relative">
-							<Textarea 
+							<Textarea
 								name="gratitude"
-								placeholder="Hari ini, aku bersyukur karena..." 
+								placeholder={m.journal_gratitude_placeholder()}
 								class="min-h-[120px] text-lg leading-relaxed resize-none bg-base-100 border-base-content/10 focus:border-primary/50"
 								bind:value={gratitudeText}
 							/>
@@ -181,19 +247,19 @@
 
 					<!-- Action -->
 					<div class="flex justify-end">
-						<Button 
+						<Button
 							type="submit"
-							variant="primary" 
+							variant="primary"
 							class="gap-2 px-8 rounded-full shadow-lg shadow-primary/20 dark:shadow-primary/30 hover:shadow-xl hover:shadow-primary/25 transition-all"
 							disabled={!gratitudeText.trim() || isSubmitting}
 							loading={isSubmitting}
 						>
 							{#if isSubmitting}
-								<Loading variant='infinity' />
-								memuat
+								<Loading variant="infinity" />
+								{m.journal_loading()}
 							{:else}
 								<Save class="size-4" />
-								Simpan Catatan
+								{m.journal_save_button()}
 							{/if}
 						</Button>
 					</div>
@@ -203,22 +269,29 @@
 
 		<!-- History Log -->
 		<div class="space-y-4">
-			<h2 class="text-xl font-bold flex items-center gap-2 px-1" in:fly={{ y: 20, duration: 600, delay: 200 }}>
+			<h2
+				class="text-xl font-bold flex items-center gap-2 px-1"
+				in:fly={{ y: 20, duration: 600, delay: 200 }}
+			>
 				<Calendar class="size-5 text-base-content/60" />
-				Catatan untuk {formatDate(currentDate)}
+				{m.journal_history_title()}
+				{formatDate(currentDate)}
 			</h2>
 
 			<div class="space-y-4">
 				{#if filteredLogs.length === 0}
-					<div class="text-center py-12 text-base-content/40 bg-base-100 rounded-3xl border border-dashed border-base-content/10" in:fade>
+					<div
+						class="text-center py-12 text-base-content/40 bg-base-100 rounded-3xl border border-dashed border-base-content/10"
+						in:fade
+					>
 						<Sparkles class="size-8 mx-auto mb-2 opacity-50" />
-						<p>Belum ada catatan hari ini. Mulai menulis!</p>
+						<p>{m.journal_no_logs()}</p>
 					</div>
 				{:else}
 					{#each filteredLogs as log, i (log.id)}
-						<div 
+						<div
 							class="card bg-base-100 shadow-sm border border-base-content/5 hover:shadow-md transition-all duration-300 group"
-							in:fly={{ y: 20, duration: 500, delay: 300 + (i * 100) }}
+							in:fly={{ y: 20, duration: 500, delay: 300 + i * 100 }}
 							out:slide|local
 						>
 							<div class="card-body p-5">
@@ -226,27 +299,30 @@
 									<div class="flex items-start gap-4">
 										<div class="mt-1 p-2 rounded-xl bg-base-200/50">
 											<!-- svelte-ignore svelte_component_deprecated -->
-											<svelte:component 
-												this={getMoodIcon(log.mood)} 
-												class="size-6 {getMoodColor(log.mood)}" 
+											<svelte:component
+												this={getMoodIcon(log.mood)}
+												class="size-6 {getMoodColor(log.mood)}"
 											/>
-											
 										</div>
 										<div class="space-y-1">
-											<p class="text-base-content/80 leading-relaxed whitespace-pre-wrap">{log.gratitude}</p>
-											<p class="text-xs text-base-content/40 font-medium pt-1">{formatTime(log.createdAt || new Date())}</p>
+											<p class="text-base-content/80 leading-relaxed whitespace-pre-wrap">
+												{log.gratitude}
+											</p>
+											<p class="text-xs text-base-content/40 font-medium pt-1">
+												{formatTime(log.createdAt || new Date())}
+											</p>
 										</div>
 									</div>
-									
+
 									<div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-										<button 
+										<button
 											class="btn btn-ghost btn-xs btn-circle text-base-content/60"
 											onclick={() => openEditModal(log)}
 											title="Ubah Catatan"
 										>
 											<Pencil class="size-4" />
 										</button>
-										<button 
+										<button
 											class="btn btn-ghost btn-xs btn-circle text-error"
 											onclick={() => openDeleteModal(log.id)}
 											title="Hapus Catatan"
@@ -265,22 +341,22 @@
 </div>
 
 <!-- Edit Modal -->
-<Modal bind:open={isEditModalOpen} title="Ubah Catatan Jurnal">
+<Modal bind:open={isEditModalOpen} title={m.journal_edit_title()}>
 	{#if editingLog}
-		<form 
-			method="POST" 
-			action="?/update" 
+		<form
+			method="POST"
+			action="?/update"
 			use:enhance={() => {
-				isSubmitting = true
+				isSubmitting = true;
 				return async ({ result, update }) => {
 					if (result.type === 'success') {
-						toast.add('Catatan berhasil diperbarui!', 'success');
+						toast.add(m.journal_toast_updated(), 'success');
 						isEditModalOpen = false;
 						triggerConfetti();
-						isSubmitting = false
+						isSubmitting = false;
 						await update();
 					} else {
-						toast.add('Gagal memperbarui catatan.', 'error');
+						toast.add(m.journal_toast_update_failed(), 'error');
 					}
 				};
 			}}
@@ -292,18 +368,27 @@
 			<!-- Mood Selector -->
 			<div class="space-y-3">
 				<label class="label" for="">
-					<span class="label-text font-medium text-base">Perasaan</span>
+					<span class="label-text font-medium text-base">{m.journal_mood_label()}</span>
 				</label>
 				<div class="flex justify-between overflow-x-auto p-2 gap-2">
 					{#each moods as mood}
-						<button 
+						<button
 							type="button"
 							class="flex flex-1 flex-col items-center gap-2 rounded-xl p-3 transition-all
 							{editingLog.mood === mood.type ? mood.bg : 'bg-base-200 hover:bg-base-300'}"
-							onclick={() => editingLog!.mood = mood.type}
+							onclick={() => (editingLog!.mood = mood.type)}
 						>
-							<div class="size-8 flex items-center justify-center transition-transform duration-300 {editingLog.mood === mood.type ? 'scale-110' : ''}">
-								<mood.icon class="size-6 {editingLog.mood === mood.type ? mood.color : 'text-base-content/30'}" />
+							<div
+								class="size-8 flex items-center justify-center transition-transform duration-300 {editingLog.mood ===
+								mood.type
+									? 'scale-110'
+									: ''}"
+							>
+								<mood.icon
+									class="size-6 {editingLog.mood === mood.type
+										? mood.color
+										: 'text-base-content/30'}"
+								/>
 							</div>
 						</button>
 					{/each}
@@ -312,24 +397,22 @@
 
 			<div class="space-y-3">
 				<label class="label" for="edit-gratitude">
-					<span class="label-text font-medium">Rasa Syukur</span>
+					<span class="label-text font-medium">{m.journal_gratitude_label()}</span>
 				</label>
-				<Textarea 
-					name="gratitude"
-					bind:value={editingLog.gratitude}
-					class="min-h-[120px]"
-				/>
+				<Textarea name="gratitude" bind:value={editingLog.gratitude} class="min-h-[120px]" />
 			</div>
 
 			<div class="flex justify-end gap-3">
-				<Button type="button" variant="ghost" onclick={() => isEditModalOpen = false}>Batal</Button>
+				<Button type="button" variant="ghost" onclick={() => (isEditModalOpen = false)}
+					>{m.journal_cancel_button()}</Button
+				>
 				<Button type="submit" variant="primary" disabled={isSubmitting}>
 					{#if isSubmitting}
-						<Loading variant='infinity' />
-						memuat
+						<Loading variant="infinity" />
+						{m.journal_loading()}
 					{:else}
 						<Save class="size-4" />
-						Perbarui
+						{m.journal_update_button()}
 					{/if}
 				</Button>
 			</div>
@@ -338,28 +421,30 @@
 </Modal>
 
 <!-- Delete Modal -->
-<Modal bind:open={isDeleteModalOpen} title="Hapus Catatan">
+<Modal bind:open={isDeleteModalOpen} title={m.journal_delete_title()}>
 	<div class="space-y-4">
-		<p>Apakah Anda yakin ingin menghapus catatan ini? Tindakan ini tidak dapat dibatalkan.</p>
-		<form 
-			method="POST" 
-			action="?/delete" 
+		<p>{m.journal_delete_confirm()}</p>
+		<form
+			method="POST"
+			action="?/delete"
 			use:enhance={() => {
 				return async ({ result, update }) => {
 					if (result.type === 'success') {
-						toast.add('Catatan berhasil dihapus.', 'info');
+						toast.add(m.journal_toast_deleted(), 'info');
 						isDeleteModalOpen = false;
 						update();
 					} else {
-						toast.add('Gagal menghapus catatan.', 'error');
+						toast.add(m.journal_toast_delete_failed(), 'error');
 					}
 				};
 			}}
 			class="flex justify-end gap-3"
 		>
 			<input type="hidden" name="id" value={deletingLogId} />
-			<Button type="button" variant="ghost" onclick={() => isDeleteModalOpen = false}>Batal</Button>
-			<Button type="submit" variant="error">Hapus</Button>
+			<Button type="button" variant="ghost" onclick={() => (isDeleteModalOpen = false)}
+				>{m.journal_cancel_button()}</Button
+			>
+			<Button type="submit" variant="error">{m.journal_delete_button()}</Button>
 		</form>
 	</div>
 </Modal>

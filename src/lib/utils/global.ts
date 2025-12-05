@@ -3,21 +3,21 @@ import { Dumbbell, GlassWater, BookOpen, Coffee, Briefcase, Heart, Star, Zap, } 
 export type Category = 'Wajib' | 'Sunnah' | 'Mubah';
 
 
-export const categories: { label: Category; color: string; description: string }[] = [
-	{ label: 'Wajib', color: 'primary', description: 'Ibadah wajib yang harus ditunaikan.' },
-	{ label: 'Sunnah', color: 'secondary', description: 'Amalan sunnah untuk pahala tambahan.' },
-	{ label: 'Mubah', color: 'accent', description: 'Aktivitas harian yang bermanfaat.' }
+export const categories: { label: Category; color: string; description: string; labelKey: string; descKey: string }[] = [
+	{ label: 'Wajib', color: 'primary', description: 'Ibadah wajib yang harus ditunaikan.', labelKey: 'category_wajib', descKey: 'category_wajib_desc' },
+	{ label: 'Sunnah', color: 'secondary', description: 'Amalan sunnah untuk pahala tambahan.', labelKey: 'category_sunnah', descKey: 'category_sunnah_desc' },
+	{ label: 'Mubah', color: 'accent', description: 'Aktivitas harian yang bermanfaat.', labelKey: 'category_mubah', descKey: 'category_mubah_desc' }
 ];
 
 export const icons = [
-	{ component: Dumbbell, label: 'Olahraga' },
-	{ component: BookOpen, label: 'Membaca' },
-	{ component: GlassWater, label: 'Minum' },
-	{ component: Coffee, label: 'Santai' },
-	{ component: Briefcase, label: 'Bekerja' },
-	{ component: Heart, label: 'Kesehatan' },
-	{ component: Star, label: 'Target' },
-	{ component: Zap, label: 'Energi' }
+	{ component: Dumbbell, label: 'Olahraga', labelKey: 'icon_sports' },
+	{ component: BookOpen, label: 'Membaca', labelKey: 'icon_reading' },
+	{ component: GlassWater, label: 'Minum', labelKey: 'icon_drinking' },
+	{ component: Coffee, label: 'Santai', labelKey: 'icon_relax' },
+	{ component: Briefcase, label: 'Bekerja', labelKey: 'icon_work' },
+	{ component: Heart, label: 'Kesehatan', labelKey: 'icon_health' },
+	{ component: Star, label: 'Target', labelKey: 'icon_target' },
+	{ component: Zap, label: 'Energi', labelKey: 'icon_energy' }
 ];
 
 
