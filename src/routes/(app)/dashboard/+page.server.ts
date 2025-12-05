@@ -4,6 +4,7 @@ import { db } from '$lib/server/db';
 import { prayerLogs, habits, habitLogs, quranProgress } from '$lib/server/db/schema';
 import { eq, and, desc} from 'drizzle-orm';
 import { lucia } from '$lib/server/auth.js';
+import { formatDateShort } from '$lib/utils/format.js';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
@@ -11,7 +12,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	}
 
 	const userId = locals.user.id;
-	const todayStr = new Date().toISOString().split('T')[0];
+	const todayStr = formatDateShort(new Date());
 
 	// Fetch data in parallel
 	const [

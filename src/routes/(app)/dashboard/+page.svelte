@@ -8,10 +8,8 @@
 		Check,
 		BookOpen,
 		Activity,
-		ArrowRight,
 		Sparkles,
-		Heart,
-		RefreshCw
+		Heart
 	} from 'lucide-svelte';
 	import { Badge, Button } from '$lib/components/ui';
 	import { goto, invalidateAll } from '$app/navigation';
@@ -22,12 +20,6 @@
 
 	// Initialize Timer
 	const timer = new PrayerTimer(data?.prayerTimes || []);
-
-	$effect(() => {
-		if (data?.prayerTimes) {
-			timer?.updatePrayers(data?.prayerTimes);
-		}
-	});
 
 	const profile = $derived(data?.user);
 
@@ -140,8 +132,9 @@
 							</Badge>
 							<Button
 								onclick={() => {
-									// goto('/jadwal-solat');
-									timer.playAudio()
+									goto('/jadwal-solat');
+									// timer.playAudio();
+									// timer.checkAudio();
 								}}
 								class="rounded-xl"
 								size="sm"

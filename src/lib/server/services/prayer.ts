@@ -1,7 +1,8 @@
 import { user } from '$lib/server/db/schema';
+import type { UserPreferences } from '$lib/utils/global';
 import type { InferSelectModel } from 'drizzle-orm';
 
-type User = InferSelectModel<typeof user>;
+export type User = InferSelectModel<typeof user>;
 
 const PRAYER_NAMES = {
 	fajr: 'Subuh',
@@ -45,7 +46,7 @@ export async function fetchPrayerTimes(
 	};
 }
 
-export function formatPrayerTimes(timings: Record<string, string>, preferences: any): PrayerTime[] {
+export function formatPrayerTimes(timings: Record<string, string>, preferences: UserPreferences): PrayerTime[] {
 	return Object.entries(timings)
 		.filter(([key]) => Object.keys(PRAYER_NAMES).includes(key.toLowerCase()))
 		.map(([key, timeStr]) => {
@@ -57,8 +58,8 @@ export function formatPrayerTimes(timings: Record<string, string>, preferences: 
 			const isNotificationEnabled = preferences?.notificationSettings?.prayers?.[prayerKey] ?? false;
 
 			return {
-				id: key,
-				name: PRAYER_NAMES[key as PrayerName],
+				id: prayerKey,
+				name: PRAYER_NAMES[prayerKey as PrayerName],
 				time: timeStr,
 				timestamp: prayerDate.getTime(),
 				isNext: false,

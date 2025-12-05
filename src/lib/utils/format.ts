@@ -7,6 +7,14 @@ export const formatDate = (date: Date, locale: string = 'id-ID'): string => {
   }).format(date);
 };
 
+export const formatDateShort = (date: Date, locale: string = 'en-CA'): string => {
+  return new Intl.DateTimeFormat(locale, {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(date);
+}
+
 export const hijriDate = (date: Date, locale: string = 'id-ID-u-ca-islamic'): string => {
   return new Intl.DateTimeFormat(locale, {
     day: 'numeric',

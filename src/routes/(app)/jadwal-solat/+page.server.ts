@@ -2,16 +2,10 @@ import { fail } from "@sveltejs/kit";
 import { db } from "$lib/server/db";
 import { user } from "$lib/server/db/schema";
 import { eq } from "drizzle-orm";
+import type { UserPreferences } from "$lib/utils/global";
 
 
 
-type UserPreferences = {
-	notificationSettings?: {
-		prayers: Record<string, boolean>;
-		habits: boolean;
-		sound: string;
-	};
-};
 
 export const actions = {
 	toggle: async ({ request, locals }) => {

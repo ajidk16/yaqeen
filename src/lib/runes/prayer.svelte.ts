@@ -96,6 +96,7 @@ export class PrayerTimer {
 
 	playAudio() {
 		if (this.audio) {
+			console.log("Playing audio:", this.audioSrc);
 			this.audio.src = this.audioSrc;
 			this.audio.currentTime = 0;
 			this.audio.play().catch(e => console.error("Audio play failed", e));
@@ -169,11 +170,21 @@ export class PrayerTimer {
 			}
 		}
 
-		// During Prayer (0 - 10 mins after the *current active* prayer)
+		// Play audio at the start of the current active prayer
 		if (this.currentActivePrayer) {
 			const diffFromActive = now - this.currentActivePrayer.timestamp;
-			if (diffFromActive >= 0 && diffFromActive <= TEN_MINUTES_MS) {
-				return `Sedang Solat ${this.currentActivePrayer.name}`;
+			if (diffFromActive >= 0 && diffFromActive <= 5000) {
+				this.playAudio();
+			}
+		}
+
+		
+		if (this.currentActivePrayer) {
+			const diffFromActive = now - this.currentActivePrayer.timestamp;
+			if (diffFromActive > 0 && diffFromActive <= TEN_MINUTES_MS) {
+				const minutes = Math.floor((TEN_MINUTES_MS - diffFromActive) / (1000 * 60));
+				const seconds = Math.floor(((TEN_MINUTES_MS - diffFromActive) % (1000 * 60)) / 1000);
+				return `Sedang ${this.currentActivePrayer.name} - ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 			}
 		}
 

@@ -32,6 +32,11 @@
 
 	function refreshLocation() {
 		isLoading = true;
+
+		timer.playAudio();
+		isLoading = false;
+		return
+
 		if (!navigator.geolocation) {
 			error = 'Geolokasi tidak didukung';
 			isLoading = false;

@@ -138,3 +138,11 @@ export const surahs = [
 	'Al-Falaq',
 	'An-Nas'
 ];
+
+export type UserPreferences = {
+	notificationSettings?: {
+		prayers: Record<string, boolean>;
+		habits: boolean;
+		sound: string;
+	};
+};

@@ -4,13 +4,14 @@ import type { PageServerLoad, Actions } from './$types';
 import { db } from '$lib/server/db';
 import { quranProgress, hafalanProgress, user } from '$lib/server/db/schema';
 import { eq, and } from 'drizzle-orm';
+import { formatDateShort } from '$lib/utils/format';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (!locals.user) {
 		throw redirect(302, '/login');
 	}
 
-	const dateStr = url.searchParams.get('date') || new Date().toISOString().split('T')[0];
+	const dateStr = url.searchParams.get('date') || formatDateShort(new Date());
 
 	// Fetch current day's progress
 	const progress = await db.query.quranProgress.findFirst({
