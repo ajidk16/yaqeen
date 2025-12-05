@@ -125,7 +125,9 @@
 							<Clock class="size-4" />
 							<span>{formatDate(new Date())}</span>
 						</Badge>
-						<h2 class="text-4xl font-bold tracking-tight mt-2">{timer.nextPrayer.name}</h2>
+						<h2 class="text-4xl font-bold tracking-tight mt-2">
+							{timer.nextPrayer.name ?? 'Shubuh'}
+						</h2>
 						<div class="text-6xl font-black font-mono tracking-tighter my-4 tabular-nums">
 							{timer.countdown}
 						</div>
@@ -137,7 +139,10 @@
 								<span>{timer.nextPrayer.time}</span>
 							</Badge>
 							<Button
-								onclick={() => goto('/jadwal-solat')}
+								onclick={() => {
+									// goto('/jadwal-solat');
+									timer.playAudio()
+								}}
 								class="rounded-xl"
 								size="sm"
 								variant="primary">Jadwal Sholat</Button

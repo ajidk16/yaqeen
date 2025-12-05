@@ -4,7 +4,7 @@
 	import AddHabitModal from '$lib/components/habits/AddHabitModal.svelte';
 	import PrayerCountdown from '$lib/components/prayer/PrayerCountdown.svelte';
 
-	let { children, data } = $props();
+	let { children } = $props();
 </script>
 
 <div class="min-h-screen bg-surface-200 pb-20 font-body text-content-primary md:pb-0 md:pl-20">
@@ -18,8 +18,8 @@
 	<BottomNav class="md:hidden" />
 
 	<AddHabitModal />
-	<PrayerCountdown
+	<!-- <PrayerCountdown
 		prayerTimes={data.prayerTimes}
 		soundPreference={data.user?.preferences?.notificationSettings?.sound}
-	/>
+	/> -->
 </div>

@@ -10,11 +10,17 @@
 	let { data } = $props();
 
 	// Initialize Timer
-	const timer = new PrayerTimer(data.prayerTimes || []);
+	const timer = new PrayerTimer(
+		data.prayerTimes || [],
+		data.user?.preferences?.notificationSettings?.sound
+	);
 
 	$effect(() => {
 		if (data.prayerTimes) {
 			timer.updatePrayers(data.prayerTimes);
+		}
+		if (data.user?.preferences?.notificationSettings?.sound) {
+			timer.updatePreference(data.user.preferences.notificationSettings.sound);
 		}
 	});
 
