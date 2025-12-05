@@ -56,3 +56,45 @@ import { ComponentName } from '$lib/components/ui';
 2. **DaisyUI**: Use daisyUI utility classes for styling components.
 3. **Icons**: Use SVG snippets or icon components to pass to `icon` props where supported.
 4. **Type Safety**: Ensure all props and state are properly typed with TypeScript.
+
+### Component Usage Guidelines
+
+**CRITICAL**: You MUST use the provided local UI components whenever possible instead of writing raw HTML/CSS or DaisyUI classes directly.
+
+#### 1. Button (`Button.svelte`)
+
+- Wraps `.btn`.
+- Props: `variant`, `size`, `outline`, `active`, `disabled`, `glass`, `loading`, `wide`, `block`, `circle`, `square`.
+- Example: `<Button variant="primary" onclick={handleClick}>Click Me</Button>`
+
+#### 2. Card (`Card.svelte`)
+
+- Wraps `.card`.
+- Props: `title` (optional header), `bordered`, `compact`, `glass`, `imageFull`, `figure` (snippet), `actions` (snippet).
+- Example:
+  ```svelte
+  <Card title="Title">
+    <p>Content</p>
+    {#snippet actions()}<Button>Action</Button>{/snippet}
+  </Card>
+  ```
+
+#### 3. Input (`Input.svelte`)
+
+- Wraps `.input` with form control and label.
+- Props: `label`, `error`, `helperText`, `value` (bindable), `startIcon`, `endIcon`.
+- Example: `<Input label="Name" bind:value={name} error={errors.name} />`
+
+#### 4. Modal (`Modal.svelte`)
+
+- Wraps `<dialog>` with `.modal`.
+- Props: `open` (bindable boolean), `title`, `actions` (snippet).
+- Example: `<Modal bind:open={isOpen} title="Confirm">...</Modal>`
+
+### DaisyUI Best Practices
+
+- **Layout**: Use `drawer`, `footer`, `hero`, `indicator`, `join`, `mask`, `stack`, `toast`.
+- **Navigation**: Use `navbar`, `menu`, `tabs`, `breadcrumbs`, `dock` (bottom nav).
+- **Data Display**: Use `carousel`, `chat`, `collapse`, `countdown`, `diff`, `kbd`, `stat`, `table`, `timeline`.
+- **Feedback**: Use `progress`, `radial-progress`, `skeleton`.
+- **Reactivity**: ALWAYS use Svelte 5 Runes (`$state`, `$derived`, `$effect`, `$props`).

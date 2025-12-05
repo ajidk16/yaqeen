@@ -7,6 +7,7 @@
 		compact?: boolean;
 		glass?: boolean;
 		imageFull?: boolean;
+		hover?: boolean;
 		class?: string;
 		children?: Snippet;
 		figure?: Snippet;
@@ -19,20 +20,24 @@
 		compact = false,
 		glass = false,
 		imageFull = false,
+		hover,
 		class: className = '',
 		children,
 		figure,
 		actions,
+		...rest // Added rest props for forwarding to the div
 	}: Props = $props();
 </script>
 
 <div
-	class="card bg-base-100 w-full shadow-sm transition-all duration-300
+	class="card bg-base-100 shadow-sm
 	{bordered ? 'card-bordered' : ''}
 	{compact ? 'card-compact' : ''}
-	{glass ? 'glass' : ''}
+	{glass ? 'glass border-white/20 shadow-xl backdrop-blur-md' : ''}
 	{imageFull ? 'image-full' : ''}
+	{hover ? 'transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg' : ''}
 	{className}"
+	{...rest}
 >
 	{#if figure}
 		<figure>{@render figure()}</figure>

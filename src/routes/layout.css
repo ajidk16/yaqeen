@@ -6,30 +6,30 @@
 	--font-display: "Outfit", sans-serif;
 	--font-body: "Inter", sans-serif;
 
-	/* Colors */
-	--color-primary: #8B5CF6;
-	--color-primary-soft: #DDD6FE;
-	--color-primary-content: #FFFFFF;
+	/* Colors - Semantic overrides if needed, but relying on daisyUI themes is better */
+	--color-primary: var(--p);
+	--color-primary-content: var(--pc);
+	--color-secondary: var(--s);
+	--color-secondary-content: var(--sc);
+	--color-accent: var(--a);
+	--color-accent-content: var(--ac);
+	--color-neutral: var(--n);
+	--color-neutral-content: var(--nc);
+	
+	--color-base-100: var(--b1);
+	--color-base-200: var(--b2);
+	--color-base-300: var(--b3);
+	--color-base-content: var(--bc);
 
-	--color-secondary: #10B981;
-	--color-secondary-soft: #D1FAE5;
-
+	/* Custom Semantic Colors */
 	--color-ibadah: #14B8A6;
-	--color-ibadah-bg: #F0FDFA;
+	--color-ibadah-bg: oklch(0.96 0.01 180); /* Soft teal */
 
 	--color-health: #F43F5E;
-	--color-health-bg: #FFF1F2;
+	--color-health-bg: oklch(0.96 0.02 350); /* Soft rose */
 
 	--color-learning: #F59E0B;
-	--color-learning-bg: #FFFBEB;
-
-	--color-surface-100: #FFFFFF;
-	--color-surface-200: #F8FAFC;
-	--color-surface-300: #F1F5F9;
-
-	--color-content-primary: #1E293B;
-	--color-content-secondary: #64748B;
-	--color-content-tertiary: #94A3B8;
+	--color-learning-bg: oklch(0.97 0.02 80); /* Soft amber */
 
 	/* Animations */
 	--animate-float: float 6s ease-in-out infinite;
@@ -46,20 +46,64 @@
 		to { opacity: 1; transform: translateY(0); }
 	}
 
+	@keyframes fadeIn {
+		from { opacity: 0; }
+		to { opacity: 1; }
+	}
+
 	@keyframes scaleIn {
 		from { opacity: 0; transform: scale(0.9); }
 		to { opacity: 1; transform: scale(1); }
 	}
+
+	@keyframes slideInLeft {
+		from { opacity: 0; transform: translateX(-20px); }
+		to { opacity: 1; transform: translateX(0); }
+	}
+
+	@keyframes slideInRight {
+		from { opacity: 0; transform: translateX(20px); }
+		to { opacity: 1; transform: translateX(0); }
+	}
+
+	.animate-float {
+		animation: float 3s ease-in-out infinite;
+	}
+
+	.animate-on-scroll {
+		opacity: 0;
+	}
+
+	.visible {
+		opacity: 1;
+	}
+
+	/* View Transitions */
+	::view-transition-old(root),
+	::view-transition-new(root) {
+		animation-duration: 0.3s;
+	}
 }
 
 /* Global Styles */
+html {
+	scroll-behavior: smooth;
+	scroll-padding-top: 5rem; /* Offset for sticky navbar */
+}
+
 body {
 	font-family: var(--font-body);
-	background-color: var(--color-surface-200);
-	color: var(--color-content-primary);
+	@apply bg-base-200 text-base-content antialiased selection:bg-primary selection:text-primary-content;
 }
 
 h1, h2, h3, h4, h5, h6 {
 	font-family: var(--font-display);
+	@apply font-bold tracking-tight;
 }
+
+/* Smooth transitions for theme switching */
+:root {
+	transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 

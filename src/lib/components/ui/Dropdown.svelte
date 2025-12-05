@@ -10,6 +10,7 @@
 		bottom?: boolean;
 		left?: boolean;
 		right?: boolean;
+		variant?: 'primary' | 'secondary' | 'accent' | 'info' | 'success' | 'warning' | 'error' | 'ghost' | 'link' | 'neutral';
 		class?: string;
 		trigger?: Snippet; // Custom trigger element
 		children?: Snippet; // Dropdown content
@@ -24,6 +25,7 @@
 		bottom = true,
 		left = false,
 		right = false,
+		variant,
 		class: className = '',
 		trigger,
 		children
@@ -46,7 +48,7 @@
 			{@render trigger()}
 		</div>
 	{:else}
-		<div tabindex="0" role="button" class="btn m-1">{label ?? 'Dropdown'}</div>
+		<div tabindex="0" role="button" class="btn m-1 {variant ? `btn-${variant}` : ''}">{label ?? 'Dropdown'}</div>
 	{/if}
 
 	<ul class="dropdown-content z-1 menu p-2 shadow bg-base-100 rounded-box w-52">

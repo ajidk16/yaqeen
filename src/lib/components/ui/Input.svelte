@@ -41,7 +41,7 @@
 		{/if}
 
 		<input
-			class="input input-bordered w-full transition-all focus:input-primary 
+			class="input input-bordered w-full transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:border-primary 
 			{error ? 'input-error' : ''} 
 			{startIcon ? 'pl-10' : ''} 
 			{endIcon ? 'pr-10' : ''} 

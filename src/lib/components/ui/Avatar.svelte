@@ -7,6 +7,7 @@
 		shape?: 'circle' | 'square' | 'squircle' | 'hexagon' | 'triangle'; // Mask shapes
 		online?: boolean;
 		offline?: boolean;
+		circle?: boolean;
 		class?: string;
 		containerClass?: string;
 	}
@@ -19,6 +20,7 @@
 		shape,
 		online,
 		offline,
+		circle,
 		class: className = '',
 		containerClass = ''
 	}: Props = $props();
@@ -34,8 +36,8 @@
 
 <div class="avatar {online ? 'online' : ''} {offline ? 'offline' : ''} {placeholder ? 'placeholder' : ''} {containerClass}">
 	<div
-		class="{sizeClasses[size]} rounded-full
-		{shape ? `mask mask-${shape}` : ''}
+		class="{sizeClasses[size]} {circle || shape === 'circle' ? 'rounded-full' : ''}
+		{shape && shape !== 'circle' ? `mask mask-${shape}` : ''}
 		{className}
 		{placeholder ? 'bg-neutral text-neutral-content' : ''}"
 	>

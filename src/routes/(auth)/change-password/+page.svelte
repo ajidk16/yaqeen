@@ -6,6 +6,7 @@
 	import { toast } from '$lib/stores/toast';
 	import confetti from 'canvas-confetti';
 	import { Lock, Eye, EyeOff, Check, X, ArrowRight, ShieldCheck } from 'lucide-svelte';
+	import { Input, Button } from '$lib/components/ui';
 
 	let { data } = $props();
 
@@ -127,22 +128,20 @@
 					>
 						<!-- New Password -->
 						<div class="form-control">
-							<label class="label" for="new-password">
-								<span class="label-text font-medium">Password Baru</span>
-							</label>
 							<div class="relative">
-								<input
+								<Input
+									label="Password Baru"
 									id="new-password"
 									type={showNewPassword ? 'text' : 'password'}
 									name="password"
 									bind:value={newPassword}
 									placeholder="Masukkan password baru"
-									class="input input-bordered w-full pr-12"
 									disabled={isLoading}
+									endIcon
 								/>
 								<button
 									type="button"
-									class="absolute right-3 top-1/2 -translate-y-1/2 text-base-content/50 hover:text-base-content transition-colors"
+									class="absolute right-3 top-[3.2rem] -translate-y-1/2 text-base-content/50 hover:text-base-content transition-colors"
 									onclick={() => showNewPassword = !showNewPassword}
 								>
 									{#if showNewPassword}
@@ -173,22 +172,21 @@
 
 						<!-- Confirm Password -->
 						<div class="form-control">
-							<label class="label" for="confirm-password">
-								<span class="label-text font-medium">Konfirmasi Password</span>
-							</label>
 							<div class="relative">
-								<input
+								<Input
+									label="Konfirmasi Password"
 									id="confirm-password"
 									type={showConfirmPassword ? 'text' : 'password'}
 									name="confirmPassword"
 									bind:value={confirmPassword}
 									placeholder="Ulangi password baru"
-									class="input input-bordered w-full pr-12 {confirmPassword.length > 0 ? (passwordsMatch ? 'input-success' : 'input-error') : ''}"
+									error={confirmPassword.length > 0 && !passwordsMatch ? 'Password tidak cocok' : undefined}
 									disabled={isLoading}
+									endIcon
 								/>
 								<button
 									type="button"
-									class="absolute right-3 top-1/2 -translate-y-1/2 text-base-content/50 hover:text-base-content transition-colors"
+									class="absolute right-3 top-[3.2rem] -translate-y-1/2 text-base-content/50 hover:text-base-content transition-colors"
 									onclick={() => showConfirmPassword = !showConfirmPassword}
 								>
 									{#if showConfirmPassword}
@@ -198,11 +196,6 @@
 									{/if}
 								</button>
 							</div>
-							{#if confirmPassword.length > 0 && !passwordsMatch}
-								<label class="label">
-									<span class="label-text-alt text-error">Password tidak cocok</span>
-								</label>
-							{/if}
 						</div>
 
 						<!-- Password Requirements -->
@@ -224,19 +217,18 @@
 						</div>
 
 						<!-- Submit Button -->
-						<button 
+						<Button 
 							type="submit" 
-							class="btn btn-primary w-full gap-2"
+							variant="primary" 
+							block 
 							disabled={!isValid || isLoading}
+							loading={isLoading}
 						>
-							{#if isLoading}
-								<span class="loading loading-spinner loading-sm"></span>
-								Menyimpan...
-							{:else}
+							{#if !isLoading}
 								Simpan Password
-								<ArrowRight class="w-4 h-4" />
+								<ArrowRight class="w-4 h-4 ml-2" />
 							{/if}
-						</button>
+						</Button>
 					</form>
 				{:else}
 					<!-- Success State -->

@@ -3,7 +3,7 @@
 	import type { Snippet } from 'svelte';
 
 	interface Props extends HTMLButtonAttributes {
-		variant?: 'primary' | 'secondary' | 'accent' | 'info' | 'success' | 'warning' | 'error' | 'ghost' | 'link' | 'neutral';
+		variant?: 'primary' | 'secondary' | 'accent' | 'info' | 'success' | 'warning' | 'error' | 'ghost' | 'link' | 'neutral' | 'premium';
 		size?: 'lg' | 'md' | 'sm' | 'xs';
 		outline?: boolean;
 		active?: boolean;
@@ -44,11 +44,12 @@
 	{outline ? 'btn-outline' : ''}
 	{active ? 'btn-active' : ''}
 	{glass ? 'glass' : ''}
-	{noAnimation ? 'no-animation' : ''}
+	{noAnimation ? 'no-animation' : 'transition-all duration-200 active:scale-95 hover:scale-105'}
 	{wide ? 'btn-wide' : ''}
 	{block ? 'btn-block' : ''}
 	{circle ? 'btn-circle' : ''}
 	{square ? 'btn-square' : ''}
+	{variant === 'premium' ? 'bg-gradient-to-r from-primary to-secondary text-white border-none shadow-lg hover:shadow-xl hover:brightness-110' : ''}
 	{className}"
 	{disabled}
 	{...rest}

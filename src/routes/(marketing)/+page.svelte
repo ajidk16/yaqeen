@@ -4,6 +4,7 @@
 	import { ArrowRight, Sparkles, Briefcase, BookOpen, Heart, CheckCircle2, Star, Shield, Smartphone, Check } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui';
 	import { goto } from '$app/navigation';
+	import { animate } from '$lib/actions/transition';
 
 	let visible = $state(false);
 
@@ -104,14 +105,17 @@
 	<!-- Personas Section -->
 	<section id="features" class="py-24 bg-base-200/50 relative">
 		<div class="container mx-auto px-4">
-			<div class="text-center mb-16">
+			<div class="text-center mb-16" use:animate={{ type: 'fadeInUp' }}>
 				<h2 class="text-3xl md:text-4xl font-bold mb-4">Dirancang untuk Setiap Perjalanan</h2>
 				<p class="text-base-content/60 max-w-2xl mx-auto">Baik Anda profesional sibuk, pelajar, atau baru memulai hijrah, YaaQeen beradaptasi dengan kebutuhan Anda.</p>
 			</div>
 
 			<div class="grid md:grid-cols-3 gap-8">
 				{#each personas as persona, i}
-					<div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 border border-base-content/5 hover:-translate-y-1 group">
+					<div 
+						class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 border border-base-content/5 hover:-translate-y-1 group"
+						use:animate={{ type: 'fadeInUp', delay: i * 100 }}
+					>
 						<div class="card-body items-center text-center p-8">
 							<div class="size-16 rounded-2xl bg-linear-to-br from-primary/10 to-secondary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
 								<persona.icon class="size-8 text-primary" />
@@ -137,7 +141,7 @@
 	<section class="py-24 relative overflow-hidden">
 		<div class="container mx-auto px-4">
 			<div class="grid lg:grid-cols-2 gap-16 items-center">
-				<div class="space-y-8">
+				<div class="space-y-8" use:animate={{ type: 'slideInLeft' }}>
 					<h2 class="text-3xl md:text-4xl font-bold">Mengapa Memilih YaaQeen?</h2>
 					<div class="space-y-6">
 						<div class="flex gap-4">
@@ -169,7 +173,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="relative">
+				<div class="relative" use:animate={{ type: 'slideInRight', delay: 200 }}>
 					<div class="absolute inset-0 bg-linear-to-tr from-primary/20 to-secondary/20 rounded-3xl blur-3xl -z-10"></div>
 					<div class="bg-base-100 rounded-3xl shadow-2xl border border-base-content/5 p-8 rotate-3 hover:rotate-0 transition-transform duration-500">
 						<!-- Mockup Content -->
@@ -194,14 +198,17 @@
 	<!-- Pricing Section -->
 	<section id="pricing" class="py-24 bg-base-200/50">
 		<div class="container mx-auto px-4">
-			<div class="text-center mb-16">
+			<div class="text-center mb-16" use:animate={{ type: 'fadeInUp' }}>
 				<h2 class="text-3xl md:text-4xl font-bold mb-4">Investasi Terbaik untuk Diri Sendiri</h2>
 				<p class="text-base-content/60 max-w-2xl mx-auto">Pilih paket yang sesuai untuk mendukung pertumbuhan pribadi dan spiritual Anda.</p>
 			</div>
 
 			<div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-				{#each pricingPlans as plan}
-					<div class="card bg-base-100 shadow-xl border {plan.popular ? 'border-primary ring-2 ring-primary/20' : 'border-base-content/5'} relative hover:-translate-y-1 transition-transform duration-300">
+				{#each pricingPlans as plan, i}
+					<div 
+						class="card bg-base-100 shadow-xl border {plan.popular ? 'border-primary ring-2 ring-primary/20' : 'border-base-content/5'} relative hover:-translate-y-1 transition-transform duration-300"
+						use:animate={{ type: 'scaleIn', delay: i * 100 }}
+					>
 						{#if plan.popular}
 							<div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-primary-content text-xs font-bold rounded-full uppercase tracking-wider">
 								Paling Populer
@@ -236,7 +243,7 @@
 
 	<!-- About Section -->
 	<section id="about" class="py-24 relative overflow-hidden">
-		<div class="container mx-auto px-4 text-center">
+		<div class="container mx-auto px-4 text-center" use:animate={{ type: 'fadeInUp' }}>
 			<div class="max-w-3xl mx-auto space-y-8">
 				<div class="inline-flex items-center justify-center size-16 rounded-full bg-base-200 mb-4">
 					<Heart class="size-8 text-primary" />
@@ -255,7 +262,10 @@
 	<!-- CTA Section -->
 	<section class="py-24 bg-base-100">
 		<div class="container mx-auto px-4">
-			<div class="bg-linear-to-r from-primary to-secondary rounded-3xl p-12 text-center text-primary-content relative overflow-hidden">
+			<div 
+				class="bg-linear-to-r from-primary to-secondary rounded-3xl p-12 text-center text-primary-content relative overflow-hidden"
+				use:animate={{ type: 'scaleIn' }}
+			>
 				<div class="absolute top-0 left-0 w-full h-full bg-grid-pattern opacity-10"></div>
 				<div class="relative z-10 max-w-2xl mx-auto space-y-8">
 					<h2 class="text-3xl md:text-5xl font-bold">Siap Mengubah Hidup Anda?</h2>
