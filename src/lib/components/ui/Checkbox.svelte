@@ -30,7 +30,7 @@
 		{/if}
 	</label>
 	{#if error}
-		<label class="label">
+		<label for={error} class="label">
 			<span class="label-text-alt text-error">{error}</span>
 		</label>
 	{/if}

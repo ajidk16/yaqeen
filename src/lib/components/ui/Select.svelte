@@ -55,11 +55,11 @@
 		{/if}
 	</select>
 	{#if error}
-		<label class="label">
+		<label for={label} class="label">
 			<span class="label-text-alt text-error">{error}</span>
 		</label>
 	{:else if helperText}
-		<label class="label">
+		<label for={label} class="label">
 			<span class="label-text-alt text-base-content/60">{helperText}</span>
 		</label>
 	{/if}

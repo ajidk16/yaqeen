@@ -2,40 +2,28 @@
 	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui';
 	import { onMount } from 'svelte';
-	import { Sun, Moon, Menu, X } from 'lucide-svelte';
+	import {  Menu, X } from 'lucide-svelte';
+	import ToggleTheme from './ToggleTheme.svelte';
 
 	let isMenuOpen = $state(false);
-	let theme = $state('light');
 
 	function toggleMenu() {
 		isMenuOpen = !isMenuOpen;
 	}
 
-	function toggleTheme() {
-		theme = theme === 'light' ? 'dark' : 'light';
-		document.documentElement.setAttribute('data-theme', theme);
-		localStorage.setItem('theme', theme);
-	}
-
-	onMount(() => {
-		const savedTheme = localStorage.getItem('theme');
-		if (savedTheme) {
-			theme = savedTheme;
-		} else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-			theme = 'dark';
-		}
-	});
-
 	onMount(() => {
 		document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-			anchor.addEventListener('click', function (e) {
+			anchor.addEventListener('click', function (e: Event) {
 				e.preventDefault();
-				const targetId = this.getAttribute('href').substring(1);
-				const targetElement = document.getElementById(targetId);
-				if (targetElement) {
-					targetElement.scrollIntoView({
-						behavior: 'smooth'
-					});
+				const target = e.currentTarget as HTMLAnchorElement;
+				const targetId = target.getAttribute('href')?.substring(1);
+				if (targetId) {
+					const targetElement = document.getElementById(targetId);
+					if (targetElement) {
+						targetElement.scrollIntoView({
+							behavior: 'smooth'
+						});
+					}
 				}
 			});
 		});
@@ -74,13 +62,7 @@
 
 			<!-- Actions -->
 			<div class="hidden md:flex md:items-center md:gap-4">
-				<Button variant="ghost" size="sm" circle onclick={toggleTheme}>
-					{#if theme === 'light'}
-						<Moon class="h-5 w-5" />
-					{:else}
-						<Sun class="h-5 w-5" />
-					{/if}
-				</Button>
+				<ToggleTheme />
 				{#if page.data.user}
 					<a href="/dashboard" class="rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/25 transition-all hover:scale-105 hover:bg-primary-600 hover:shadow-primary/40 active:scale-95">
 						Dashboard Saya
@@ -122,13 +104,7 @@
 				{/each}
 				<div class="mt-4 flex items-center justify-between border-t border-base-200 pt-4">
 					<span class="text-sm font-medium text-base-content/70">Theme</span>
-					<Button variant="ghost" size="sm" circle onclick={toggleTheme}>
-						{#if theme === 'light'}
-							<Moon class="h-5 w-5" />
-						{:else}
-							<Sun class="h-5 w-5" />
-						{/if}
-					</Button>
+					<ToggleTheme />
 				</div>
 				<div class="mt-4">
 					<Button variant="primary" block class="rounded-full">Get Started</Button>

@@ -43,7 +43,7 @@
 	<div class="max-w-2xl mx-auto space-y-8">
 		<!-- Header -->
 		<header class="flex items-center gap-4" in:fly={{ y: -20, duration: 800, easing: quintOut }}>
-			<Button variant="ghost" circle size="sm" onclick={()=>goto('/profile')}>
+			<Button variant="ghost" circle size="sm" onclick={() => goto('/profile')} aria-label="Go back to profile">
 				<ArrowLeft class="size-5" />
 			</Button>
 			<div>
@@ -52,9 +52,9 @@
 			</div>
 		</header>
 
-		<form 
-			method="POST" 
-			action="?/update" 
+		<form
+			method="POST"
+			action="?/update"
 			use:enhance={() => {
 				isSaving = true;
 				return async ({ result, update }) => {
@@ -75,11 +75,15 @@
 			<div class="flex flex-col items-center gap-4" in:scale={{ duration: 600, start: 0.95, delay: 100 }}>
 				<div class="relative group">
 					<div class="size-32 rounded-full overflow-hidden ring-4 ring-base-100 shadow-xl">
-						<img src={avatar} alt="Profile" class="w-full h-full object-cover" />
+						<img src={avatar} alt="Profile avatar" class="w-full h-full object-cover" />
 					</div>
-					<label class="absolute bottom-0 right-0 p-2 bg-primary text-white rounded-full shadow-lg cursor-pointer hover:bg-primary-focus transition-colors transform hover:scale-105 active:scale-95">
+					<label
+						for="avatar-upload"
+						class="absolute bottom-0 right-0 p-2 bg-primary text-white rounded-full shadow-lg cursor-pointer hover:bg-primary-focus transition-colors transform hover:scale-105 active:scale-95"
+						aria-label="Change profile picture"
+					>
 						<Camera class="size-5" />
-						<input type="file" accept="image/*" name='image' class="hidden" onchange={handleAvatarChange} />
+						<input id="avatar-upload" type="file" accept="image/*" name="image" class="hidden" onchange={handleAvatarChange} />
 					</label>
 				</div>
 				<p class="text-xs text-base-content/40">Ketuk ikon untuk mengubah foto</p>
@@ -94,27 +98,45 @@
 							<User class="size-5 text-primary" />
 							Informasi Pribadi
 						</h3>
-						
+
 						<div class="grid gap-4">
 							<div class="form-control w-full">
 								<label class="label" for="fullName">
 									<span class="label-text font-medium">Nama Lengkap</span>
 								</label>
-								<Input name="fullName" placeholder="Masukkan nama lengkap Anda" bind:value={profile.name} class="bg-base-200/50" />
+								<Input
+									id="fullName"
+									name="fullName"
+									placeholder="Masukkan nama lengkap Anda"
+									bind:value={profile.name}
+									class="bg-base-200/50"
+								/>
 							</div>
 
 							<div class="form-control w-full">
 								<label class="label" for="username">
 									<span class="label-text font-medium">Username</span>
 								</label>
-								<Input name="username" placeholder="@username" bind:value={profile.username} class="bg-base-200/50" />
+								<Input
+									id="username"
+									name="username"
+									placeholder="@username"
+									bind:value={profile.username}
+									class="bg-base-200/50"
+								/>
 							</div>
 
 							<div class="form-control w-full">
 								<label class="label" for="bio">
 									<span class="label-text font-medium">Bio</span>
 								</label>
-								<Textarea name="bio" placeholder="Ceritakan tentang diri Anda..." bind:value={profile.bio} class="bg-base-200/50 min-h-[100px]" />
+								<Textarea
+									id="bio"
+									name="bio"
+									placeholder="Ceritakan tentang diri Anda..."
+									bind:value={profile.bio}
+									class="bg-base-200/50 min-h-[100px]"
+								/>
 							</div>
 
 							<div class="form-control w-full">
@@ -123,9 +145,15 @@
 								</label>
 								<div class="relative">
 									<MapPin class="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-base-content/40" />
-									<Input name="location" placeholder="Kota, Negara" bind:value={profile.location.city} class="pl-10 bg-base-200/50" />
+									<Input
+										id="location"
+										name="location"
+										placeholder="Kota, Negara"
+										bind:value={profile.location.city}
+										class="pl-10 bg-base-200/50"
+									/>
 								</div>
-								<label class="label" for="">
+								<label class="label" for="location">
 									<span class="label-text-alt text-base-content/40">Digunakan untuk perhitungan waktu sholat</span>
 								</label>
 							</div>
@@ -156,12 +184,14 @@
 										<p class="text-xs text-base-content/40">Sesuaikan tampilan aplikasi</p>
 									</div>
 								</div>
-								<input type="hidden" name="theme" value={profile.preferences.theme} />
-								<input 
-									type="checkbox" 
-									class="toggle toggle-primary" 
-									checked={profile.preferences.theme === 'dark'} 
-									onclick={() => profile.preferences.theme = profile.preferences.theme === 'dark' ? 'light' : 'dark'}
+								<input type="hidden" name="theme" value={theme} />
+								<input
+									id="theme-toggle"
+									type="checkbox"
+									class="toggle toggle-primary"
+									checked={theme === 'dark'}
+									onchange={() => (theme = theme === 'dark' ? 'light' : 'dark')}
+									aria-label="Toggle dark mode"
 								/>
 							</div>
 						</div>
@@ -171,13 +201,8 @@
 
 			<!-- Actions -->
 			<div class="sticky bottom-6 flex gap-3 pt-4" in:fly={{ y: 20, duration: 800, delay: 300 }}>
-				<Button type='button' variant="ghost" class="flex-1" onclick={()=>goto('/profile')}>Batal</Button>
-				<Button 
-					type="submit"
-					variant="primary" 
-					class="flex-2 gap-2 shadow-lg shadow-primary/20" 
-					disabled={isSaving}
-				>
+				<Button type="button" variant="ghost" class="flex-1" onclick={() => goto('/profile')}>Batal</Button>
+				<Button type="submit" variant="primary" class="flex-2 gap-2 shadow-lg shadow-primary/20" disabled={isSaving}>
 					{#if isSaving}
 						<span class="loading loading-spinner loading-sm"></span>
 						Menyimpan...

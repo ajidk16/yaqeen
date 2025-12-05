@@ -46,7 +46,8 @@
 			{startIcon ? 'pl-10' : ''} 
 			{endIcon ? 'pr-10' : ''} 
 			{className}"
-			bind:value
+			value={value}
+			oninput={(e) => (value = e.currentTarget.value)}
 			{...rest}
 		/>
 

@@ -2,102 +2,106 @@
 	import { page } from '$app/state';
 	import { User, Settings, Bell, Shield, HelpCircle, LogOut, ChevronRight, Camera, Activity } from 'lucide-svelte';
 	import { enhance } from '$app/forms';
-
-
+	import { Card, Button } from '$lib/components/ui';
 
 	const listProfile = [
 		{
 			title: 'Edit Profil',
 			svg: User,
 			path: '/profile/edit',
-			bg: 'bg-blue-50',
-			text: 'text-blue-500'
+			bg: 'bg-info/10',
+			text: 'text-info'
 		},
 		{
 			title: 'Notifikasi',
 			svg: Bell,
 			path: '/profile/notifications',
-			bg: 'bg-purple-50',
-			text: 'text-purple-500'
+			bg: 'bg-primary/10',
+			text: 'text-primary'
 		},
 		{
 			title: 'Preferensi',
 			svg: Settings,
 			path: '/profile/settings',
-			bg: 'bg-emerald-50',
-			text: 'text-emerald-500'
+			bg: 'bg-success/10',
+			text: 'text-success'
 		},
 		{
 			title: 'Keamanan & Privasi',
 			svg: Shield,
 			path: '/profile/security',
-			bg: 'bg-rose-50',
-			text: 'text-rose-500'
+			bg: 'bg-error/10',
+			text: 'text-error'
 		},
 		{
 			title: 'Bantuan & Support',
 			svg: HelpCircle,
 			path: '/profile/support',
-			bg: 'bg-orange-50',
-			text: 'text-orange-500'
+			bg: 'bg-warning/10',
+			text: 'text-warning'
 		}
 	]
 </script>
 
-<div class="space-y-6 animate-fade-in-up">
+<div class="space-y-6 animate-fade-in-up max-w-2xl mx-auto pb-20">
 	<!-- Header -->
 	<header>
-		<h1 class="text-2xl font-bold text-slate-800">Profil Saya</h1>
+		<h1 class="text-2xl font-bold text-base-content">Profil Saya</h1>
 	</header>
 
 	<!-- User Card -->
-	<section class="flex items-center gap-4 rounded-2xl bg-white p-5 shadow-sm border border-slate-100">
-		<div class="relative">
-			<div class="flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 text-slate-400">
-				{#if page.data.user.image}
-					<img src={page.data.user.image} alt="user mage" class="h-full w-full rounded-full object-cover" />
-				{:else}
-					<User size={40} />
-				{/if}
+	<Card class="border-base-content/5">
+		<div class="flex items-center gap-4">
+			<div class="relative">
+				<div class="flex h-20 w-20 items-center justify-center rounded-full bg-base-200 text-base-content/30 overflow-hidden border-2 border-base-100 shadow-sm">
+					{#if page.data.user.image}
+						<img src={page.data.user.image} alt="user mage" class="h-full w-full object-cover" />
+					{:else}
+						<User size={40} />
+					{/if}
+				</div>
+				<button class="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-content shadow-md hover:bg-primary-focus transition-colors hover:scale-105 active:scale-95">
+					<Camera size={14} />
+				</button>
 			</div>
-			<button class="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white shadow-md hover:bg-primary-600 transition-colors">
-				<Camera size={14} />
-			</button>
+			<div>
+				<h2 class="text-lg font-bold text-base-content">{page.data.user.name}</h2>
+				<p class="text-sm text-base-content/60">{page.data.user.email}</p>
+				<span class="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+					Anggota Premium
+				</span>
+			</div>
 		</div>
-		<div>
-			<h2 class="text-lg font-bold text-slate-800">{page.data.user.name}</h2>
-			<p class="text-sm text-slate-500">{page.data.user.email}</p>
-			<span class="mt-2 inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
-				Anggota Premium
-			</span>
-		</div>
-	</section>
+	</Card>
 
 	<!-- Settings List -->
-	<section class="overflow-hidden rounded-2xl bg-white shadow-sm border border-slate-100">
-		<div class="divide-y divide-slate-50">
+	<Card class="border-base-content/5 overflow-hidden p-0!">
+		<div class="divide-y divide-base-content/5">
 			{#each listProfile as item}
-			<a href={item.path} class="flex w-full items-center justify-between p-4 transition-colors hover:bg-slate-50">
+			<a href={item.path} class="flex w-full items-center justify-between p-4 transition-colors hover:bg-base-200/50 group">
 				<div class="flex items-center gap-3">
-					<div class="rounded-lg {item.bg} p-2 {item.text}">
+					<div class="rounded-xl {item.bg} p-2.5 {item.text} transition-transform group-hover:scale-110">
 						<item.svg size={20} />
 					</div>
-					<span class="font-medium text-slate-700">{item.title}</span>
+					<span class="font-medium text-base-content group-hover:text-primary transition-colors">{item.title}</span>
 				</div>
-				<ChevronRight size={18} class="text-slate-400" />
+				<ChevronRight size={18} class="text-base-content/30 group-hover:text-primary transition-colors" />
 			</a>
 			{/each}
 		</div>
-	</section>
+	</Card>
 
 	<!-- Logout Button -->
 	<form action="/dashboard/?/logout" method="POST" use:enhance class="w-full">
-		<button 
+		<Button 
 			type="submit"
-			class="flex w-full items-center justify-center gap-2 rounded-xl border border-red-100 bg-red-50 p-4 font-bold text-red-500 transition-all hover:bg-red-100 active:scale-95"
+			variant="error"
+			outline
+			block
+			class="gap-2 font-bold hover:bg-error hover:text-error-content"
 		>
 			<LogOut size={20} />
 			Keluar Aplikasi
-		</button>
+		</Button>
 	</form>
 </div>

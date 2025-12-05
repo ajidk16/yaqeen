@@ -224,7 +224,6 @@
 									bind:value={tilawahTarget} 
 									onblur={saveTarget}
 									onkeydown={(e) => e.key === 'Enter' && saveTarget()}
-									autofocus={true}
 								/>
 								<span class="text-xs text-base-content/60">Halaman</span>
 							</div>

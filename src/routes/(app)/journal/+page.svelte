@@ -40,11 +40,11 @@
 
 	// Constants
 	const moods: { type: MoodType; icon: any; label: string; color: string, bg: string }[] = [
-		{ type: 'happy', icon: Smile, label: 'Senang', color: 'text-success', bg: 'bg-green-50 ring-2 ring-green-500 ring-offset-2 text-green-500' },
-		{ type: 'blessed', icon: Heart, label: 'Berkah', color: 'text-error', bg: 'bg-red-50 ring-2 ring-red-500 ring-offset-2 text-red-500' },
-		{ type: 'neutral', icon: Meh, label: 'Biasa', color: 'text-warning', bg: 'bg-yellow-50 ring-2 ring-yellow-500 ring-offset-2 text-yellow-500' },
-		{ type: 'tired', icon: Coffee, label: 'Lelah', color: 'text-neutral', bg: 'bg-gray-50 ring-2 ring-gray-500 ring-offset-2 text-gray-500' },
-		{ type: 'sad', icon: Frown, label: 'Sedih', color: 'text-info', bg: 'bg-blue-50 ring-2 ring-blue-500 ring-offset-2 text-blue-500' }
+		{ type: 'happy', icon: Smile, label: 'Senang', color: 'text-success', bg: 'bg-success/10 ring-2 ring-success ring-offset-2 ring-offset-base-100 text-success' },
+		{ type: 'blessed', icon: Heart, label: 'Berkah', color: 'text-error', bg: 'bg-error/10 ring-2 ring-error ring-offset-2 ring-offset-base-100 text-error' },
+		{ type: 'neutral', icon: Meh, label: 'Biasa', color: 'text-warning', bg: 'bg-warning/10 ring-2 ring-warning ring-offset-2 ring-offset-base-100 text-warning' },
+		{ type: 'tired', icon: Coffee, label: 'Lelah', color: 'text-gray-300', bg: 'bg-gray-300/10 ring-2 ring-gray-300 ring-offset-2 ring-offset-base-100 text-gray-300' },
+		{ type: 'sad', icon: Frown, label: 'Sedih', color: 'text-info', bg: 'bg-info/10 ring-2 ring-info ring-offset-2 ring-offset-base-100 text-info' }
 	];
 
 	// Actions
@@ -146,7 +146,7 @@
 								<button 
 									type="button"
 									class="flex flex-1 flex-col items-center gap-2 rounded-xl p-3 transition-all
-									{selectedMood === mood.type ? mood.bg : 'bg-slate-50 hover:bg-slate-100'}"
+									{selectedMood === mood.type ? mood.bg : 'bg-base-200 hover:bg-base-300'}"
 									onclick={() => selectedMood = mood.type}
 								>
 									<div class="size-10 flex items-center justify-center transition-transform duration-300 {selectedMood === mood.type ? 'scale-110' : ''}">
@@ -184,7 +184,7 @@
 						<Button 
 							type="submit"
 							variant="primary" 
-							class="gap-2 px-8 rounded-full shadow-lg shadow-primary/20"
+							class="gap-2 px-8 rounded-full shadow-lg shadow-primary/20 dark:shadow-primary/30 hover:shadow-xl hover:shadow-primary/25 transition-all"
 							disabled={!gratitudeText.trim() || isSubmitting}
 							loading={isSubmitting}
 						>
@@ -299,7 +299,7 @@
 						<button 
 							type="button"
 							class="flex flex-1 flex-col items-center gap-2 rounded-xl p-3 transition-all
-							{editingLog.mood === mood.type ? mood.bg : 'bg-slate-50 hover:bg-slate-100'}"
+							{editingLog.mood === mood.type ? mood.bg : 'bg-base-200 hover:bg-base-300'}"
 							onclick={() => editingLog!.mood = mood.type}
 						>
 							<div class="size-8 flex items-center justify-center transition-transform duration-300 {editingLog.mood === mood.type ? 'scale-110' : ''}">
