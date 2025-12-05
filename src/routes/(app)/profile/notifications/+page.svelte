@@ -56,7 +56,7 @@
 			in:fly={{ y: 20, duration: 800, delay: 100 }}
 		>
 			<Card class="bg-base-100 shadow-sm border border-base-content/10">
-				<div class="p-6 flex items-center justify-between">
+				<div class="flex items-center justify-between">
 					<div class="flex items-center gap-3">
 						<div class="p-2 rounded-lg bg-primary/10 text-primary">
 							<Bell class="size-5" />

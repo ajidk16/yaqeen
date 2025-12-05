@@ -95,7 +95,6 @@ export const actions: Actions = {
 					bio,
 					location: { city: location },
 					preferences: {
-						theme,
 						notifications
 					},
 					updatedAt: new Date(),
@@ -107,6 +106,6 @@ export const actions: Actions = {
 			return fail(500, { message: "Failed to update profile" });
 		}
 
-		return { success: true };
+		return { success: true, theme };
 	}
 };

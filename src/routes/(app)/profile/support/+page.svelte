@@ -59,7 +59,7 @@
 							}
 						};
 					}}
-					class="p-6 space-y-4"
+					class="space-y-4"
 				>
 					<h3 class="font-bold text-lg flex items-center gap-2">
 						<MessageCircle class="size-5 text-primary" />

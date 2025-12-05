@@ -70,7 +70,7 @@
 
 <div class="min-h-screen bg-base-100 overflow-x-hidden font-body">
 	<!-- 1. Hero Section -->
-	<section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+	<section class="relative pt-24 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
 		<!-- Background Elements -->
 		<div
 			class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl -z-10 pointer-events-none"
@@ -96,9 +96,9 @@
 				in:fly={{ y: 20, duration: 800, delay: 100, easing: quintOut }}
 				class="text-5xl md:text-7xl font-bold tracking-tight mb-6 font-display"
 			>
-				Seimbangkan <span
-					class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"
-					>Dunia & Akhirat</span
+				Seimbangkan <div
+					class="text-transparent bg-clip-text bg-linear-to-r from-primary to-secondary"
+					>Dunia & Akhirat</div
 				>
 			</h1>
 

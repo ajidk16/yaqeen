@@ -64,7 +64,7 @@
 							}
 						};
 					}}
-					class="p-6 space-y-4"
+					class="space-y-4"
 				>
 					<h3 class="font-bold text-lg flex items-center gap-2">
 						<Key class="size-5 text-primary" />
@@ -122,7 +122,7 @@
 
 			<!-- 2FA -->
 			<Card class="bg-base-100 shadow-sm border border-base-content/10">
-				<div class="p-6 flex items-center justify-between">
+				<div class="flex items-center justify-between">
 					<div class="flex items-center gap-3">
 						<div class="p-2 rounded-lg bg-base-200 text-base-content/60">
 							<Shield class="size-5" />
@@ -130,7 +130,7 @@
 						<div>
 							<div class="flex items-center gap-2">
 								<p class="font-medium">Two-Factor Authentication</p>
-								<Badge variant="warning" size="sm">Coming Soon</Badge>
+								<Badge variant="warning" size="sm hidden lg:block">Coming Soon</Badge>
 							</div>
 							<p class="text-xs text-base-content/40">Tambahan lapisan keamanan</p>
 						</div>
@@ -141,7 +141,7 @@
 
 			<!-- Active Sessions -->
 			<Card class="bg-base-100 shadow-sm border border-base-content/10">
-				<div class="p-6 space-y-4">
+				<div class="space-y-4">
 					<h3 class="font-bold text-lg flex items-center gap-2">
 						<Smartphone class="size-5 text-secondary" />
 						Sesi Aktif

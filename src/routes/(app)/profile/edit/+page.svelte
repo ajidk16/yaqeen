@@ -8,12 +8,13 @@
 	import confetti from 'canvas-confetti';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
 
 	const profile = $derived(page.data.user)
 
 	let isSaving = $state(false);
 
-	let theme = $state(page.data.user.preferences?.theme || 'light');
+	let theme = $state('light');
 	
 	let avatar = $state(page.data.user.image || 'https://i.pravatar.cc/150?u=' + page.data.user.id);
 
@@ -37,6 +38,15 @@
 			colors: ['#10B981', '#34D399', '#FBBF24', '#F472B6']
 		});
 	}
+
+	onMount(() => {
+		const savedTheme = localStorage.getItem('theme');
+		if (savedTheme) {
+			theme = savedTheme;
+			document.documentElement.setAttribute('data-theme', theme);
+		}
+	});
+
 </script>
 
 <div class="min-h-screen bg-base-100 p-4 pb-24 lg:p-8">
@@ -58,11 +68,15 @@
 			use:enhance={() => {
 				isSaving = true;
 				return async ({ result, update }) => {
+					
 					isSaving = false;
 					if (result.type === 'success') {
 						toast.add('Profil berhasil diperbarui!', 'success');
 						triggerConfetti();
 						await update();
+						document.documentElement.setAttribute('data-theme', result?.data?.theme as string);
+						localStorage.setItem('theme', result?.data?.theme as string);
+						theme = result?.data?.theme as string;
 					} else {
 						toast.add('Gagal memperbarui profil.', 'error');
 					}

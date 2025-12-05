@@ -80,7 +80,7 @@
 			<div class="space-y-6" in:fly={{ y: 20, duration: 800, delay: 100 }}>
 				<!-- General -->
 				<Card class="bg-base-100 shadow-sm border border-base-content/10">
-					<div class="p-6 space-y-6">
+					<div class="space-y-6">
 						<h3 class="font-bold text-lg flex items-center gap-2">
 							<Globe class="size-5 text-primary" />
 							Umum
@@ -118,7 +118,7 @@
 
 				<!-- Ibadah Settings -->
 				<Card class="bg-base-100 shadow-sm border border-base-content/10">
-					<div class="p-6 space-y-6">
+					<div class="space-y-6">
 						<h3 class="font-bold text-lg flex items-center gap-2">
 							<Moon class="size-5 text-secondary" />
 							Pengaturan Ibadah
