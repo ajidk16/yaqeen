@@ -93,68 +93,81 @@
 			<div class="space-y-6" in:fly={{ y: 20, duration: 800, delay: 200 }}>
 				<!-- Personal Info -->
 				<Card class="bg-base-100 shadow-sm border border-base-content/10">
-					<div class="p-6 space-y-4">
+					<div class="space-y-4">
 						<h3 class="font-bold text-lg flex items-center gap-2 mb-2">
 							<User class="size-5 text-primary" />
 							Informasi Pribadi
 						</h3>
 
-						<div class="grid gap-4">
-							<div class="form-control w-full">
+						<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+							<div class="form-control w-full sm:col-span-2">
 								<label class="label" for="fullName">
 									<span class="label-text font-medium">Nama Lengkap</span>
 								</label>
 								<Input
 									id="fullName"
 									name="fullName"
+									type="text"
 									placeholder="Masukkan nama lengkap Anda"
 									bind:value={profile.name}
-									class="bg-base-200/50"
+									class="input input-bordered w-full bg-base-200/50 focus:input-primary"
+									required
+									aria-required="true"
 								/>
 							</div>
 
-							<div class="form-control w-full">
+							<div class="form-control w-full sm:col-span-2">
 								<label class="label" for="username">
 									<span class="label-text font-medium">Username</span>
 								</label>
 								<Input
 									id="username"
 									name="username"
+									type="text"
 									placeholder="@username"
 									bind:value={profile.username}
-									class="bg-base-200/50"
+									class="input input-bordered w-full bg-base-200/50 focus:input-primary"
+									required
+									aria-required="true"
 								/>
 							</div>
 
-							<div class="form-control w-full">
+							<div class="form-control w-full sm:col-span-2">
 								<label class="label" for="bio">
 									<span class="label-text font-medium">Bio</span>
+									<span class="label-text-alt text-base-content/40">{profile.bio?.length || 0}/200</span>
 								</label>
 								<Textarea
 									id="bio"
 									name="bio"
 									placeholder="Ceritakan tentang diri Anda..."
 									bind:value={profile.bio}
-									class="bg-base-200/50 min-h-[100px]"
+									class="textarea textarea-bordered w-full bg-base-200/50 focus:textarea-primary min-h-[100px] resize-none"
+									aria-describedby="bio-help"
 								/>
+								<label class="label" for="bio">
+									<span id="bio-help" class="label-text-alt text-base-content/40">Maksimal 200 karakter</span>
+								</label>
 							</div>
 
-							<div class="form-control w-full">
+							<div class="form-control w-full sm:col-span-2">
 								<label class="label" for="location">
 									<span class="label-text font-medium">Lokasi</span>
 								</label>
 								<div class="relative">
-									<MapPin class="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-base-content/40" />
+									<MapPin class="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-base-content/40 pointer-events-none" />
 									<Input
 										id="location"
 										name="location"
+										type="text"
 										placeholder="Kota, Negara"
 										bind:value={profile.location.city}
-										class="pl-10 bg-base-200/50"
+										class="input input-bordered w-full pl-10 bg-base-200/50 focus:input-primary"
+										aria-describedby="location-help"
 									/>
 								</div>
 								<label class="label" for="location">
-									<span class="label-text-alt text-base-content/40">Digunakan untuk perhitungan waktu sholat</span>
+									<span id="location-help" class="label-text-alt text-base-content/40">Digunakan untuk perhitungan waktu sholat</span>
 								</label>
 							</div>
 						</div>
@@ -163,7 +176,7 @@
 
 				<!-- Preferences -->
 				<Card class="bg-base-100 shadow-sm border border-base-content/10">
-					<div class="p-6 space-y-4">
+					<div class="space-y-4">
 						<h3 class="font-bold text-lg flex items-center gap-2 mb-2">
 							<Smartphone class="size-5 text-secondary" />
 							Preferensi Aplikasi

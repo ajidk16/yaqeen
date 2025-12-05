@@ -2,8 +2,9 @@
 	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui';
 	import { onMount } from 'svelte';
-	import {  Menu, X } from 'lucide-svelte';
+	import { Menu, X } from 'lucide-svelte';
 	import ToggleTheme from './ToggleTheme.svelte';
+	import { goto } from '$app/navigation';
 
 	let isMenuOpen = $state(false);
 
@@ -31,8 +32,8 @@
 
 	const navLinks = [
 		{ href: '#features', label: 'Fitur Unggulan' },
-		{ href: '#pricing', label: 'Investasi' },
-		{ href: '#about', label: 'Tentang Kami' },
+		// { href: '#pricing', label: 'Investasi' },
+		{ href: '#about', label: 'Tentang Kami' }
 	];
 </script>
 
@@ -41,10 +42,12 @@
 		<div class="flex h-16 items-center justify-between">
 			<!-- Logo -->
 			<a href="/" class="flex items-center gap-2 text-xl font-bold text-primary">
-				<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-content">
-					H
+				<div
+					class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-content"
+				>
+					YQ
 				</div>
-				<span>HabbiTrax</span>
+				<span>YaaQeen</span>
 			</a>
 
 			<!-- Desktop Navigation -->
@@ -64,19 +67,29 @@
 			<div class="hidden md:flex md:items-center md:gap-4">
 				<ToggleTheme />
 				{#if page.data.user}
-					<a href="/dashboard" class="rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/25 transition-all hover:scale-105 hover:bg-primary-600 hover:shadow-primary/40 active:scale-95">
+					<a
+						href="/dashboard"
+						class="rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/25 transition-all hover:scale-105 hover:bg-primary-600 hover:shadow-primary/40 active:scale-95"
+					>
 						Dashboard Saya
 					</a>
 				{:else}
-					<a href="/login" class="text-sm font-bold text-slate-600 transition-colors hover:text-primary">Masuk</a>
-					<a href="/register" class="rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/25 transition-all hover:scale-105 hover:bg-primary-600 hover:shadow-primary/40 active:scale-95">
+					<a
+						href="/login"
+						class="text-sm font-bold text-slate-600 transition-colors hover:text-primary">Masuk</a
+					>
+					<a
+						href="#cta"
+						class="rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/25 transition-all hover:scale-105 hover:bg-primary-600 hover:shadow-primary/40 active:scale-95"
+					>
 						Mulai Hijrah
 					</a>
 				{/if}
 			</div>
 
 			<!-- Mobile Menu Button -->
-			<div class="flex md:hidden">
+			<div class="flex md:hidden gap-2">
+				<ToggleTheme />
 				<Button variant="ghost" size="sm" circle onclick={toggleMenu}>
 					{#if isMenuOpen}
 						<X class="h-6 w-6" />
@@ -102,12 +115,41 @@
 						{link.label}
 					</a>
 				{/each}
-				<div class="mt-4 flex items-center justify-between border-t border-base-200 pt-4">
+				<!-- <div class="mt-4 flex items-center justify-between border-t border-base-200 px-4 py-4">
 					<span class="text-sm font-medium text-base-content/70">Theme</span>
 					<ToggleTheme />
-				</div>
+				</div> -->
 				<div class="mt-4">
-					<Button variant="primary" block class="rounded-full">Get Started</Button>
+					{#if page.data.user}
+						<Button
+							onclick={() => {
+								goto('/dashboard');
+								isMenuOpen = false;
+							}}
+							class="block w-full rounded-full bg-primary px-6 py-2.5 text-center text-sm font-bold text-white shadow-lg shadow-primary/25 transition-all hover:scale-105 hover:bg-primary-600 hover:shadow-primary/40 active:scale-95"
+						>
+							Dashboard Saya
+						</Button>
+					{:else}
+						<Button
+							class="block w-full rounded-full px-6 py-2.5 text-center text-sm font-bold text-slate-600 transition-colors hover:text-primary mb-3"
+							onclick={() => {
+								goto('/login');
+								isMenuOpen = false;
+							}}
+						>
+							Masuk
+						</Button>
+					{/if}
+					<Button
+						onclick={() => {
+							goto('#cta');
+							isMenuOpen = false;
+						}}
+						variant="primary"
+						block
+						class="rounded-full">Mulai Hijrah</Button
+					>
 				</div>
 			</div>
 		</div>

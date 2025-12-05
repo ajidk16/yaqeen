@@ -51,7 +51,7 @@
 
 	<!-- User Card -->
 	<Card class="border-base-content/5">
-		<div class="flex items-center gap-4">
+		<div class="flex items-center gap-5">
 			<div class="relative">
 				<div class="flex h-20 w-20 items-center justify-center rounded-full bg-base-200 text-base-content/30 overflow-hidden border-2 border-base-100 shadow-sm">
 					{#if page.data.user.image}
@@ -78,7 +78,7 @@
 	<Card class="border-base-content/5 overflow-hidden p-0!">
 		<div class="divide-y divide-base-content/5">
 			{#each listProfile as item}
-			<a href={item.path} class="flex w-full items-center justify-between p-4 transition-colors hover:bg-base-200/50 group">
+			<a href={item.path} class="flex w-full items-center justify-between py-4 transition-colors hover:bg-base-200/50 group">
 				<div class="flex items-center gap-3">
 					<div class="rounded-xl {item.bg} p-2.5 {item.text} transition-transform group-hover:scale-110">
 						<item.svg size={20} />

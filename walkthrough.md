@@ -32,4 +32,4 @@ I have implemented the **Pricing** and **About** sections with modern motion ani
 
 ## Next Steps
 - Add actual images/illustrations to the About section (currently using CSS placeholders).
-- Connect the "Get Started" buttons to the actual registration flow.
+- Connect the "Mulai Hijrah" buttons to the actual registration flow.

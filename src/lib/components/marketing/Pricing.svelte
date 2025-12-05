@@ -23,8 +23,8 @@
 	};
 </script>
 
-<section 
-id="pricing"
+<section
+	id="pricing"
 	class="py-24 bg-slate-50 relative overflow-hidden"
 	use:inview={{ threshold: 0.2 }}
 >
@@ -40,14 +40,15 @@ id="pricing"
 				Invest in Your <span class="text-primary">Akhirat</span>
 			</h2>
 			<p class="text-lg text-slate-600">
-				Choose the plan that fits your journey. Our premium plan includes a direct contribution to charity.
+				Choose the plan that fits your journey. Our premium plan includes a direct contribution to
+				charity.
 			</p>
 		</div>
 
 		{#if visible}
 			<div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
 				<!-- Free Plan -->
-				<div 
+				<div
 					in:fly={{ y: 50, duration: 800, delay: 0 }}
 					class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative group"
 				>
@@ -63,7 +64,9 @@ id="pricing"
 					<ul class="space-y-4 mb-8">
 						{#each features.free as feature}
 							<li class="flex items-start gap-3 text-slate-600">
-								<div class="mt-1 w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0">
+								<div
+									class="mt-1 w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0"
+								>
 									<Check size={12} class="text-slate-600" />
 								</div>
 								{feature}
@@ -71,20 +74,27 @@ id="pricing"
 						{/each}
 					</ul>
 
-					<a href="/register" class="block w-full py-3 px-6 text-center rounded-xl bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 transition-colors">
-						Get Started
+					<a
+						href="/register"
+						class="block w-full py-3 px-6 text-center rounded-xl bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 transition-colors"
+					>
+						Mulai Hijrah
 					</a>
 				</div>
 
 				<!-- Premium Plan -->
-				<div 
+				<div
 					in:fly={{ y: 50, duration: 800, delay: 200 }}
 					class="bg-slate-900 rounded-3xl p-8 border border-slate-800 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 relative group overflow-hidden"
 				>
 					<!-- Gradient Border Effect -->
-					<div class="absolute inset-0 bg-gradient-to-br from-primary/20 to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+					<div
+						class="absolute inset-0 bg-gradient-to-br from-primary/20 to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+					></div>
 
-					<div class="absolute top-0 right-0 bg-gradient-to-l from-primary to-purple-600 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">
+					<div
+						class="absolute top-0 right-0 bg-gradient-to-l from-primary to-purple-600 text-white text-xs font-bold px-3 py-1 rounded-bl-xl"
+					>
 						RECOMMENDED
 					</div>
 
@@ -102,7 +112,9 @@ id="pricing"
 					<ul class="space-y-4 mb-8 relative z-10">
 						{#each features.premium as feature}
 							<li class="flex items-start gap-3 text-slate-300">
-								<div class="mt-1 w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0 shadow-lg shadow-primary/50">
+								<div
+									class="mt-1 w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0 shadow-lg shadow-primary/50"
+								>
 									<Check size={12} class="text-white" />
 								</div>
 								{feature}
@@ -110,7 +122,10 @@ id="pricing"
 						{/each}
 					</ul>
 
-					<a href="/register?plan=premium" class="block w-full py-3 px-6 text-center rounded-xl bg-gradient-to-r from-primary to-purple-600 text-white font-bold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-[1.02] relative z-10">
+					<a
+						href="/register?plan=premium"
+						class="block w-full py-3 px-6 text-center rounded-xl bg-gradient-to-r from-primary to-purple-600 text-white font-bold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-[1.02] relative z-10"
+					>
 						Subscribe & Donate
 					</a>
 				</div>
