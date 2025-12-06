@@ -3,7 +3,6 @@
 	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
 	import dayjs from 'dayjs';
 	import 'dayjs/locale/id'; // Import locale if needed, assuming 'id' for Indonesian context
-	import { formatDate } from '$lib/utils/format';
 
 	let {
 		open = $bindable(false),
