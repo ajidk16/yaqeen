@@ -139,7 +139,7 @@
 		clearTimeout(debounceTimer);
 		debounceTimer = setTimeout(() => {
 			goto(`?date=${dateStr}`);
-		}, 100);
+		}, 10);
 	}
 
 	// Date Navigation
@@ -151,7 +151,9 @@
 
 	function handleDateSelect(date: Date) {
 		selectedDate = date;
-		const newDateStr = selectedDate.toISOString().split('T')[0];
+		const newDate = new Date(selectedDate);
+		newDate.setDate(newDate.getDate() + 1);
+		const newDateStr = newDate.toISOString().split('T')[0];
 		navigateToDate(newDateStr);
 	}
 

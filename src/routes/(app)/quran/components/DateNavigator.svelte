@@ -19,7 +19,7 @@
 		clearTimeout(debounceTimer);
 		debounceTimer = setTimeout(() => {
 			goto(`?date=${dateStr}`);
-		}, 100);
+		}, 10);
 	}
 
 	$effect(() => {
@@ -38,7 +38,9 @@
 
 	function handleDateSelect(date: Date) {
 		currentDate = date;
-		const newDateStr = currentDate.toISOString().split('T')[0];
+		const newDate = new Date(currentDate);
+		newDate.setDate(newDate.getDate() + 1);
+		const newDateStr = newDate.toISOString().split('T')[0];
 		navigateToDate(newDateStr);
 	}
 </script>
