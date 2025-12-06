@@ -19,10 +19,11 @@
 	import { formatDate } from '$lib/utils/format.js';
 	import { page } from '$app/state';
 	import * as m from '$lib/paraglide/messages.js';
+	import CalendarModal from '../quran/components/CalendarModal.svelte';
 
 	let { data } = $props();
 
-	let selectedDate = $state(new Date(data.date));
+	let selectedDate = $state(new Date());
 	let locationName = $state('Jakarta, ID');
 
 	// Fardhu Prayers State
@@ -131,12 +132,27 @@
 		invalidateAll();
 	}
 
+	let debounceTimer: NodeJS.Timeout;
+	let isCalendarOpen = $state(false);
+
+	function navigateToDate(dateStr: string) {
+		clearTimeout(debounceTimer);
+		debounceTimer = setTimeout(() => {
+			goto(`?date=${dateStr}`);
+		}, 100);
+	}
+
 	// Date Navigation
 	function changeDate(days: number) {
-		const newDate = new Date(selectedDate);
-		newDate.setDate(selectedDate.getDate() + days);
-		const dateStr = newDate.toISOString().split('T')[0];
-		goto(`?date=${dateStr}`);
+		selectedDate = new Date(selectedDate.setDate(selectedDate.getDate() + days));
+		const dateStr = selectedDate.toISOString().split('T')[0];
+		navigateToDate(dateStr);
+	}
+
+	function handleDateSelect(date: Date) {
+		selectedDate = date;
+		const newDateStr = selectedDate.toISOString().split('T')[0];
+		navigateToDate(newDateStr);
 	}
 
 	// Progress Calculation
@@ -174,10 +190,13 @@
 				<Button variant="ghost" size="sm" circle onclick={() => changeDate(-1)}>
 					<ChevronLeft class="size-5" />
 				</Button>
-				<div class="flex items-center gap-2 font-medium min-w-[180px] justify-center">
+				<button
+					onclick={() => (isCalendarOpen = true)}
+					class="flex items-center gap-2 font-medium min-w-[180px] justify-center"
+				>
 					<Calendar class="size-4 text-primary" />
 					<span>{formatDate(selectedDate)}</span>
-				</div>
+				</button>
 				<Button variant="ghost" size="sm" circle onclick={() => changeDate(1)}>
 					<ChevronRight class="size-5" />
 				</Button>
@@ -371,3 +390,5 @@
 		</section>
 	</div>
 </div>
+
+<CalendarModal bind:open={isCalendarOpen} currentDate={selectedDate} onSelect={handleDateSelect} />

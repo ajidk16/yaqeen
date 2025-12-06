@@ -6,20 +6,40 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import CalendarModal from './CalendarModal.svelte';
 
 	let { children } = $props();
 
-	let currentDate = $state(new Date()) as Date;
+	let currentDate = $state(new Date());
+	let isCalendarOpen = $state(false);
+
+	let debounceTimer: NodeJS.Timeout;
+
+	function navigateToDate(dateStr: string) {
+		clearTimeout(debounceTimer);
+		debounceTimer = setTimeout(() => {
+			goto(`?date=${dateStr}`);
+		}, 100);
+	}
 
 	$effect(() => {
-		currentDate = new Date(page?.data.date);
+		const urlDate = page.url.searchParams.get('date');
+		if (urlDate) {
+			currentDate = new Date(urlDate);
+		}
 	});
 
 	function changeDate(days: number) {
-		const newDate = new Date(currentDate);
-		newDate.setDate(newDate.getDate() + days);
-		const newDateStr = newDate.toISOString().split('T')[0];
-		goto(`?date=${newDateStr}`);
+		currentDate = new Date(currentDate.setDate(currentDate.getDate() + days));
+
+		const newDateStr = currentDate.toISOString().split('T')[0];
+		navigateToDate(newDateStr);
+	}
+
+	function handleDateSelect(date: Date) {
+		currentDate = date;
+		const newDateStr = currentDate.toISOString().split('T')[0];
+		navigateToDate(newDateStr);
 	}
 </script>
 
@@ -45,10 +65,14 @@
 			<ChevronLeft class="size-5" />
 		</button>
 
-		<div class="flex flex-col items-end">
+		<button
+			class="flex flex-col items-end hover:bg-base-200/50 px-3 py-1 rounded-lg transition-colors cursor-pointer text-right"
+			onclick={() => (isCalendarOpen = true)}
+		>
 			<span class="font-bold text-sm">{formatDate(currentDate)}</span>
 			<span class="text-xs text-primary font-medium">{hijriDate(currentDate)}</span>
-		</div>
+		</button>
+
 		<button
 			class="btn btn-circle btn-sm btn-ghost"
 			onclick={() => changeDate(1)}
@@ -58,3 +82,5 @@
 		</button>
 	</div>
 </div>
+
+<CalendarModal bind:open={isCalendarOpen} {currentDate} onSelect={handleDateSelect} />
