@@ -4,11 +4,23 @@
 	import { fly } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 	import * as m from '$lib/paraglide/messages.js';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 
-	let { date, onDateChange, children } = $props<{
-		date: Date;
-		onDateChange: (days: number) => void;
-	}>();
+	let { children } = $props();
+
+	let currentDate = $state(new Date()) as Date;
+
+	$effect(() => {
+		currentDate = new Date(page?.data.date);
+	});
+
+	function changeDate(days: number) {
+		const newDate = new Date(currentDate);
+		newDate.setDate(newDate.getDate() + days);
+		const newDateStr = newDate.toISOString().split('T')[0];
+		goto(`?date=${newDateStr}`);
+	}
 </script>
 
 <div
@@ -23,23 +35,23 @@
 	</div>
 
 	<div
-		class="flex items-center justify-between w-full gap-4 bg-base-100 shadow-sm border border-base-content/10 rounded-full p-1 max-w-full md:max-w-1/3"
+		class="flex items-center justify-between w-full gap-4 bg-base-100 shadow-sm border border-base-content/10 rounded-full p-1 max-w-full md:max-w-xs"
 	>
 		<button
 			class="btn btn-circle btn-sm btn-ghost"
-			onclick={() => onDateChange(-1)}
+			onclick={() => changeDate(-1)}
 			aria-label={m.quran_prev_day()}
 		>
 			<ChevronLeft class="size-5" />
 		</button>
 
 		<div class="flex flex-col items-end">
-			<span class="font-bold text-sm">{formatDate(date)}</span>
-			<span class="text-xs text-primary font-medium">{hijriDate(date)}</span>
+			<span class="font-bold text-sm">{formatDate(currentDate)}</span>
+			<span class="text-xs text-primary font-medium">{hijriDate(currentDate)}</span>
 		</div>
 		<button
 			class="btn btn-circle btn-sm btn-ghost"
-			onclick={() => onDateChange(1)}
+			onclick={() => changeDate(1)}
 			aria-label={m.quran_next_day()}
 		>
 			<ChevronRight class="size-5" />

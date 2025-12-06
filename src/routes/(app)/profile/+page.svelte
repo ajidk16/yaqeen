@@ -20,7 +20,12 @@
 	const user = $derived(page.data.user);
 
 	const menuItems = [
-		{ icon: User, label: m.profile_menu_edit(), href: '/profile/edit', color: 'text-primary' },
+		{
+			icon: User,
+			label: m.profile_menu_edit(),
+			href: '/profile/edit',
+			color: 'text-primary'
+		},
 		{
 			icon: Bell,
 			label: m.profile_menu_notifications(),
@@ -30,7 +35,7 @@
 		{
 			icon: Palette,
 			label: m.profile_menu_preferences(),
-			href: '/profile/preferences',
+			href: '/profile/settings',
 			color: 'text-accent'
 		},
 		{
@@ -39,7 +44,12 @@
 			href: '/profile/security',
 			color: 'text-success'
 		},
-		{ icon: CircleHelp, label: m.profile_menu_help(), href: '/help', color: 'text-info' }
+		{
+			icon: CircleHelp,
+			label: m.profile_menu_help(),
+			href: '/profile/support',
+			color: 'text-info'
+		}
 	];
 </script>
 

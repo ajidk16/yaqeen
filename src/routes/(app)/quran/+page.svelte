@@ -10,11 +10,10 @@
 	import TilawahCard from './components/TilawahCard.svelte';
 	import HafalanCard from './components/HafalanCard.svelte';
 	import QuranStats from './components/QuranStats.svelte';
-
-	let { data } = $props();
+	import { formatDateShort } from '$lib/utils/format';
 
 	// State
-	let currentDate = $state(new Date());
+	let currentDate = $state(new Date()) as Date;
 	let tilawahTarget = $state(10);
 
 	// Initialize state from server data
@@ -42,7 +41,7 @@
 	});
 
 	// Derived
-	let dateKey = $derived(currentDate.toISOString().split('T')[0]);
+	let dateKey = $derived(formatDateShort(currentDate));
 	let hafalanTotalAyahs = $derived(currentEntry.hafalanAyahEnd - currentEntry.hafalanAyahStart + 1);
 
 	// Actions
@@ -71,13 +70,6 @@
 			method: 'POST',
 			body: formData
 		});
-	}
-
-	function changeDate(days: number) {
-		const newDate = new Date(currentDate);
-		newDate.setDate(newDate.getDate() + days);
-		const newDateStr = newDate.toISOString().split('T')[0];
-		goto(`?date=${newDateStr}`);
 	}
 
 	function updateEntry(updates: Partial<typeof currentEntry>, debounce = false) {
@@ -142,7 +134,7 @@
 
 <div class="min-h-screen bg-base-100 p-4 pb-24 lg:p-8">
 	<div class="max-w-4xl mx-auto space-y-8">
-		<DateNavigator date={currentDate} onDateChange={changeDate}>
+		<DateNavigator>
 			<BookOpen class="size-8 text-primary" />
 			{m.quran_title()}
 		</DateNavigator>

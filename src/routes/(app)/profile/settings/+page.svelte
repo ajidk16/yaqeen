@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fade, fly } from 'svelte/transition';
+	import { setLocale } from '$lib/paraglide/runtime';
 	import { quintOut } from 'svelte/easing';
 	import { ArrowLeft, Globe, MapPin, Moon, Smartphone, Save } from 'lucide-svelte';
 	import { Card, Button, Input } from '$lib/components/ui';
@@ -8,8 +9,9 @@
 	import { toast } from '$lib/stores/toast';
 	import confetti from 'canvas-confetti';
 	import { page } from '$app/state';
+	import { onMount } from 'svelte';
 
-	const profile = page.data.user
+	const profile = page.data.user;
 
 	let isSaving = $state(false);
 
@@ -22,9 +24,9 @@
 		});
 	}
 
-	let location = $state(profile?.location.method ?? false)
-	let longitude = $state(profile?.location.longitude ?? null)
-	let latitude = $state(profile?.location.latitude ?? null)
+	let location = $state(false);
+	let longitude = $state<number | null>(null);
+	let latitude = $state<number | null>(null);
 
 	const handleLocationToggle = () => {
 		location = !location;
@@ -37,19 +39,27 @@
 				},
 				(err) => {
 					console.error(err);
-					toast.add("Gagal mengambil lokasi otomatis.", "error");
+					toast.add('Gagal mengambil lokasi otomatis.', 'error');
 					location = false;
 				}
 			);
 		}
-	}
+	};
+
+	onMount(() => {
+		if (profile.location.method === 'auto') {
+			location = profile.location.method;
+			longitude = profile.location.lng;
+			latitude = profile.location.lat;
+		}
+	});
 </script>
 
 <div class="min-h-screen bg-base-100 p-4 pb-24 lg:p-8">
 	<div class="max-w-2xl mx-auto space-y-6">
 		<!-- Header -->
 		<header class="flex items-center gap-4" in:fly={{ y: -20, duration: 800, easing: quintOut }}>
-			<Button variant="ghost" circle size="sm" onclick={()=>goto('/profile')}>
+			<Button variant="ghost" circle size="sm" onclick={() => goto('/profile')}>
 				<ArrowLeft class="size-5" />
 			</Button>
 			<div>
@@ -58,9 +68,9 @@
 			</div>
 		</header>
 
-		<form 
-			method="POST" 
-			action="?/update" 
+		<form
+			method="POST"
+			action="?/update"
 			use:enhance={() => {
 				isSaving = true;
 				return async ({ result, update }) => {
@@ -68,10 +78,13 @@
 					if (result.type === 'success') {
 						toast.add('Settings saved successfully!', 'success');
 						triggerConfetti();
-						update();
+						// update();
 					} else {
 						toast.add('Failed to save settings.', 'error');
 					}
+					setTimeout(() => {
+						setLocale(page.data.language);
+					}, 500);
 				};
 			}}
 			class="space-y-6"
@@ -85,12 +98,16 @@
 							<Globe class="size-5 text-primary" />
 							Umum
 						</h3>
-						
+
 						<div class="form-control w-full">
 							<label class="label" for="language">
 								<span class="label-text font-medium">Bahasa / Language</span>
 							</label>
-							<select name="language" class="select select-bordered w-full bg-base-200/50" bind:value={profile.preferences.language}>
+							<select
+								name="language"
+								class="select select-bordered w-full bg-base-200/50"
+								bind:value={page.data.language}
+							>
 								<option value="id">Bahasa Indonesia</option>
 								<option value="en">English</option>
 							</select>
@@ -106,11 +123,11 @@
 									<p class="text-xs text-base-content/40">Kurangi animasi & gambar</p>
 								</div>
 							</div>
-							<input 
-								type="checkbox" 
+							<input
+								type="checkbox"
 								name="dataSaver"
-								class="toggle toggle-primary" 
-								bind:checked={profile.settings.dataSaver} 
+								class="toggle toggle-primary"
+								bind:checked={profile.settings.dataSaver}
 							/>
 						</div>
 					</div>
@@ -123,12 +140,16 @@
 							<Moon class="size-5 text-secondary" />
 							Pengaturan Ibadah
 						</h3>
-						
+
 						<div class="form-control w-full">
 							<label class="label" for="mazhab">
 								<span class="label-text font-medium">Metode Perhitungan (Mazhab)</span>
 							</label>
-							<select name="mazhab" class="select select-bordered w-full bg-base-200/50" bind:value={profile.mazhab}>
+							<select
+								name="mazhab"
+								class="select select-bordered w-full bg-base-200/50"
+								bind:value={profile.mazhab}
+							>
 								<option value="shafi">Syafi'i (Standard)</option>
 								<option value="hanafi">Hanafi</option>
 							</select>
@@ -148,13 +169,13 @@
 										<p class="text-xs text-base-content/40">Untuk jadwal sholat akurat</p>
 									</div>
 								</div>
-								<input type="hidden" name="locationMethod" value={location ? true : false} />
+								<input type="hidden" name="locationMethod" value={location ? 'auto' : 'manual'} />
 								<input type="hidden" name="longitude" value={longitude} />
 								<input type="hidden" name="latitude" value={latitude} />
-								<input 
-									type="checkbox" 
-									class="toggle toggle-secondary" 
-									checked={location} 
+								<input
+									type="checkbox"
+									class="toggle toggle-secondary"
+									checked={location}
 									onclick={handleLocationToggle}
 								/>
 							</div>
@@ -164,7 +185,12 @@
 									<label class="label" for="manualLocation">
 										<span class="label-text font-medium">Kota Manual</span>
 									</label>
-									<Input name="manualLocation" placeholder="Masukkan nama kota..." bind:value={profile.location.city} class="bg-base-200/50" />
+									<Input
+										name="manualLocation"
+										placeholder="Masukkan nama kota..."
+										bind:value={profile.location.city}
+										class="bg-base-200/50"
+									/>
 								</div>
 							{/if}
 						</div>
@@ -174,10 +200,10 @@
 
 			<!-- Save Action -->
 			<div class="sticky bottom-6 pt-4" in:fly={{ y: 20, duration: 800, delay: 200 }}>
-				<Button 
+				<Button
 					type="submit"
-					variant="primary" 
-					class="w-full gap-2 shadow-lg shadow-primary/20" 
+					variant="primary"
+					class="w-full gap-2 shadow-lg shadow-primary/20"
 					disabled={isSaving}
 				>
 					{#if isSaving}

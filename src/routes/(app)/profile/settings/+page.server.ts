@@ -4,7 +4,8 @@ import { user } from "$lib/server/db/schema";
 import { eq } from "drizzle-orm";
 import type { PageServerLoad, Actions } from "./$types";
 
-export const load: PageServerLoad = async ({ locals }) => {
+
+export const load: PageServerLoad = async ({ locals, cookies }) => {
 	if (!locals.user) {
 		throw redirect(302, "/login");
 	}
@@ -17,13 +18,17 @@ export const load: PageServerLoad = async ({ locals }) => {
 		throw redirect(302, "/login");
 	}
 
+	const language = cookies.get('PARAGLIDE_LOCALE')
+
+
 	return {
-		user: currentUser
+		user: currentUser,
+		language
 	};
 };
 
 export const actions: Actions = {
-	update: async ({ request, locals }) => {
+	update: async ({ request, locals, cookies }) => {
 		if (!locals.user) {
 			return fail(401);
 		}
@@ -77,14 +82,23 @@ export const actions: Actions = {
 					location: {
 						...currentLocation,
 						method: locationMethod,
-						city: manualLocation ? manualLocation : openStreetData.address.city || openStreetData.address.town || openStreetData.address.village || '',
-						lat: latitude,
-						lng: longitude,
+						city: locationMethod === 'manual' ? manualLocation : openStreetData.address.city || openStreetData.address.town || openStreetData.address.village || '',
+						lat: locationMethod === 'manual' ? 0 : latitude,
+						lng: locationMethod === 'manual' ? 0 : longitude,
 						displayName: openStreetData.display_name
 					},
 					updatedAt: new Date()
 				})
 				.where(eq(user.id, locals.user.id));
+			
+			cookies.set('PARAGLIDE_LOCALE', language, {
+				path: '/',
+				httpOnly: false,
+				sameSite: "none",
+				secure: false,
+				maxAge: 60 * 60 * 24 * 365
+			});
+
 		} catch (e) {
 			console.error(e);
 			return fail(500, { message: "Failed to update settings" });
