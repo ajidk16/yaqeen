@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import { onMount } from 'svelte';
-	import { fade, slide } from 'svelte/transition';
+	import { page } from '$app/state';
 	import {
 		ChevronLeft,
 		MoreVertical,
@@ -14,25 +12,43 @@
 	import { Button, Card } from '$lib/components/ui';
 	import VerseItem from '$lib/components/quran/VerseItem.svelte';
 	import ActionMenu from '$lib/components/quran/ActionMenu.svelte';
+	import SurahHeader from '$lib/components/quran/SurahHeader.svelte';
+	import VerseFilter from '$lib/components/quran/VerseFilter.svelte';
+	import NoteModal from '$lib/components/quran/NoteModal.svelte';
+	import ShareImageModal from '$lib/components/quran/ShareImageModal.svelte';
+	import { toast } from '$lib/stores/toast';
 
 	// Props from load
-	let { data } = $props();
 
 	// State
 	let activeTab = $state('translation'); // translation, page, tafsir
 	let isPlaying = $state(false);
 	let activeVerse = $state<any>(null);
 	let isMenuOpen = $state(false);
-	let bookmarks = $state(data.userInteractions?.bookmarks?.map((b) => b.ayahNumber) || []);
+	let bookmarks = $state(
+		page.data.userInteractions?.bookmarks?.map((b: { ayahNumber: number }) => b.ayahNumber) || []
+	);
+	const quran = $derived(page.data.quran.data);
+
 	let highlights = $state<Record<number, string>>({}); // ayahNumber -> color
-	let notes = $state<number[]>(data.userInteractions?.notes?.map((n) => n.ayahNumber) || []);
+	let notes = $state<number[]>(
+		page.data.userInteractions?.notes?.map((n: { ayahNumber: number }) => n.ayahNumber) || []
+	);
 	let isDarkMode = $state(false); // Should sync with global theme ideally
+
+	// New state for filters and modals
+	let selectedAyat = $state(1);
+	let selectedQori = $state('05'); // Default: Mishary Alafasy
+	let isNoteModalOpen = $state(false);
+	let isShareImageModalOpen = $state(false);
+	let currentNoteText = $state('');
+	let audioRef = $state<HTMLAudioElement | null>(null);
 
 	// Initialize highlights map
 	$effect(() => {
-		if (data.userInteractions?.highlights) {
+		if (page.data.userInteractions?.highlights) {
 			const map: Record<number, string> = {};
-			data.userInteractions.highlights.forEach((h) => {
+			page.data.userInteractions.highlights.forEach((h: { ayahNumber: number; color: string }) => {
 				map[h.ayahNumber] = h.color;
 			});
 			highlights = map;
@@ -56,15 +72,14 @@
 				isMenuOpen = true;
 				break;
 			case 'bookmark':
-				toggleBookmark(activeVerse.number.inSurah);
+				toggleBookmark(activeVerse.nomorAyat);
 				break;
 			case 'highlight':
-				updateHighlight(activeVerse.number.inSurah, payload);
+				updateHighlight(activeVerse.nomorAyat, payload);
 				break;
 			case 'note':
-				// TODO: Open note modal
-				alert('Fitur catatan akan segera hadir!');
 				isMenuOpen = false;
+				isNoteModalOpen = true;
 				break;
 			case 'play':
 				// Play specific verse audio
@@ -77,9 +92,8 @@
 				shareVerse();
 				break;
 			case 'shareAsImage':
-				// TODO: Generate image from verse
-				alert('Fitur bagikan sebagai gambar akan segera hadir!');
 				isMenuOpen = false;
+				isShareImageModalOpen = true;
 				break;
 			case 'addToTilawah':
 				addToTilawah();
@@ -92,18 +106,18 @@
 
 	function copyVerseToClipboard() {
 		if (!activeVerse) return;
-		const text = `${activeVerse.text.arab}\n\n${activeVerse.translation.text}\n\n— QS. ${data.surah.nameSimple}: ${activeVerse.number.inSurah}`;
+		const text = `${activeVerse.teksArab}\n\n${activeVerse.teksIndonesia}\n\n— QS. ${quran.namaLatin}: ${activeVerse.nomorAyat}`;
 		navigator.clipboard.writeText(text);
-		// TODO: Show toast notification
+		toast.success('Teks ayat berhasil disalin!');
 		isMenuOpen = false;
 	}
 
 	async function shareVerse() {
 		if (!activeVerse) return;
 		const shareData = {
-			title: `QS. ${data.surah.nameSimple}: ${activeVerse.number.inSurah}`,
-			text: `${activeVerse.text.arab}\n\n${activeVerse.translation.text}`,
-			url: `${window.location.origin}/quran/list/${data.surah.id}#ayah-${activeVerse.number.inSurah}`
+			title: `QS. ${quran.namaLatin}: ${activeVerse.nomorAyat}`,
+			text: `${activeVerse.teksArab}\n\n${activeVerse.teksIndonesia}`,
+			url: `${window.location.origin}/quran/list/${quran.nomor}#ayah-${activeVerse.nomorAyat}`
 		};
 
 		try {
@@ -112,45 +126,116 @@
 			} else {
 				// Fallback: copy to clipboard
 				await navigator.clipboard.writeText(`${shareData.text}\n\n${shareData.url}`);
+				toast.success('Link berhasil disalin!');
 			}
 		} catch (e) {
-			console.error('Share failed:', e);
+			if ((e as Error).name !== 'AbortError') {
+				console.error('Share failed:', e);
+			}
 		}
 		isMenuOpen = false;
 	}
 
 	function playVerseAudio(verse: any) {
-		// TODO: Implement actual audio playback
-		console.log('Playing audio for verse:', verse?.number?.inSurah);
+		if (!verse?.audio?.[selectedQori]) {
+			toast.error('Audio tidak tersedia');
+			return;
+		}
+
+		// Create or reuse audio element
+		if (audioRef) {
+			audioRef.pause();
+		}
+		audioRef = new Audio(verse.audio[selectedQori]);
+		audioRef.play();
 		isPlaying = true;
-		// Placeholder: would integrate with audio API
-	}
 
-	function addToTilawah() {
-		// TODO: Call API to add to daily tilawah log
-		console.log('Adding to tilawah:', activeVerse?.number?.inSurah);
-		alert(`Ayat ${activeVerse?.number?.inSurah} ditambahkan ke Tilawah Harian!`);
+		audioRef.onended = () => {
+			isPlaying = false;
+		};
+
 		isMenuOpen = false;
 	}
 
-	function addToHafalan() {
-		// TODO: Call API to add to hafalan progress
-		console.log('Adding to hafalan:', activeVerse?.number?.inSurah);
-		alert(`Ayat ${activeVerse?.number?.inSurah} ditambahkan ke Target Hafalan!`);
+	function playSurahAudio() {
+		if (!quran.audioFull?.[selectedQori]) {
+			toast.error('Audio tidak tersedia');
+			return;
+		}
+
+		if (audioRef) {
+			audioRef.pause();
+		}
+		audioRef = new Audio(quran.audioFull[selectedQori]);
+		audioRef.play();
+		isPlaying = true;
+
+		audioRef.onended = () => {
+			isPlaying = false;
+		};
+	}
+
+	async function addToTilawah() {
+		if (!activeVerse) return;
+
+		const formData = new FormData();
+		formData.append('surahNumber', quran.nomor.toString());
+		formData.append('surahName', quran.namaLatin);
+		formData.append('ayahNumber', activeVerse.nomorAyat.toString());
+
+		try {
+			await fetch('?/addToTilawah', { method: 'POST', body: formData });
+			toast.success(`Ayat ${activeVerse.nomorAyat} ditambahkan ke Tilawah Harian!`);
+		} catch (e) {
+			console.error(e);
+			toast.error('Gagal menambahkan ke tilawah');
+		}
 		isMenuOpen = false;
+	}
+
+	async function addToHafalan() {
+		if (!activeVerse) return;
+
+		const formData = new FormData();
+		formData.append('surahNumber', quran.nomor.toString());
+		formData.append('surahName', quran.namaLatin);
+		formData.append('ayahNumber', activeVerse.nomorAyat.toString());
+
+		try {
+			await fetch('?/addToHafalan', { method: 'POST', body: formData });
+			toast.success(`Ayat ${activeVerse.nomorAyat} ditambahkan ke Target Hafalan!`);
+		} catch (e) {
+			console.error(e);
+			toast.error('Gagal menambahkan ke hafalan');
+		}
+		isMenuOpen = false;
+	}
+
+	function handleNoteSaved(note: string) {
+		if (activeVerse && !notes.includes(activeVerse.nomorAyat)) {
+			notes = [...notes, activeVerse.nomorAyat];
+		}
+		currentNoteText = note;
+	}
+
+	function handleNoteDeleted() {
+		if (activeVerse) {
+			notes = notes.filter((n) => n !== activeVerse.nomorAyat);
+		}
+		currentNoteText = '';
 	}
 
 	async function toggleBookmark(ayah: number) {
 		// Optimistic update
 		const wasBookmarked = bookmarks.includes(ayah);
 		if (wasBookmarked) {
-			bookmarks = bookmarks.filter((b) => b !== ayah);
+			bookmarks = bookmarks.filter((b: unknown) => b !== ayah);
 		} else {
 			bookmarks = [...bookmarks, ayah];
 		}
 
 		const formData = new FormData();
-		formData.append('surahNumber', data.surah.id.toString());
+		formData.append('surahNumber', quran.nomor.toString());
 		formData.append('ayahNumber', ayah.toString());
 
 		try {
@@ -159,7 +244,7 @@
 			console.error(e);
 			// Revert on error
 			if (wasBookmarked) bookmarks = [...bookmarks, ayah];
-			else bookmarks = bookmarks.filter((b) => b !== ayah);
+			else bookmarks = bookmarks.filter((b: unknown) => b !== ayah);
 		}
 	}
 
@@ -177,7 +262,7 @@
 		isMenuOpen = false;
 
 		const formData = new FormData();
-		formData.append('surahNumber', data.surah.id.toString());
+		formData.append('surahNumber', quran.nomor.toString());
 		formData.append('ayahNumber', ayah.toString());
 		if (color) formData.append('color', color);
 
@@ -205,9 +290,9 @@
 					<ChevronLeft class="size-5" />
 				</a>
 				<div>
-					<h1 class="font-bold text-lg leading-tight">{data.surah.nameSimple}</h1>
+					<h1 class="font-bold text-lg leading-tight">{quran.namaLatin}</h1>
 					<p class="text-xs text-base-content/60">
-						{data.surah.translatedName.name} • {data.surah.versesCount} Ayat
+						{quran.arti} • {quran.jumlahAyat} Ayat
 					</p>
 				</div>
 			</div>
@@ -259,24 +344,32 @@
 		</div>
 	</header>
 
+	<!-- Surah Header Card -->
+	<SurahHeader surah={quran} {selectedQori} {isPlaying} onPlayAudio={playSurahAudio} />
+
+	<!-- Verse Filter -->
+	<VerseFilter totalAyat={quran.jumlahAyat} bind:selectedAyat bind:selectedQori />
+
 	<!-- Main Content -->
 	<main class="max-w-3xl mx-auto py-4">
 		<!-- Bismillah -->
-		{#if data.surah.bismillahPre}
+		{#if quran.nomor !== 1 && quran.nomor !== 9}
 			<div class="text-center py-8 font-amiri text-3xl md:text-4xl text-base-content/80">﷽</div>
 		{/if}
 
 		<div class="space-y-2">
 			{#if activeTab === 'translation'}
-				{#each data.verses as verse (verse.id)}
-					<VerseItem
-						{verse}
-						surahNumber={data.surah.id}
-						isBookmarked={bookmarks.includes(verse.number.inSurah)}
-						highlightColor={highlights[verse.number.inSurah]}
-						hasNotes={notes.includes(verse.number.inSurah)}
-						onAction={handleVerseAction}
-					/>
+				{#each quran.ayat as verse (verse.nomorAyat)}
+					<div id="ayah-{verse.nomorAyat}">
+						<VerseItem
+							{verse}
+							surahNumber={quran.nomor}
+							isBookmarked={bookmarks.includes(verse.nomorAyat)}
+							highlightColor={highlights[verse.nomorAyat]}
+							hasNotes={notes.includes(verse.nomorAyat)}
+							onAction={handleVerseAction}
+						/>
+					</div>
 				{/each}
 			{:else if activeTab === 'page'}
 				<!-- Mushaf Page View -->
@@ -317,37 +410,37 @@
 							dir="rtl"
 							style="text-align-last: center; word-spacing: 0.15em;"
 						>
-							{data.mushafPageText}
+							{page.data.mushafPageText}
 						</p>
 					</div>
 
 					<!-- Page Number -->
 					<div class="text-center mt-6">
-						<span class="text-primary font-medium text-sm">{data.surah.pageNumber || 1}</span>
+						<span class="text-primary font-medium text-sm">{page.data.surah.pageNumber || 1}</span>
 					</div>
 				</div>
 			{:else}
 				<!-- Tafsir View -->
 				<div class="tafsir-container space-y-6 p-4">
-					{#each data.verses as verse (verse.id)}
+					{#each quran.ayat as verse (verse.nomorAyat)}
 						<div
 							class="bg-base-100 rounded-2xl border border-base-300 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
 						>
 							<!-- Verse Header -->
 							<div
-								class="bg-gradient-to-r from-primary/10 to-secondary/10 px-4 py-3 flex items-center justify-between"
+								class="bg-linear-to-r from-primary/10 to-secondary/10 px-4 py-3 flex items-center justify-between"
 							>
 								<div class="flex items-center gap-3">
 									<div class="size-8 rounded-full bg-primary/20 flex items-center justify-center">
-										<span class="text-sm font-bold text-primary">{verse.number.inSurah}</span>
+										<span class="text-sm font-bold text-primary">{verse.nomorAyat}</span>
 									</div>
-									<p class="font-amiri text-xl text-base-content" dir="rtl">{verse.text.arab}</p>
+									<p class="font-amiri text-xl text-base-content" dir="rtl">{verse.teksArab}</p>
 								</div>
 							</div>
 
 							<!-- Translation -->
 							<div class="px-4 py-3 border-b border-base-200">
-								<p class="text-sm text-base-content/80">{verse.translation.text}</p>
+								<p class="text-sm text-base-content/80">{verse.teksIndonesia}</p>
 							</div>
 
 							<!-- Tafsir Content -->
@@ -371,7 +464,9 @@
 											Tafsir
 										</p>
 										<p class="text-sm text-base-content/90 leading-relaxed">
-											{verse.tafsir?.text || 'Tafsir belum tersedia untuk ayat ini.'}
+											{@html quran.tafsir?.wpiId
+												? `Lihat tafsir untuk Surah ${quran.namaLatin}`
+												: 'Tafsir belum tersedia.'}
 										</p>
 									</div>
 								</div>
@@ -389,7 +484,7 @@
 	>
 		<div class="max-w-3xl mx-auto flex items-center gap-4">
 			<div class="flex-1">
-				<p class="text-xs font-bold truncate">QS. {data.surah.nameSimple}</p>
+				<p class="text-xs font-bold truncate">QS. {quran.namaLatin}</p>
 				<p class="text-[10px] text-base-content/60">Mishary Rashid Alafasy</p>
 			</div>
 			<div class="flex items-center gap-3">
@@ -417,14 +512,33 @@
 
 	<!-- Action Drawer -->
 	<ActionMenu
-		bind:open={isMenuOpen}
+		open={isMenuOpen}
 		verse={activeVerse}
-		surahName={data.surah.nameSimple}
-		isBookmarked={activeVerse ? bookmarks.includes(activeVerse.number.inSurah) : false}
-		highlightColor={activeVerse ? highlights[activeVerse.number.inSurah] : null}
-		hasNotes={activeVerse ? notes.includes(activeVerse.number.inSurah) : false}
+		surahName={quran.namaLatin}
+		isBookmarked={activeVerse ? bookmarks.includes(activeVerse.nomorAyat) : false}
+		highlightColor={activeVerse ? highlights[activeVerse.nomorAyat] : null}
+		hasNotes={activeVerse ? notes.includes(activeVerse.nomorAyat) : false}
 		onClose={() => (isMenuOpen = false)}
 		onAction={handleVerseAction}
+	/>
+
+	<!-- Note Modal -->
+	<NoteModal
+		bind:open={isNoteModalOpen}
+		verse={activeVerse}
+		surahNumber={quran.nomor}
+		surahName={quran.namaLatin}
+		existingNote={currentNoteText}
+		onSave={handleNoteSaved}
+		onDelete={handleNoteDeleted}
+	/>
+
+	<!-- Share Image Modal -->
+	<ShareImageModal
+		bind:open={isShareImageModalOpen}
+		verse={activeVerse}
+		surahName={quran.namaLatin}
+		surahNumber={quran.nomor}
 	/>
 </div>
 

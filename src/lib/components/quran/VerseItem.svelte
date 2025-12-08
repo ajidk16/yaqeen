@@ -18,8 +18,10 @@
 		hasNotes = false,
 		onAction
 	}: Props = $props();
+	console.log('verse', verse);
 	let isPressed = $state(false);
 	let isHovered = $state(false);
+	console.log('anjeng')
 	// Highlight mapping with proper Tailwind classes
 	const highlightColors: Record<string, string> = {
 		yellow: 'bg-yellow-100/80 dark:bg-yellow-500/20',
@@ -61,7 +63,7 @@
 					<polygon points="20,0 40,20 20,40 0,20" fill="currentColor" />
 				</svg>
 				<span class="relative z-10 text-xs md:text-sm font-bold text-primary">
-					{verse.number.inSurah}
+					{verse.nomorAyat}
 				</span>
 			</div>
 			<!-- Status Indicators -->
@@ -85,17 +87,17 @@
 				class="font-amiri text-right text-2xl sm:text-3xl md:text-4xl leading-[1.9] md:leading-[2.1] text-base-content"
 				dir="rtl"
 			>
-				{verse.text.arab}
+				{verse.teksArab}
 			</p>
 			<!-- Transliteration & Translation -->
 			<div class="space-y-2">
-				{#if verse.transliteration?.text}
+				{#if verse.teksLatin}
 					<p class="text-xs sm:text-sm text-primary/70 italic font-medium leading-relaxed">
-						{verse.transliteration.text}
+						{verse.teksLatin}
 					</p>
 				{/if}
 				<p class="text-sm sm:text-base text-base-content/75 leading-relaxed">
-					{verse.translation.text}
+					{verse.teksIndonesia}
 				</p>
 			</div>
 		</div>

@@ -89,10 +89,26 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     // Full text for mushaf page view
     const mushafPageText = `بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ ۝١ ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ ۝٢ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ ۝٣ مَـٰلِكِ يَوْمِ ٱلدِّينِ ۝٤ إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ ۝٥ ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ ۝٦ صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ ۝٧`;
 
+    const quranResponse = await fetch(`https://equran.id/api/v2/surat/${surahNumber}`);
+    if (!quranResponse.ok) {
+        throw error(500, 'Gagal mengambil data dari API Quran');
+    }
+    const quranData = await quranResponse.json();
+
+    const tafsirResponse = await fetch(`https://equran.id/api/v2/tafsir/${surahNumber}`);
+    if (!tafsirResponse.ok) {
+        throw error(500, 'Gagal mengambil data tafsir dari API Quran');
+    }
+    const tafsirData = await tafsirResponse.json();
+    // Here you would normally fetch real user interactions from the database
+
+
     return {
         surah: dummySurah,
         verses: alFatihahVerses,
         mushafPageText: mushafPageText,
+        quran: quranData,
+        tafsir: tafsirData,
         pagination: { total: 7, totalPages: 1, currentPage: 1 },
         userInteractions: {
             bookmarks: [{ ayahNumber: 1, surahNumber: 1 }],
@@ -181,6 +197,173 @@ export const actions = {
         } catch (e) {
              console.error(e);
              return { success: false, error: 'Database error' };
+        }
+    },
+
+    saveNote: async ({ request, locals }) => {
+        const session = locals.session;
+        if (!session) return { success: false, error: 'Unauthorized' };
+
+        const formData = await request.formData();
+        const surahNumber = Number(formData.get('surahNumber'));
+        const ayahNumber = Number(formData.get('ayahNumber'));
+        const text = formData.get('text')?.toString();
+
+        if (!surahNumber || !ayahNumber || !text) return { success: false, error: 'Invalid data' };
+
+        try {
+            const existing = await db.query.quranNotes.findFirst({
+                where: and(
+                    eq(table.quranNotes.userId, session.user.id),
+                    eq(table.quranNotes.surahNumber, surahNumber),
+                    eq(table.quranNotes.ayahNumber, ayahNumber)
+                )
+            });
+
+            if (existing) {
+                await db.update(table.quranNotes)
+                    .set({ text, updatedAt: new Date() })
+                    .where(eq(table.quranNotes.id, existing.id));
+                return { success: true, action: 'updated' };
+            } else {
+                await db.insert(table.quranNotes).values({
+                    id: crypto.randomUUID(),
+                    userId: session.user.id,
+                    surahNumber,
+                    ayahNumber,
+                    text
+                });
+                return { success: true, action: 'added' };
+            }
+        } catch (e) {
+            console.error(e);
+            return { success: false, error: 'Database error' };
+        }
+    },
+
+    deleteNote: async ({ request, locals }) => {
+        const session = locals.session;
+        if (!session) return { success: false, error: 'Unauthorized' };
+
+        const formData = await request.formData();
+        const surahNumber = Number(formData.get('surahNumber'));
+        const ayahNumber = Number(formData.get('ayahNumber'));
+
+        if (!surahNumber || !ayahNumber) return { success: false, error: 'Invalid data' };
+
+        try {
+            await db.delete(table.quranNotes).where(
+                and(
+                    eq(table.quranNotes.userId, session.user.id),
+                    eq(table.quranNotes.surahNumber, surahNumber),
+                    eq(table.quranNotes.ayahNumber, ayahNumber)
+                )
+            );
+            return { success: true };
+        } catch (e) {
+            console.error(e);
+            return { success: false, error: 'Database error' };
+        }
+    },
+
+    addToTilawah: async ({ request, locals }) => {
+        const session = locals.session;
+        if (!session) return { success: false, error: 'Unauthorized' };
+
+        const formData = await request.formData();
+        const surahNumber = Number(formData.get('surahNumber'));
+        const surahName = formData.get('surahName')?.toString() || '';
+        const ayahNumber = Number(formData.get('ayahNumber'));
+
+        if (!surahNumber || !ayahNumber) return { success: false, error: 'Invalid data' };
+
+        const today = new Date().toISOString().split('T')[0];
+
+        try {
+            // Check if already has progress for today
+            const existing = await db.query.quranProgress.findFirst({
+                where: and(
+                    eq(table.quranProgress.userId, session.user.id),
+                    eq(table.quranProgress.date, today)
+                )
+            });
+
+            if (existing) {
+                // Update existing progress
+                await db.update(table.quranProgress)
+                    .set({ 
+                        endPage: ayahNumber, // Using ayah as page reference
+                        pagesRead: (existing.pagesRead || 0) + 1
+                    })
+                    .where(eq(table.quranProgress.id, existing.id));
+            } else {
+                await db.insert(table.quranProgress).values({
+                    id: crypto.randomUUID(),
+                    userId: session.user.id,
+                    date: today,
+                    startPage: ayahNumber,
+                    endPage: ayahNumber,
+                    pagesRead: 1
+                });
+            }
+            return { success: true, action: 'added' };
+        } catch (e) {
+            console.error(e);
+            return { success: false, error: 'Database error' };
+        }
+    },
+
+    addToHafalan: async ({ request, locals }) => {
+        const session = locals.session;
+        if (!session) return { success: false, error: 'Unauthorized' };
+
+        const formData = await request.formData();
+        const surahNumber = Number(formData.get('surahNumber'));
+        const surahName = formData.get('surahName')?.toString() || '';
+        const ayahNumber = Number(formData.get('ayahNumber'));
+
+        if (!surahNumber || !surahName || !ayahNumber) return { success: false, error: 'Invalid data' };
+
+        const today = new Date().toISOString().split('T')[0];
+
+        try {
+            // Check if already tracking this surah
+            const existing = await db.query.hafalanProgress.findFirst({
+                where: and(
+                    eq(table.hafalanProgress.userId, session.user.id),
+                    eq(table.hafalanProgress.surahName, surahName)
+                )
+            });
+
+            if (existing) {
+                // Update progress array
+                const progress = (existing.progress as number[]) || [];
+                if (!progress.includes(ayahNumber)) {
+                    progress.push(ayahNumber);
+                    await db.update(table.hafalanProgress)
+                        .set({ 
+                            progress,
+                            ayahEnd: Math.max(existing.ayahEnd, ayahNumber),
+                            lastReviewed: new Date()
+                        })
+                        .where(eq(table.hafalanProgress.id, existing.id));
+                }
+            } else {
+                await db.insert(table.hafalanProgress).values({
+                    id: crypto.randomUUID(),
+                    userId: session.user.id,
+                    surahName,
+                    date: today,
+                    ayahStart: ayahNumber,
+                    ayahEnd: ayahNumber,
+                    progress: [ayahNumber],
+                    status: 'memorizing'
+                });
+            }
+            return { success: true, action: 'added' };
+        } catch (e) {
+            console.error(e);
+            return { success: false, error: 'Database error' };
         }
     }
 };
