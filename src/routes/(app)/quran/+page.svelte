@@ -1,15 +1,14 @@
 <script lang="ts">
 	import { BookOpen } from 'lucide-svelte';
 	import confetti from 'canvas-confetti';
-	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import * as m from '$lib/paraglide/messages.js';
 
 	// Components
-	import DateNavigator from './components/DateNavigator.svelte';
-	import TilawahCard from './components/TilawahCard.svelte';
-	import HafalanCard from './components/HafalanCard.svelte';
-	import QuranStats from './components/QuranStats.svelte';
+	import DateNavigator from '../../../lib/modules/quran/components/DateNavigator.svelte';
+	import TilawahCard from '../../../lib/modules/quran/components/TilawahCard.svelte';
+	import HafalanCard from '../../../lib/modules/quran/components/HafalanCard.svelte';
+	import QuranStats from '../../../lib/modules/quran/components/QuranStats.svelte';
 	import { formatDateShort } from '$lib/utils/format';
 
 	// State

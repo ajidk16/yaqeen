@@ -19,7 +19,7 @@
 	import { formatDate } from '$lib/utils/format.js';
 	import { page } from '$app/state';
 	import * as m from '$lib/paraglide/messages.js';
-	import CalendarModal from '../quran/components/CalendarModal.svelte';
+	import CalendarModal from '../../../lib/modules/quran/components/CalendarModal.svelte';
 
 	let { data } = $props();
 
