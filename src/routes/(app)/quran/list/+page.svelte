@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { Search, BookOpen, ChevronLeft, Sparkles, Filter } from 'lucide-svelte';
-	import { Input, Card, Badge, Button } from '$lib/components/ui';
 	import { quranMetadata } from '$lib/data/quran-metadata';
 	import * as m from '$lib/paraglide/messages.js';
 	import { fly, fade } from 'svelte/transition';
+	import { page } from '$app/state';
 
 	let searchQuery = $state('');
 	let selectedType = $state<'all' | 'Meccan' | 'Medinan'>('all');
+	const chapters = $derived(page.data.chapters.data);
 
 	// Daily quotes
 	const quotes = [
@@ -137,62 +138,83 @@
 
 		<!-- Surah Grid -->
 		<div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-			{#each filteredSurahs as surah, idx (surah.number)}
-				<a
-					href="/quran/list/{surah.number}"
-					class="group"
-					in:fly={{ y: 10, duration: 200, delay: Math.min(idx * 20, 200) }}
-				>
-					<div
-						class="relative h-full p-4 rounded-2xl bg-base-100 border border-base-300 hover:border-primary hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-[1.02] overflow-hidden"
+			{#if page.data.chapters.code !== 200}
+				<!-- No Results Found -->
+				<div class="text-center py-16 flex items-center justify-center" in:fade={{ duration: 200 }}>
+					<div class="inline-flex items-center justify-center p-4 rounded-full bg-base-300 mb-4">
+						<Search class="size-8 opacity-40" />
+					</div>
+					<p class="text-base-content/60">
+						Tidak ditemukan surah dengan kata kunci "{searchQuery}"
+					</p>
+					<button
+						class="mt-4 text-sm text-primary hover:underline"
+						onclick={() => {
+							searchQuery = '';
+							selectedType = 'all';
+						}}
 					>
-						<!-- Background Gradient on Hover -->
+						Reset pencarian
+					</button>
+				</div>
+			{:else}
+				{#each chapters as surah, idx (surah.nomor)}
+					<a
+						href="/quran/list/{surah.nomor}"
+						class="group"
+						in:fly={{ y: 10, duration: 200, delay: Math.min(idx * 20, 200) }}
+					>
 						<div
-							class="absolute inset-0 bg-linear-to-br from-primary/0 to-secondary/0 group-hover:from-primary/5 group-hover:to-secondary/5 transition-all duration-500"
-						></div>
+							class="relative h-full p-4 rounded-2xl bg-base-100 border border-base-300 hover:border-primary hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-[1.02] overflow-hidden"
+						>
+							<!-- Background Gradient on Hover -->
+							<div
+								class="absolute inset-0 bg-linear-to-br from-primary/0 to-secondary/0 group-hover:from-primary/5 group-hover:to-secondary/5 transition-all duration-500"
+							></div>
 
-						<!-- Content -->
-						<div class="relative z-10 flex flex-col items-center text-center space-y-3">
-							<!-- Surah Number Badge -->
-							<div class="relative size-12 flex items-center justify-center">
-								<svg class="absolute inset-0 size-full" viewBox="0 0 60 60">
-									<polygon
-										points="30,0 60,30 30,60 0,30"
-										class="fill-primary/10 group-hover:fill-primary/20 transition-colors"
-									/>
-								</svg>
-								<span class="relative z-10 font-bold text-sm text-primary">{surah.number}</span>
-							</div>
+							<!-- Content -->
+							<div class="relative z-10 flex flex-col items-center text-center space-y-3">
+								<!-- Surah Number Badge -->
+								<div class="relative size-12 flex items-center justify-center">
+									<svg class="absolute inset-0 size-full" viewBox="0 0 60 60">
+										<polygon
+											points="30,0 60,30 30,60 0,30"
+											class="fill-primary/10 group-hover:fill-primary/20 transition-colors"
+										/>
+									</svg>
+									<span class="relative z-10 font-bold text-sm text-primary">{surah.nomor}</span>
+								</div>
 
-							<!-- Arabic Name -->
-							<p
-								class="font-amiri text-xl md:text-2xl text-base-content/80 group-hover:text-primary transition-colors"
-								dir="rtl"
-							>
-								{surah.glass}
-							</p>
-
-							<!-- Latin Name -->
-							<h3 class="font-bold text-sm group-hover:text-primary transition-colors">
-								{surah.name}
-							</h3>
-
-							<!-- Info -->
-							<div class="flex flex-col items-center gap-1">
-								<p class="text-xs text-base-content/50">
-									{surah.ayahs} Ayat
-								</p>
-								<span
-									class="inline-block px-2 py-0.5 rounded-full text-[10px] font-medium
-									{surah.type === 'Meccan' ? 'bg-warning/20 text-warning' : 'bg-secondary/20 text-secondary'}"
+								<!-- Arabic Name -->
+								<p
+									class="font-amiri text-xl md:text-2xl text-base-content/80 group-hover:text-primary transition-colors"
+									dir="rtl"
 								>
-									{surah.type === 'Meccan' ? 'Makkiyah' : 'Madaniyah'}
-								</span>
+									{surah.namaLatin}
+								</p>
+
+								<!-- Latin Name -->
+								<h3 class="font-bold font-amiri text-sm group-hover:text-primary transition-colors">
+									{surah.nama}
+								</h3>
+
+								<!-- Info -->
+								<div class="flex flex-col items-center gap-1">
+									<p class="text-xs text-base-content/50">
+										{surah.ayat} Ayat
+									</p>
+									<span
+										class="inline-block px-2 py-0.5 rounded-full text-[10px] font-medium
+									{surah.tempatTurun === 'Mekah' ? 'bg-warning/20 text-warning' : 'bg-secondary/20 text-secondary'}"
+									>
+										{surah.tempatTurun}
+									</span>
+								</div>
 							</div>
 						</div>
-					</div>
-				</a>
-			{/each}
+					</a>
+				{/each}
+			{/if}
 		</div>
 
 		{#if filteredSurahs.length === 0}

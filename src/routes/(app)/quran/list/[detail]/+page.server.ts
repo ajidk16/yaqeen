@@ -1,41 +1,186 @@
-import { quranApi } from '$lib/server/quran-api';
-import { quranMetadata } from '$lib/data/quran-metadata';
 import type { PageServerLoad } from './$types';
+import { quran } from '$lib/server/quran';
+import { db } from '$lib/server/db';
+import * as table from '$lib/server/db/schema';
+import { eq, and } from 'drizzle-orm';
+import { error } from '@sveltejs/kit';
 
-export const load: PageServerLoad = async ({ params }) => {
-	const chapterNumber = parseInt(params.detail);
-    console.log(`Loading Surah data for chapter number: ${chapterNumber}`);
-	const surahMeta = quranMetadata.find((s) => s.number === chapterNumber);
+export const load: PageServerLoad = async ({ params, locals }) => {
+	// Updated auth logic based on hooks.server.ts
+    const user = locals.user;
+    const session = locals.session;
+	const surahNumber = Number(params.detail);
 
-    // Fetch verses from API
-    // We try to request a reasonably large per_page to get most surahs in one go, 
-    // or we might need to handle pagination in the client if we want full mushaf.
-    // For this integration, we'll try to get as many as allowed.
-    const apiResponse = await quranApi.getVerses(chapterNumber);
-
-    let ayahs = [];
-
-    if (apiResponse && apiResponse.verses) {
-        ayahs = apiResponse.verses.map((verse: any) => ({
-            number: verse.verse_number,
-            // Prioritize Uthmani, fallback to Indopak or simple text
-            text: verse.text_uthmani || verse.text_indopak || verse.text_imlaei,
-            // Assuming first translation is the one requested (ID)
-            translation: verse.translations?.[0]?.text || 'Terjemahan tidak tersedia',
-            tafsir: 'Tafsir belum tersedia via API' // API usually requires separate call for Tafsir
-        }));
-    } else {
-        // Fallback to dummy data if API fails or for offline dev
-        console.warn('Using dummy/empty data due to API failure');
-        ayahs = [];
-    }
-
-	return {
-		surahData: {
-            number: chapterNumber,
-            name: surahMeta?.name || `Surah ${chapterNumber}`,
-            ayahs: ayahs
+	if (isNaN(surahNumber) || surahNumber < 1 || surahNumber > 114) {
+		error(404, 'Surah tidak ditemukan');
+	}
+    
+    // --- DUMMY DATA for Al-Fatihah ---
+    const alFatihahVerses = [
+        {
+            id: 1,
+            number: { inSurah: 1 },
+            text: { arab: 'بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ' },
+            transliteration: { text: "Bismillāhir-raḥmānir-raḥīm" },
+            translation: { text: "Dengan nama Allah Yang Maha Pengasih, Maha Penyayang." },
+            tafsir: { text: "Ayat ini disebut Basmalah. Setiap Muslim dianjurkan untuk memulai setiap pekerjaan dengan menyebut nama Allah. Ar-Rahman dan Ar-Rahim keduanya berasal dari kata rahmat, namun Ar-Rahman menunjukkan kasih sayang yang luas mencakup semua makhluk, sedangkan Ar-Rahim khusus untuk orang-orang beriman." }
         },
-        meta: surahMeta
-	};
+        {
+            id: 2,
+            number: { inSurah: 2 },
+            text: { arab: 'ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ' },
+            transliteration: { text: "Al-ḥamdu lillāhi rabbil-'ālamīn" },
+            translation: { text: "Segala puji bagi Allah, Tuhan seluruh alam." },
+            tafsir: { text: "Al-Hamd adalah pujian yang sempurna yang hanya layak bagi Allah. Rabb berarti Tuhan yang memelihara, mengatur, dan mendidik seluruh alam. Al-'Alamin mencakup semua makhluk: manusia, jin, malaikat, hewan, tumbuhan, dan seluruh alam semesta." }
+        },
+        {
+            id: 3,
+            number: { inSurah: 3 },
+            text: { arab: 'ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ' },
+            transliteration: { text: "Ar-raḥmānir-raḥīm" },
+            translation: { text: "Yang Maha Pengasih, Maha Penyayang." },
+            tafsir: { text: "Pengulangan dua sifat ini menegaskan betapa luasnya kasih sayang Allah. Dalam hadits Qudsi, Allah berfirman bahwa rahmat-Nya mengalahkan murka-Nya. Rahmat Allah meliputi segala sesuatu dan diberikan kepada semua makhluk." }
+        },
+        {
+            id: 4,
+            number: { inSurah: 4 },
+            text: { arab: 'مَـٰلِكِ يَوْمِ ٱلدِّينِ' },
+            transliteration: { text: "Māliki yawmid-dīn" },
+            translation: { text: "Pemilik hari pembalasan." },
+            tafsir: { text: "Yaumid-Din adalah Hari Kiamat, hari di mana semua amal akan dihisab dan dibalas. Allah adalah satu-satunya Penguasa dan Hakim pada hari itu. Tidak ada seorang pun yang dapat menolong kecuali dengan izin-Nya." }
+        },
+        {
+            id: 5,
+            number: { inSurah: 5 },
+            text: { arab: 'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ' },
+            transliteration: { text: "Iyyāka na'budu wa iyyāka nasta'īn" },
+            translation: { text: "Hanya kepada Engkaulah kami menyembah dan hanya kepada Engkaulah kami memohon pertolongan." },
+            tafsir: { text: "Ayat ini adalah inti tauhid. Mendahulukan objek (Iyyaka) menunjukkan pengkhususan ibadah hanya untuk Allah. Ibadah tanpa pertolongan Allah tidak akan terlaksana, maka kita memohon pertolongan-Nya dalam segala urusan." }
+        },
+        {
+            id: 6,
+            number: { inSurah: 6 },
+            text: { arab: 'ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ' },
+            transliteration: { text: "Ihdinash-shirātal-mustaqīm" },
+            translation: { text: "Tunjukilah kami jalan yang lurus." },
+            tafsir: { text: "Ash-Shirath Al-Mustaqim adalah jalan Islam, jalan yang ditempuh oleh Nabi Muhammad ﷺ dan para sahabatnya. Hidayah yang dimohon meliputi petunjuk ke jalan yang benar dan kekuatan untuk istiqamah di atasnya." }
+        },
+        {
+            id: 7,
+            number: { inSurah: 7 },
+            text: { arab: 'صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ' },
+            transliteration: { text: "Shirāthal-ladhīna an'amta 'alayhim ghayril-maghdhūbi 'alayhim wa ladh-dhāllīn" },
+            translation: { text: "(Yaitu) jalan orang-orang yang telah Engkau beri nikmat, bukan (jalan) mereka yang dimurkai, dan bukan (pula jalan) mereka yang sesat." },
+            tafsir: { text: "Orang-orang yang diberi nikmat adalah para Nabi, shiddiqin, syuhada, dan orang-orang saleh. Al-Maghdhubi 'alaihim adalah mereka yang mengetahui kebenaran tapi tidak mengamalkannya. Adh-Dhallin adalah mereka yang beribadah tanpa ilmu." }
+        }
+    ];
+
+    const dummySurah = {
+        id: surahNumber,
+        nameSimple: 'Al-Fatihah',
+        nameArabic: 'الفاتحة',
+        translatedName: { name: 'Pembukaan' },
+        versesCount: 7,
+        bismillahPre: false,
+        revelationPlace: 'makkah',
+        pageNumber: 1
+    };
+
+    // Full text for mushaf page view
+    const mushafPageText = `بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ ۝١ ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ ۝٢ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ ۝٣ مَـٰلِكِ يَوْمِ ٱلدِّينِ ۝٤ إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ ۝٥ ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ ۝٦ صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ ۝٧`;
+
+    return {
+        surah: dummySurah,
+        verses: alFatihahVerses,
+        mushafPageText: mushafPageText,
+        pagination: { total: 7, totalPages: 1, currentPage: 1 },
+        userInteractions: {
+            bookmarks: [{ ayahNumber: 1, surahNumber: 1 }],
+            highlights: [{ ayahNumber: 2, surahNumber: 1, color: 'yellow' }],
+            notes: [{ ayahNumber: 5, surahNumber: 1 }]
+        }
+    };
+};
+
+export const actions = {
+    toggleBookmark: async ({ request, locals }) => {
+        const session = locals.session;
+        if (!session) return { success: false, error: 'Unauthorized' };
+
+        const formData = await request.formData();
+        const surahNumber = Number(formData.get('surahNumber'));
+        const ayahNumber = Number(formData.get('ayahNumber'));
+
+        if (!surahNumber || !ayahNumber) return { success: false, error: 'Invalid data' };
+
+        try {
+            const existing = await db.query.quranBookmarks.findFirst({
+                where: and(
+                    eq(table.quranBookmarks.userId, session.user.id),
+                    eq(table.quranBookmarks.surahNumber, surahNumber),
+                    eq(table.quranBookmarks.ayahNumber, ayahNumber)
+                )
+            });
+
+            if (existing) {
+                await db.delete(table.quranBookmarks).where(eq(table.quranBookmarks.id, existing.id));
+                return { success: true, action: 'removed' };
+            } else {
+                await db.insert(table.quranBookmarks).values({
+                    id: crypto.randomUUID(),
+                    userId: session.user.id,
+                    surahNumber,
+                    ayahNumber
+                });
+                return { success: true, action: 'added' };
+            }
+        } catch (e) {
+            console.error(e);
+            return { success: false, error: 'Database error' };
+        }
+    },
+
+    updateHighlight: async ({ request, locals }) => {
+        const session = locals.session;
+        if (!session) return { success: false, error: 'Unauthorized' };
+
+        const formData = await request.formData();
+        const surahNumber = Number(formData.get('surahNumber'));
+        const ayahNumber = Number(formData.get('ayahNumber'));
+        const color = formData.get('color')?.toString();
+
+        if (!surahNumber || !ayahNumber) return { success: false, error: 'Invalid data' };
+
+        try {
+            const existing = await db.query.quranHighlights.findFirst({
+                 where: and(
+                    eq(table.quranHighlights.userId, session.user.id),
+                    eq(table.quranHighlights.surahNumber, surahNumber),
+                    eq(table.quranHighlights.ayahNumber, ayahNumber)
+                )
+            });
+
+            if (existing) {
+                if (!color) {
+                     await db.delete(table.quranHighlights).where(eq(table.quranHighlights.id, existing.id));
+                     return { success: true, action: 'removed' };
+                } else {
+                     await db.update(table.quranHighlights).set({ color }).where(eq(table.quranHighlights.id, existing.id));
+                     return { success: true, action: 'updated' };
+                }
+            } else if (color) {
+                 await db.insert(table.quranHighlights).values({
+                    id: crypto.randomUUID(),
+                    userId: session.user.id,
+                    surahNumber,
+                    ayahNumber,
+                    color
+                });
+                return { success: true, action: 'added' };
+            }
+        } catch (e) {
+             console.error(e);
+             return { success: false, error: 'Database error' };
+        }
+    }
 };

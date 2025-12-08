@@ -65,6 +65,7 @@
 	"dependencies": {
 		"@neondatabase/serverless": "^1.0.2",
 		"@node-rs/argon2": "^2.0.2",
+		"@quranjs/api": "^2.0.0",
 		"canvas-confetti": "^1.9.4",
 		"cloudinary": "^2.8.0",
 		"dayjs": "^1.11.19",

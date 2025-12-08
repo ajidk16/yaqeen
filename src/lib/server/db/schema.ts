@@ -160,6 +160,16 @@ export const supportTickets = pgTable('support_tickets', {
 	createdAt: timestamp('created_at').defaultNow()
 });
 
+
+export const quranHighlights = pgTable('quran_highlights', {
+	id: text('id').primaryKey(),
+	userId: text('user_id').references(() => user.id).notNull(),
+	surahNumber: integer('surah_number').notNull(),
+	ayahNumber: integer('ayah_number').notNull(),
+	color: text('color').notNull(), // 'yellow', 'green', 'blue', 'pink'
+	createdAt: timestamp('created_at').defaultNow()
+});
+
 export const ibadahLogs	= relations(habitLogs, ({ one }) => ({
   habit: one(habits, {
     fields: [habitLogs.habitId],
