@@ -211,7 +211,7 @@
 				<Button
 					variant="link"
 					class="text-primary no-underline hover:underline p-0 h-auto"
-					onclick={() => goto('/ibadah')}>{m.dashboard_view_all()}</Button
+					onclick={() => goto('/habits')}>{m.dashboard_view_all()}</Button
 				>
 			</div>
 
@@ -265,7 +265,7 @@
 			</Button>
 			<Button
 				class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-secondary hover:text-secondary transition-all"
-				onclick={() => goto('/ibadah')}
+				onclick={() => goto('/habits')}
 			>
 				<Sparkles class="size-6" />
 				<span class="text-xs font-medium">{m.dashboard_quick_habit()}</span>

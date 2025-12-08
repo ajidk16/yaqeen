@@ -8,7 +8,8 @@
 		AlarmClock,
 		Flame,
 		BookOpenText,
-		Heart
+		Heart,
+		BookOpen
 	} from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import { isAddHabitModalOpen } from '$lib/stores/ui';
@@ -26,10 +27,10 @@
 
 	const navItems = [
 		{ icon: House, label: m.nav_home(), path: '/dashboard' },
-		// { icon: AlarmClock, label: 'Ibadah', path: '/ibadah' },
-		{ icon: BookOpenText, label: m.nav_quran(), path: '/quran' },
+		// { icon: AlarmClock, label: 'Ibadah', path: '/habits' },
+		{ icon: Flame, label: m.nav_habits(), path: '/habits' },
 		// FAB goes here in the middle
-		{ icon: Flame, label: m.nav_habits(), path: '/ibadah' },
+		{ icon: BookOpen, label: m.nav_quran(), path: '/quran' },
 		// { icon: Heart, label: 'Jurnal', path: '/journal' },
 		{ icon: User, label: m.nav_profile(), path: '/profile' }
 	];

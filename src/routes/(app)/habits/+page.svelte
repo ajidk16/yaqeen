@@ -299,7 +299,7 @@
 					<div class="size-2 rounded-full bg-secondary"></div>
 					{m.ibadah_others_section()}
 				</h2>
-				<Button variant="info" size="xs" onclick={() => goto('/ibadah/habits')}>
+				<Button variant="info" size="xs" onclick={() => goto('/habits/habits')}>
 					<Plus class="size-4 mr-1" />
 					{m.ibadah_manage_habits()}
 				</Button>

@@ -1,16 +1,5 @@
 <script lang="ts">
-	import {
-		House,
-		Calendar,
-		ChartBar,
-		User,
-		LogOut,
-		Plus,
-		AlarmClock,
-		Flame,
-		BookOpenText,
-		Heart
-	} from 'lucide-svelte';
+	import { House, User, LogOut, Plus, Flame, Heart, BookOpen } from 'lucide-svelte';
 	import { page } from '$app/state';
 	import { isAddHabitModalOpen } from '$lib/stores/ui';
 	import { enhance } from '$app/forms';
@@ -33,10 +22,10 @@
 		{
 			icon: Flame,
 			label: m.nav_habits(),
-			path: '/ibadah'
+			path: '/habits'
 		},
 		{
-			icon: BookOpenText,
+			icon: BookOpen,
 			label: m.nav_quran(),
 			path: '/quran'
 		},
