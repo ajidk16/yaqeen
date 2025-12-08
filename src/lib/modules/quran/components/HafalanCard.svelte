@@ -2,7 +2,7 @@
 	import { Trophy } from 'lucide-svelte';
 	import { Badge, Card } from '$lib/components/ui';
 	import { fly } from 'svelte/transition';
-	import { surahs } from '$lib/utils/global.js';
+	import { quranMetadata } from '$lib/data/quran-metadata';
 	import * as m from '$lib/paraglide/messages.js';
 
 	type HafalanProps = {
@@ -16,10 +16,24 @@
 
 	let { surah, start, end, progress, onUpdate, onToggleAyah } = $props<HafalanProps>();
 
+	let currentSurahData = $derived(quranMetadata.find((s) => s.name === surah) || quranMetadata[0]);
+	let maxAyah = $derived(currentSurahData.ayahs);
+
 	let totalAyahs = $derived(end - start + 1);
 	let percentage = $derived(
 		Math.round(((Array.isArray(progress) ? progress.length : 0) / totalAyahs) * 100)
 	);
+
+	function handleSurahChange(e: Event) {
+		const newSurah = (e.currentTarget as HTMLSelectElement).value;
+		const newSurahData = quranMetadata.find((s) => s.name === newSurah);
+		// Reset start/end if out of bounds (though unlikely on surah change unless we force it)
+		onUpdate({
+			hafalanSurah: newSurah,
+			hafalanAyahStart: 1,
+			hafalanAyahEnd: Math.min(7, newSurahData?.ayahs || 7)
+		});
+	}
 </script>
 
 <Card class="border-secondary/20 bg-linear-to-br from-base-100 to-secondary/5 shadow-sm">
@@ -43,10 +57,13 @@
 					id="surah-select"
 					class="select select-bordered w-full"
 					value={surah}
-					onchange={(e) => onUpdate({ hafalanSurah: e.currentTarget.value })}
+					onchange={handleSurahChange}
 				>
-					{#each surahs as s}
-						<option value={s}>{s}</option>
+					{#each quranMetadata as s}
+						<option value={s.name}
+							>{s.number}. {s.name} ({s.ayahs}
+							{m.quran_tilawah_pages ? m.quran_tilawah_pages() : 'ayat'})</option
+						>
 					{/each}
 				</select>
 			</div>
@@ -61,9 +78,16 @@
 						type="number"
 						class="input input-bordered w-full"
 						value={start}
-						oninput={(e) =>
-							onUpdate({ hafalanAyahStart: parseInt(e.currentTarget.value) || 1 }, true)}
+						oninput={(e) => {
+							let val = parseInt(e.currentTarget.value) || 1;
+							if (val < 1) val = 1;
+							if (val > maxAyah) val = maxAyah;
+							// Ensure start <= end
+							if (val > end) onUpdate({ hafalanAyahStart: val, hafalanAyahEnd: val }, true);
+							else onUpdate({ hafalanAyahStart: val }, true);
+						}}
 						min="1"
+						max={maxAyah}
 					/>
 				</div>
 				<div class="form-control flex-1">
@@ -75,18 +99,43 @@
 						type="number"
 						class="input input-bordered w-full"
 						value={end}
-						oninput={(e) =>
-							onUpdate({ hafalanAyahEnd: parseInt(e.currentTarget.value) || start }, true)}
+						oninput={(e) => {
+							let val = parseInt(e.currentTarget.value) || start;
+							if (val < start) val = start;
+							if (val > maxAyah) val = maxAyah;
+							onUpdate({ hafalanAyahEnd: val }, true);
+						}}
 						min={start}
+						max={maxAyah}
 					/>
 				</div>
 			</div>
 		</div>
 
 		<div class="space-y-2">
-			<p class="text-xs font-medium text-base-content/60 uppercase tracking-wider">
-				{m.quran_hafalan_mark_completed()}
-			</p>
+			<div class="flex justify-between items-center">
+				<p class="text-xs font-medium text-base-content/60 uppercase tracking-wider">
+					{m.quran_hafalan_mark_completed()}
+				</p>
+				<div class="flex gap-2">
+					<button
+						class="btn btn-xs btn-ghost text-xs"
+						onclick={() => {
+							// Select all
+							const all = Array.from({ length: totalAyahs }, (_, i) => start + i);
+							onUpdate({ hafalanProgress: all });
+						}}
+					>
+						All
+					</button>
+					<button
+						class="btn btn-xs btn-ghost text-xs"
+						onclick={() => onUpdate({ hafalanProgress: [] })}
+					>
+						None
+					</button>
+				</div>
+			</div>
 			<div
 				class="grid grid-cols-5 sm:grid-cols-6 gap-2 max-h-[180px] overflow-y-auto pr-2 custom-scrollbar"
 			>

@@ -1,8 +1,17 @@
 <script lang="ts">
-	import { BookOpen } from 'lucide-svelte';
+	import {
+		BookOpen,
+		Flame,
+		FileText,
+		Award,
+		ChevronRight,
+		Calendar,
+		Sparkles
+	} from 'lucide-svelte';
 	import confetti from 'canvas-confetti';
 	import { page } from '$app/state';
 	import * as m from '$lib/paraglide/messages.js';
+	import { Button, Card, Badge } from '$lib/components/ui';
 
 	// Components
 	import DateNavigator from '../../../lib/modules/quran/components/DateNavigator.svelte';
@@ -42,6 +51,21 @@
 	// Derived
 	let dateKey = $derived(formatDateShort(currentDate));
 	let hafalanTotalAyahs = $derived(currentEntry.hafalanAyahEnd - currentEntry.hafalanAyahStart + 1);
+	let formattedDate = $derived(
+		currentDate.toLocaleDateString('id-ID', {
+			weekday: 'long',
+			day: 'numeric',
+			month: 'long',
+			year: 'numeric'
+		})
+	);
+
+	// Stats (mock data for now, can be derived from server)
+	let stats = $derived({
+		streak: page?.data.stats?.streak ?? 7,
+		totalPages: page?.data.stats?.totalPages ?? 142,
+		memorizedAyahs: page?.data.stats?.memorizedAyahs ?? 28
+	});
 
 	// Actions
 	let saveTimeout: NodeJS.Timeout;
@@ -114,14 +138,14 @@
 				angle: 60,
 				spread: 55,
 				origin: { x: 0 },
-				colors: ['#10B981', '#34D399', '#059669']
+				colors: ['#14B8A6', '#2DD4BF', '#0D9488']
 			});
 			confetti({
 				particleCount: 3,
 				angle: 120,
 				spread: 55,
 				origin: { x: 1 },
-				colors: ['#10B981', '#34D399', '#059669']
+				colors: ['#14B8A6', '#2DD4BF', '#0D9488']
 			});
 
 			if (Date.now() < end) {
@@ -131,13 +155,106 @@
 	}
 </script>
 
-<div class="min-h-screen bg-base-100 p-4 pb-24 lg:p-8">
+<div class="min-h-screen bg-base-200 p-4 pb-24 lg:p-8">
 	<div class="max-w-4xl mx-auto space-y-8">
+		<!-- Hero Section -->
+		<div
+			class="relative overflow-hidden rounded-3xl bg-linear-to-br from-primary via-secondary to-accent p-6 md:p-8 text-primary-content shadow-xl"
+		>
+			<!-- Background Pattern -->
+			<div class="absolute inset-0 opacity-10">
+				<svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+					<pattern id="islamic-pattern" patternUnits="userSpaceOnUse" width="20" height="20">
+						<path d="M10 0L20 10L10 20L0 10Z" fill="currentColor" />
+					</pattern>
+					<rect width="100%" height="100%" fill="url(#islamic-pattern)" />
+				</svg>
+			</div>
+
+			<div class="relative z-10">
+				<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+					<div class="space-y-3">
+						<div class="flex items-center gap-2 opacity-80">
+							<Calendar class="size-4" />
+							<span class="text-sm font-medium">{formattedDate}</span>
+						</div>
+						<h1 class="text-2xl md:text-3xl font-bold">Jurnal Al-Quran</h1>
+						<p class="opacity-80 text-sm md:text-base max-w-md">
+							Catat tilawah dan hafalan harianmu. Konsisten adalah kunci keberhasilan.
+						</p>
+					</div>
+
+					<a
+						href="/quran/list"
+						class="group flex items-center gap-3 bg-base-100/20 hover:bg-base-100/30 backdrop-blur-sm rounded-2xl px-5 py-4 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+					>
+						<div class="p-3 bg-base-100/20 rounded-xl group-hover:bg-base-100/30 transition-colors">
+							<BookOpen class="size-6" />
+						</div>
+						<div class="text-left">
+							<p class="font-bold">Baca Al-Quran</p>
+							<p class="text-xs opacity-80">Buka daftar surah</p>
+						</div>
+						<ChevronRight
+							class="size-5 opacity-60 group-hover:translate-x-1 transition-transform"
+						/>
+					</a>
+				</div>
+			</div>
+		</div>
+
+		<!-- Stats Grid -->
+		<div class="grid grid-cols-3 gap-3 md:gap-4">
+			<!-- Streak -->
+			<div
+				class="relative overflow-hidden rounded-2xl bg-warning p-4 text-warning-content shadow-lg"
+			>
+				<div class="absolute -right-2 -top-2 opacity-20">
+					<Flame class="size-16" />
+				</div>
+				<div class="relative z-10">
+					<Flame class="size-5 mb-2" />
+					<p class="text-2xl md:text-3xl font-bold">{stats.streak}</p>
+					<p class="text-xs opacity-80 font-medium">Hari Streak</p>
+				</div>
+			</div>
+
+			<!-- Total Pages -->
+			<div
+				class="relative overflow-hidden rounded-2xl bg-primary p-4 text-primary-content shadow-lg"
+			>
+				<div class="absolute -right-2 -top-2 opacity-20">
+					<FileText class="size-16" />
+				</div>
+				<div class="relative z-10">
+					<FileText class="size-5 mb-2" />
+					<p class="text-2xl md:text-3xl font-bold">{stats.totalPages}</p>
+					<p class="text-xs opacity-80 font-medium">Total Halaman</p>
+				</div>
+			</div>
+
+			<!-- Memorized Ayahs -->
+			<div
+				class="relative overflow-hidden rounded-2xl bg-secondary p-4 text-secondary-content shadow-lg"
+			>
+				<div class="absolute -right-2 -top-2 opacity-20">
+					<Award class="size-16" />
+				</div>
+				<div class="relative z-10">
+					<Award class="size-5 mb-2" />
+					<p class="text-2xl md:text-3xl font-bold">{stats.memorizedAyahs}</p>
+					<p class="text-xs opacity-80 font-medium">Ayat Dihafal</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- Date Navigator -->
 		<DateNavigator>
-			<BookOpen class="size-8 text-primary" />
-			{m.quran_title()}
+			<Sparkles class="size-5 text-primary" />
+			Progress Hari Ini
 		</DateNavigator>
 
+		<!-- Tilawah & Hafalan Cards -->
 		<div class="grid md:grid-cols-2 gap-6">
 			<TilawahCard
 				progress={currentEntry.tilawahProgress}
@@ -156,6 +273,7 @@
 			/>
 		</div>
 
+		<!-- Extended Stats -->
 		<QuranStats stats={page?.data.stats} />
 	</div>
 </div>

@@ -133,6 +133,24 @@ export const moodLogs = pgTable('mood_logs', {
 
 // --- Support ---
 
+export const quranBookmarks = pgTable('quran_bookmarks', {
+	id: text('id').primaryKey(),
+	userId: text('user_id').references(() => user.id).notNull(),
+	surahNumber: integer('surah_number').notNull(),
+	ayahNumber: integer('ayah_number').notNull(),
+	createdAt: timestamp('created_at').defaultNow()
+});
+
+export const quranNotes = pgTable('quran_notes', {
+	id: text('id').primaryKey(),
+	userId: text('user_id').references(() => user.id).notNull(),
+	surahNumber: integer('surah_number').notNull(),
+	ayahNumber: integer('ayah_number').notNull(),
+	text: text('text').notNull(),
+	createdAt: timestamp('created_at').defaultNow(),
+	updatedAt: timestamp('updated_at').defaultNow()
+});
+
 export const supportTickets = pgTable('support_tickets', {
 	id: text('id').primaryKey(),
 	userId: text('user_id').references(() => user.id).notNull(),
