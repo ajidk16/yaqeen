@@ -17,13 +17,13 @@ export async function sendVerificationEmail(email: string, otp: string) {
 	});
 
 	try {
-		await transporter.sendMail({
+		const result = await transporter.sendMail({
 			from: `Yaa Qeen <${GMAIL_USER}>`,
 			to: email,
 			subject: 'Kode Verifikasi Baru Yaa Qeen',
 			html: otpResult.body
 		});
-		return { success: true };
+		return { success: true, result };
 	} catch (error) {
 		console.error('Failed to send email:', error);
 		throw new Error('Gagal mengirim email');

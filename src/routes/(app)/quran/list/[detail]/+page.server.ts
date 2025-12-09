@@ -1,18 +1,16 @@
 import type { PageServerLoad } from './$types';
-import { quran } from '$lib/server/quran';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { error } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
-    const session = locals.session;
-	const surahNumber = Number(params.detail);
+    const surahNumber = Number(params.detail);
 
-	if (isNaN(surahNumber) || surahNumber < 1 || surahNumber > 114) {
-		error(404, 'Surah tidak ditemukan');
-	}
-    
+    if (isNaN(surahNumber) || surahNumber < 1 || surahNumber > 114) {
+        error(404, 'Surah tidak ditemukan');
+    }
+
 
     const quranResponse = await fetch(`https://equran.id/api/v2/surat/${surahNumber}`);
     if (!quranResponse.ok) {
@@ -132,7 +130,7 @@ export const actions = {
 
         try {
             const existing = await db.query.quranHighlights.findFirst({
-                 where: and(
+                where: and(
                     eq(table.quranHighlights.userId, String(locals.user?.id)),
                     eq(table.quranHighlights.surahNumber, surahNumber),
                     eq(table.quranHighlights.ayahNumber, ayahNumber)
@@ -141,14 +139,14 @@ export const actions = {
 
             if (existing) {
                 if (!color) {
-                     await db.delete(table.quranHighlights).where(eq(table.quranHighlights.id, existing.id));
-                     return { success: true, action: 'removed' };
+                    await db.delete(table.quranHighlights).where(eq(table.quranHighlights.id, existing.id));
+                    return { success: true, action: 'removed' };
                 } else {
-                     await db.update(table.quranHighlights).set({ color }).where(eq(table.quranHighlights.id, existing.id));
-                     return { success: true, action: 'updated' };
+                    await db.update(table.quranHighlights).set({ color }).where(eq(table.quranHighlights.id, existing.id));
+                    return { success: true, action: 'updated' };
                 }
             } else if (color) {
-                 await db.insert(table.quranHighlights).values({
+                await db.insert(table.quranHighlights).values({
                     id: crypto.randomUUID(),
                     userId: String(locals.user?.id),
                     surahNumber,
@@ -158,8 +156,8 @@ export const actions = {
                 return { success: true, action: 'added' };
             }
         } catch (e) {
-             console.error(e);
-             return { success: false, error: 'Database error' };
+            console.error(e);
+            return { success: false, error: 'Database error' };
         }
     },
 
@@ -254,7 +252,7 @@ export const actions = {
             if (existing) {
                 // Update existing progress
                 await db.update(table.quranProgress)
-                    .set({ 
+                    .set({
                         endPage: ayahNumber, // Using ayah as page reference
                         pagesRead: (existing.pagesRead || 0) + 1
                     })
@@ -304,7 +302,7 @@ export const actions = {
                 if (!progress.includes(ayahNumber)) {
                     progress.push(ayahNumber);
                     await db.update(table.hafalanProgress)
-                        .set({ 
+                        .set({
                             progress,
                             ayahEnd: Math.max(existing.ayahEnd, ayahNumber),
                             lastReviewed: new Date()
