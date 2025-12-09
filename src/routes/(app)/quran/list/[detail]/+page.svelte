@@ -82,8 +82,6 @@
 
 	// Actions
 	function handleVerseAction(action: string, payload?: any) {
-		console.log('Action:', action, payload);
-
 		switch (action) {
 			case 'openMenu':
 				activeVerse = payload;
@@ -153,7 +151,7 @@
 
 	function playVerseAudio(verse: any) {
 		if (!verse?.audio?.[selectedQori]) {
-			toast.error('Audio tidak tersedia');
+			toast.add('Audio tidak tersedia');
 			return;
 		}
 
@@ -200,10 +198,10 @@
 
 		try {
 			await fetch('?/addToTilawah', { method: 'POST', body: formData });
-			toast.success(`Ayat ${activeVerse.nomorAyat} ditambahkan ke Tilawah Harian!`);
+			toast.add(`Ayat ${activeVerse.nomorAyat} ditambahkan ke Tilawah Harian!`);
 		} catch (e) {
 			console.error(e);
-			toast.error('Gagal menambahkan ke tilawah');
+			toast.add('Gagal menambahkan ke tilawah', 'error');
 		}
 		isMenuOpen = false;
 	}
@@ -218,10 +216,10 @@
 
 		try {
 			await fetch('?/addToHafalan', { method: 'POST', body: formData });
-			toast.success(`Ayat ${activeVerse.nomorAyat} ditambahkan ke Target Hafalan!`);
+			toast.add(`Ayat ${activeVerse.nomorAyat} ditambahkan ke Target Hafalan!`);
 		} catch (e) {
 			console.error(e);
-			toast.error('Gagal menambahkan ke hafalan');
+			toast.add('Gagal menambahkan ke hafalan', 'error');
 		}
 		isMenuOpen = false;
 	}
@@ -304,6 +302,37 @@
 				delete newH[ayah];
 				highlights = newH;
 			}
+		}
+	}
+
+	function copyVerseToClipboard() {
+		if (!activeVerse) return;
+
+		const textToCopy = `QS. ${quran.namaLatin} ${quran.nomor}:${activeVerse.nomorAyat}\n\n${activeVerse.teksArab}\n\n${activeVerse.teksIndonesia}`;
+
+		navigator.clipboard.writeText(textToCopy).then(() => {
+			toast.add('Ayat berhasil disalin', 'success', 2000);
+			isMenuOpen = false;
+		});
+	}
+
+	async function shareVerse() {
+		if (!activeVerse) return;
+
+		const textToShare = `QS. ${quran.namaLatin} ${quran.nomor}:${activeVerse.nomorAyat}\n\n${activeVerse.teksArab}\n\n${activeVerse.teksIndonesia}`;
+
+		if (navigator.share) {
+			try {
+				await navigator.share({
+					title: `QS. ${quran.namaLatin} Ayat ${activeVerse.nomorAyat}`,
+					text: textToShare
+				});
+				isMenuOpen = false;
+			} catch (error) {
+				console.error('Error sharing:', error);
+			}
+		} else {
+			toast.add('Fitur berbagi tidak didukung di perangkat ini', 'error');
 		}
 	}
 </script>

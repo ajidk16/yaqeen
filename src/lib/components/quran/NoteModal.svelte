@@ -37,7 +37,7 @@
 
 	async function handleSave() {
 		if (!noteText.trim()) {
-			toast.error('Catatan tidak boleh kosong');
+			toast.add('Catatan tidak boleh kosong', 'error');
 			return;
 		}
 
@@ -52,15 +52,15 @@
 			const result = await response.json();
 
 			if (result.type === 'success') {
-				toast.success('Catatan berhasil disimpan!');
+				toast.add('Catatan berhasil disimpan!', 'success');
 				onSave?.(noteText.trim());
 				open = false;
 			} else {
-				toast.error('Gagal menyimpan catatan');
+				toast.add('Gagal menyimpan catatan', 'error');
 			}
 		} catch (e) {
 			console.error(e);
-			toast.error('Terjadi kesalahan');
+			toast.add('Terjadi kesalahan', 'error');
 		} finally {
 			isSaving = false;
 		}
@@ -79,16 +79,16 @@
 			const result = await response.json();
 
 			if (result.type === 'success') {
-				toast.success('Catatan dihapus');
+				toast.add('Catatan dihapus', 'success');
 				noteText = '';
 				onDelete?.();
 				open = false;
 			} else {
-				toast.error('Gagal menghapus catatan');
+				toast.add('Gagal menghapus catatan', 'error');
 			}
 		} catch (e) {
 			console.error(e);
-			toast.error('Terjadi kesalahan');
+			toast.add('Terjadi kesalahan', 'error');
 		} finally {
 			isDeleting = false;
 		}

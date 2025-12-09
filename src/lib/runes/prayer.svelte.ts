@@ -96,7 +96,7 @@ export class PrayerTimer {
 
 	playAudio() {
 		if (this.audio) {
-			console.log("Playing audio:", this.audioSrc);
+			// console.log("Playing audio:", this.audioSrc);
 			this.audio.src = this.audioSrc;
 			this.audio.currentTime = 0;
 			this.audio.play().catch(e => console.error("Audio play failed", e));

@@ -18,10 +18,10 @@
 		hasNotes = false,
 		onAction
 	}: Props = $props();
-	console.log('verse', verse);
+
 	let isPressed = $state(false);
 	let isHovered = $state(false);
-	console.log('anjeng')
+
 	// Highlight mapping with proper Tailwind classes
 	const highlightColors: Record<string, string> = {
 		yellow: 'bg-yellow-100/80 dark:bg-yellow-500/20',

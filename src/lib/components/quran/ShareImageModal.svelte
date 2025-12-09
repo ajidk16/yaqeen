@@ -60,7 +60,7 @@
 			generatedImage = canvas.toDataURL('image/png');
 		} catch (e) {
 			console.error(e);
-			toast.error('Gagal generate gambar');
+			toast.add('Gagal generate gambar', 'error');
 		} finally {
 			isGenerating = false;
 		}
@@ -75,7 +75,7 @@
 			link.download = `QS-${surahName}-${verse?.nomorAyat}.png`;
 			link.href = generatedImage;
 			link.click();
-			toast.success('Gambar berhasil diunduh!');
+			toast.add('Gambar berhasil diunduh!', 'success');
 		}
 	}
 
@@ -98,7 +98,7 @@
 					title: `QS. ${surahName}: ${verse?.nomorAyat}`,
 					files: [file]
 				});
-				toast.success('Berhasil dibagikan!');
+				toast.add('Berhasil dibagikan!', 'success');
 			} else {
 				// Fallback: download
 				handleDownload();
@@ -106,7 +106,7 @@
 		} catch (e) {
 			if ((e as Error).name !== 'AbortError') {
 				console.error(e);
-				toast.error('Gagal membagikan');
+				toast.add('Gagal membagikan', 'error');
 			}
 		}
 	}

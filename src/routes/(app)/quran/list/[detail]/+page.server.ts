@@ -241,33 +241,28 @@ export const actions = {
         const today = new Date().toISOString().split('T')[0];
 
         try {
-            // Check if already has progress for today
-            const existing = await db.query.quranProgress.findFirst({
+            // Check if already added today
+            const existing = await db.query.quranTilawah.findFirst({
                 where: and(
-                    eq(table.quranProgress.userId, String(locals.user?.id)),
-                    eq(table.quranProgress.date, today)
+                    eq(table.quranTilawah.userId, String(locals.user?.id)),
+                    eq(table.quranTilawah.date, today),
+                    eq(table.quranTilawah.surahNumber, surahNumber),
+                    eq(table.quranTilawah.ayahNumber, ayahNumber)
                 )
             });
 
-            if (existing) {
-                // Update existing progress
-                await db.update(table.quranProgress)
-                    .set({
-                        endPage: ayahNumber, // Using ayah as page reference
-                        pagesRead: (existing.pagesRead || 0) + 1
-                    })
-                    .where(eq(table.quranProgress.id, existing.id));
-            } else {
-                await db.insert(table.quranProgress).values({
+            if (!existing) {
+                await db.insert(table.quranTilawah).values({
                     id: crypto.randomUUID(),
                     userId: String(locals.user?.id),
                     date: today,
-                    startPage: ayahNumber,
-                    endPage: ayahNumber,
-                    pagesRead: 1
+                    surahNumber,
+                    surahName,
+                    ayahNumber
                 });
+                return { success: true, action: 'added' };
             }
-            return { success: true, action: 'added' };
+            return { success: true, action: 'already_exists' };
         } catch (e) {
             console.error(e);
             return { success: false, error: 'Database error' };
@@ -283,45 +278,34 @@ export const actions = {
         const surahName = formData.get('surahName')?.toString() || '';
         const ayahNumber = Number(formData.get('ayahNumber'));
 
-        if (!surahNumber || !surahName || !ayahNumber) return { success: false, error: 'Invalid data' };
+        if (!surahNumber || !ayahNumber) return { success: false, error: 'Invalid data' };
 
         const today = new Date().toISOString().split('T')[0];
 
         try {
-            // Check if already tracking this surah
-            const existing = await db.query.hafalanProgress.findFirst({
+            // Check if already in hafalan target for today
+             const existing = await db.query.quranHafalan.findFirst({
                 where: and(
-                    eq(table.hafalanProgress.userId, String(locals.user?.id)),
-                    eq(table.hafalanProgress.surahName, surahName)
+                    eq(table.quranHafalan.userId, String(locals.user?.id)),
+                    eq(table.quranHafalan.date, today),
+                    eq(table.quranHafalan.surahNumber, surahNumber),
+                    eq(table.quranHafalan.ayahNumber, ayahNumber)
                 )
             });
 
-            if (existing) {
-                // Update progress array
-                const progress = (existing.progress as number[]) || [];
-                if (!progress.includes(ayahNumber)) {
-                    progress.push(ayahNumber);
-                    await db.update(table.hafalanProgress)
-                        .set({
-                            progress,
-                            ayahEnd: Math.max(existing.ayahEnd, ayahNumber),
-                            lastReviewed: new Date()
-                        })
-                        .where(eq(table.hafalanProgress.id, existing.id));
-                }
-            } else {
-                await db.insert(table.hafalanProgress).values({
+            if (!existing) {
+                await db.insert(table.quranHafalan).values({
                     id: crypto.randomUUID(),
                     userId: String(locals.user?.id),
-                    surahName,
                     date: today,
-                    ayahStart: ayahNumber,
-                    ayahEnd: ayahNumber,
-                    progress: [ayahNumber],
-                    status: 'memorizing'
+                    surahNumber,
+                    surahName,
+                    ayahNumber
                 });
+                return { success: true, action: 'added' };
             }
-            return { success: true, action: 'added' };
+            return { success: true, action: 'already_exists' };
+
         } catch (e) {
             console.error(e);
             return { success: false, error: 'Database error' };
