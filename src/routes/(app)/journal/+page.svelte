@@ -14,9 +14,10 @@
 		BookHeart,
 		ChevronLeft,
 		ChevronRight,
-		Pencil
+		Pencil,
+		AlertTriangle
 	} from 'lucide-svelte';
-	import { Card, Button, Textarea, Modal, Loading } from '$lib/components/ui';
+	import { Button, Textarea, Modal, Loading } from '$lib/components/ui';
 	import confetti from 'canvas-confetti';
 	import { enhance } from '$app/forms';
 	import { toast } from '$lib/stores/toast';
@@ -53,42 +54,60 @@
 		})
 	);
 
-	// Constants
-	const moods: { type: MoodType; icon: any; label: string; color: string; bg: string }[] = [
+	// Constants - Enhanced with gradients
+	const moods: {
+		type: MoodType;
+		icon: any;
+		label: string;
+		color: string;
+		bg: string;
+		gradient: string;
+		dotColor: string;
+	}[] = [
 		{
 			type: 'happy',
 			icon: Smile,
 			label: m.journal_mood_happy(),
 			color: 'text-success',
-			bg: 'bg-success/10 ring-2 ring-success ring-offset-2 ring-offset-base-100 text-success'
+			bg: 'bg-success/10 ring-2 ring-success ring-offset-2 ring-offset-base-100 text-success',
+			gradient: 'from-success/20 to-emerald-500/20',
+			dotColor: 'bg-success'
 		},
 		{
 			type: 'blessed',
 			icon: Heart,
 			label: m.journal_mood_blessed(),
 			color: 'text-error',
-			bg: 'bg-error/10 ring-2 ring-error ring-offset-2 ring-offset-base-100 text-error'
+			bg: 'bg-error/10 ring-2 ring-error ring-offset-2 ring-offset-base-100 text-error',
+			gradient: 'from-error/20 to-pink-500/20',
+			dotColor: 'bg-error'
 		},
 		{
 			type: 'neutral',
 			icon: Meh,
 			label: m.journal_mood_neutral(),
 			color: 'text-warning',
-			bg: 'bg-warning/10 ring-2 ring-warning ring-offset-2 ring-offset-base-100 text-warning'
+			bg: 'bg-warning/10 ring-2 ring-warning ring-offset-2 ring-offset-base-100 text-warning',
+			gradient: 'from-warning/20 to-amber-500/20',
+			dotColor: 'bg-warning'
 		},
 		{
 			type: 'tired',
 			icon: Coffee,
 			label: m.journal_mood_tired(),
-			color: 'text-gray-300',
-			bg: 'bg-gray-300/10 ring-2 ring-gray-300 ring-offset-2 ring-offset-base-100 text-gray-300'
+			color: 'text-gray-400',
+			bg: 'bg-gray-400/10 ring-2 ring-gray-400 ring-offset-2 ring-offset-base-100 text-gray-400',
+			gradient: 'from-gray-400/20 to-slate-500/20',
+			dotColor: 'bg-gray-400'
 		},
 		{
 			type: 'sad',
 			icon: Frown,
 			label: m.journal_mood_sad(),
 			color: 'text-info',
-			bg: 'bg-info/10 ring-2 ring-info ring-offset-2 ring-offset-base-100 text-info'
+			bg: 'bg-info/10 ring-2 ring-info ring-offset-2 ring-offset-base-100 text-info',
+			gradient: 'from-info/20 to-blue-500/20',
+			dotColor: 'bg-info'
 		}
 	];
 
@@ -118,54 +137,65 @@
 		});
 	}
 
-	function getMoodColor(type: string) {
-		const mood = moods.find((m) => m.type === type);
-		return mood ? mood.color : 'text-base-content';
-	}
-
-	function getMoodIcon(type: string) {
-		const mood = moods.find((m) => m.type === type);
-		return mood ? mood.icon : Smile;
+	function getMoodData(type: string) {
+		return moods.find((m) => m.type === type) || moods[0];
 	}
 </script>
 
-<div class="min-h-screen bg-base-100 p-4 pb-24 lg:p-8">
-	<div class="max-w-2xl mx-auto space-y-8">
-		<!-- Header -->
-		<div
-			class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+<div class="min-h-screen bg-base-200 p-4 pb-24 lg:p-8">
+	<div class="mx-auto max-w-2xl space-y-6">
+		<!-- Header with Glassmorphism -->
+		<header
+			class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-error/5 via-transparent to-warning/5 p-6 lg:p-8"
 			in:fly={{ y: -20, duration: 800, easing: quintOut }}
 		>
-			<div>
-				<h1 class="text-3xl font-bold flex items-center gap-3">
-					<BookHeart class="size-8 text-primary" />
-					{m.journal_title()}
-				</h1>
-				<p class="text-base-content/60">{m.journal_subtitle()}</p>
-			</div>
-
-			<!-- Date Navigation -->
+			<!-- Animated background orbs -->
 			<div
-				class="flex items-center gap-4 bg-base-100 shadow-sm border border-base-content/10 rounded-full p-1 pr-6"
-			>
-				<div class="flex gap-1">
-					<button class="btn btn-circle btn-sm btn-ghost" onclick={() => changeDate(-1)}>
-						<ChevronLeft class="size-5" />
-					</button>
-					<button class="btn btn-circle btn-sm btn-ghost" onclick={() => changeDate(1)}>
-						<ChevronRight class="size-5" />
-					</button>
-				</div>
-				<span class="font-bold text-sm min-w-[120px] text-center">{formatDate(currentDate)}</span>
-			</div>
-		</div>
+				class="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-error/10 blur-3xl animate-breathe"
+			></div>
+			<div
+				class="pointer-events-none absolute -bottom-20 -left-20 size-56 rounded-full bg-warning/10 blur-3xl animate-breathe"
+				style="animation-delay: -2s"
+			></div>
 
-		<!-- Input Section -->
-		<div
-			class="card bg-base-100 shadow-lg border border-primary/10 overflow-visible"
-			in:scale={{ duration: 600, start: 0.95, delay: 100 }}
-		>
-			<div class="card-body p-6 space-y-6">
+			<div
+				class="relative z-10 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center"
+			>
+				<div>
+					<h1 class="flex items-center gap-3 text-3xl font-bold lg:text-4xl">
+						<div
+							class="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-error/20 to-warning/20"
+						>
+							<BookHeart class="size-6 text-error" />
+						</div>
+						{m.journal_title()}
+					</h1>
+					<p class="mt-2 text-base-content/60">{m.journal_subtitle()}</p>
+				</div>
+
+				<!-- Glass Date Navigator -->
+				<div class="glass-card flex items-center gap-1 rounded-2xl p-1.5">
+					<Button variant="ghost" size="sm" circle onclick={() => changeDate(-1)}>
+						<ChevronLeft class="size-5" />
+					</Button>
+					<span class="min-w-[140px] px-4 py-2 text-center font-medium"
+						>{formatDate(currentDate)}</span
+					>
+					<Button variant="ghost" size="sm" circle onclick={() => changeDate(1)}>
+						<ChevronRight class="size-5" />
+					</Button>
+				</div>
+			</div>
+		</header>
+
+		<!-- Input Section with Gradient Border Glow -->
+		<div class="relative" in:scale={{ duration: 600, start: 0.95, delay: 100 }}>
+			<!-- Gradient border glow -->
+			<div
+				class="absolute -inset-0.5 rounded-3xl bg-gradient-to-br from-error/20 via-warning/20 to-success/20 opacity-50 blur"
+			></div>
+
+			<div class="glass-card relative space-y-6 rounded-3xl p-6 lg:p-8">
 				<form
 					method="POST"
 					action="?/create"
@@ -190,28 +220,29 @@
 					<input type="hidden" name="mood" value={selectedMood} />
 
 					<!-- Mood Selector -->
-					<div class="space-y-3">
-						<label class="label" for="">
-							<span class="label-text font-medium text-base">{m.journal_mood_question()}</span>
+					<div class="space-y-4">
+						<label class="flex items-center gap-2 font-medium">
+							<Sparkles class="size-4 text-warning" />
+							{m.journal_mood_question()}
 						</label>
-						<div class="flex justify-between overflow-x-auto p-2 gap-2">
+
+						<div class="flex flex-wrap justify-center gap-3">
 							{#each moods as mood}
 								<button
 									type="button"
-									class="flex flex-1 flex-col items-center gap-2 rounded-xl p-3 transition-all
-									{selectedMood === mood.type ? mood.bg : 'bg-base-200 hover:bg-base-300'}"
+									class="group flex flex-col items-center gap-2 rounded-2xl p-4 transition-all duration-300
+										{selectedMood === mood.type
+										? `${mood.bg} scale-105 shadow-lg`
+										: 'glass-card hover:scale-102 hover:shadow-md'}"
 									onclick={() => (selectedMood = mood.type)}
 								>
 									<div
-										class="size-10 flex items-center justify-center transition-transform duration-300 {selectedMood ===
-										mood.type
-											? 'scale-110'
-											: ''}"
+										class="flex size-12 items-center justify-center rounded-full bg-gradient-to-br {mood.gradient} transition-transform duration-300 group-hover:scale-110"
 									>
 										<mood.icon
-											class="size-8 {selectedMood === mood.type
+											class="size-7 transition-all {selectedMood === mood.type
 												? mood.color
-												: 'text-base-content/30'}"
+												: 'text-base-content/40'}"
 											strokeWidth={selectedMood === mood.type ? 2.5 : 2}
 										/>
 									</div>
@@ -227,30 +258,33 @@
 						</div>
 					</div>
 
-					<!-- Gratitude Input -->
+					<!-- Gratitude Input with Character Count -->
 					<div class="space-y-3">
-						<label class="label" for="gratitude">
-							<span class="label-text font-medium text-base">{m.journal_gratitude_question()}</span>
+						<label class="flex items-center justify-between">
+							<span class="flex items-center gap-2 font-medium">
+								<Heart class="size-4 text-error" />
+								{m.journal_gratitude_question()}
+							</span>
+							<span class="text-xs text-base-content/40">{gratitudeText.length}/500</span>
 						</label>
+
 						<div class="relative">
 							<Textarea
 								name="gratitude"
 								placeholder={m.journal_gratitude_placeholder()}
-								class="min-h-[120px] text-lg leading-relaxed resize-none bg-base-100 border-base-content/10 focus:border-primary/50"
+								class="min-h-[140px] resize-none rounded-2xl border-base-content/10 bg-transparent text-lg leading-relaxed focus:border-error/30"
 								bind:value={gratitudeText}
+								maxlength={500}
 							/>
-							<div class="absolute bottom-3 right-3">
-								<Sparkles class="size-5 text-primary/20" />
-							</div>
+							<Sparkles class="absolute bottom-4 right-4 size-5 text-warning/30" />
 						</div>
 					</div>
 
-					<!-- Action -->
+					<!-- Save Button with Gradient -->
 					<div class="flex justify-end">
 						<Button
 							type="submit"
-							variant="primary"
-							class="gap-2 px-8 rounded-full shadow-lg shadow-primary/20 dark:shadow-primary/30 hover:shadow-xl hover:shadow-primary/25 transition-all"
+							class="gap-2 rounded-full border-0 bg-gradient-to-r from-error to-warning px-8 text-white shadow-lg shadow-error/20 transition-all hover:shadow-xl hover:shadow-error/30"
 							disabled={!gratitudeText.trim() || isSubmitting}
 							loading={isSubmitting}
 						>
@@ -267,76 +301,89 @@
 			</div>
 		</div>
 
-		<!-- History Log -->
-		<div class="space-y-4">
+		<!-- History Log - Timeline Style -->
+		<section class="space-y-4">
 			<h2
-				class="text-xl font-bold flex items-center gap-2 px-1"
+				class="flex items-center gap-2 px-1 text-xl font-bold"
 				in:fly={{ y: 20, duration: 600, delay: 200 }}
 			>
-				<Calendar class="size-5 text-base-content/60" />
+				<div class="flex size-8 items-center justify-center rounded-lg bg-base-content/5">
+					<Calendar class="size-4 text-base-content/60" />
+				</div>
 				{m.journal_history_title()}
 				{formatDate(currentDate)}
 			</h2>
 
-			<div class="space-y-4">
-				{#if filteredLogs.length === 0}
+			{#if filteredLogs.length === 0}
+				<!-- Empty State with Illustration -->
+				<div class="glass-card rounded-3xl p-12 text-center" in:fade>
 					<div
-						class="text-center py-12 text-base-content/40 bg-base-100 rounded-3xl border border-dashed border-base-content/10"
-						in:fade
+						class="mx-auto mb-4 flex size-20 items-center justify-center rounded-full bg-gradient-to-br from-warning/10 to-error/10"
 					>
-						<Sparkles class="size-8 mx-auto mb-2 opacity-50" />
-						<p>{m.journal_no_logs()}</p>
+						<Sparkles class="size-10 text-warning/50" />
 					</div>
-				{:else}
+					<p class="text-lg text-base-content/50">{m.journal_no_logs()}</p>
+					<p class="mt-2 text-sm text-base-content/30">Mulai tulis syukurmu hari ini!</p>
+				</div>
+			{:else}
+				<!-- Timeline with connecting line -->
+				<div class="relative pl-6">
+					<div class="absolute bottom-0 left-[7px] top-0 w-0.5 bg-base-content/10"></div>
+
 					{#each filteredLogs as log, i (log.id)}
+						{@const moodData = getMoodData(log.mood)}
 						<div
-							class="card bg-base-100 shadow-sm border border-base-content/5 hover:shadow-md transition-all duration-300 group"
+							class="glass-card group relative mb-4 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg"
 							in:fly={{ y: 20, duration: 500, delay: 300 + i * 100 }}
 							out:slide|local
 						>
-							<div class="card-body p-5">
-								<div class="flex items-start justify-between gap-4">
-									<div class="flex items-start gap-4">
-										<div class="mt-1 p-2 rounded-xl bg-base-200/50">
-											<!-- svelte-ignore svelte_component_deprecated -->
-											<svelte:component
-												this={getMoodIcon(log.mood)}
-												class="size-6 {getMoodColor(log.mood)}"
-											/>
-										</div>
-										<div class="space-y-1">
-											<p class="text-base-content/80 leading-relaxed whitespace-pre-wrap">
-												{log.gratitude}
-											</p>
-											<p class="text-xs text-base-content/40 font-medium pt-1">
-												{formatTime(log.createdAt || new Date())}
-											</p>
-										</div>
-									</div>
+							<!-- Timeline dot with mood color -->
+							<div
+								class="absolute -left-[17px] top-6 size-3 rounded-full {moodData.dotColor} ring-4 ring-base-200"
+							></div>
 
-									<div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-										<button
-											class="btn btn-ghost btn-xs btn-circle text-base-content/60"
-											onclick={() => openEditModal(log)}
-											title="Ubah Catatan"
-										>
-											<Pencil class="size-4" />
-										</button>
-										<button
-											class="btn btn-ghost btn-xs btn-circle text-error"
-											onclick={() => openDeleteModal(log.id)}
-											title="Hapus Catatan"
-										>
-											<Trash2 class="size-4" />
-										</button>
-									</div>
+							<div class="flex items-start gap-4">
+								<!-- Mood Icon -->
+								<div
+									class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br {moodData.gradient}"
+								>
+									<!-- svelte-ignore svelte_component_deprecated -->
+									<svelte:component this={moodData.icon} class="size-6 {moodData.color}" />
+								</div>
+
+								<!-- Content -->
+								<div class="min-w-0 flex-1">
+									<p class="whitespace-pre-wrap leading-relaxed text-base-content/80">
+										{log.gratitude}
+									</p>
+									<p class="mt-2 text-xs font-medium text-base-content/40">
+										{formatTime(log.createdAt || new Date())}
+									</p>
+								</div>
+
+								<!-- Actions -->
+								<div class="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+									<button
+										class="btn btn-circle btn-ghost btn-xs text-base-content/60"
+										onclick={() => openEditModal(log)}
+										title="Ubah Catatan"
+									>
+										<Pencil class="size-4" />
+									</button>
+									<button
+										class="btn btn-circle btn-ghost btn-xs text-error"
+										onclick={() => openDeleteModal(log.id)}
+										title="Hapus Catatan"
+									>
+										<Trash2 class="size-4" />
+									</button>
 								</div>
 							</div>
 						</div>
 					{/each}
-				{/if}
-			</div>
-		</div>
+				</div>
+			{/if}
+		</section>
 	</div>
 </div>
 
@@ -368,21 +415,18 @@
 			<!-- Mood Selector -->
 			<div class="space-y-3">
 				<label class="label" for="">
-					<span class="label-text font-medium text-base">{m.journal_mood_label()}</span>
+					<span class="label-text text-base font-medium">{m.journal_mood_label()}</span>
 				</label>
-				<div class="flex justify-between overflow-x-auto p-2 gap-2">
+				<div class="flex flex-wrap justify-center gap-2 p-2">
 					{#each moods as mood}
 						<button
 							type="button"
-							class="flex flex-1 flex-col items-center gap-2 rounded-xl p-3 transition-all
-							{editingLog.mood === mood.type ? mood.bg : 'bg-base-200 hover:bg-base-300'}"
+							class="flex flex-col items-center gap-2 rounded-xl p-3 transition-all
+								{editingLog.mood === mood.type ? mood.bg : 'bg-base-200 hover:bg-base-300'}"
 							onclick={() => (editingLog!.mood = mood.type)}
 						>
 							<div
-								class="size-8 flex items-center justify-center transition-transform duration-300 {editingLog.mood ===
-								mood.type
-									? 'scale-110'
-									: ''}"
+								class="flex size-10 items-center justify-center rounded-full bg-gradient-to-br {mood.gradient}"
 							>
 								<mood.icon
 									class="size-6 {editingLog.mood === mood.type
@@ -390,6 +434,11 @@
 										: 'text-base-content/30'}"
 								/>
 							</div>
+							<span
+								class="text-xs {editingLog.mood === mood.type
+									? mood.color
+									: 'text-base-content/50'}">{mood.label}</span
+							>
 						</button>
 					{/each}
 				</div>
@@ -423,7 +472,12 @@
 <!-- Delete Modal -->
 <Modal bind:open={isDeleteModalOpen} title={m.journal_delete_title()}>
 	<div class="space-y-4">
-		<p>{m.journal_delete_confirm()}</p>
+		<div class="flex flex-col items-center gap-4 text-center">
+			<div class="flex size-16 items-center justify-center rounded-full bg-error/10 text-error">
+				<AlertTriangle class="size-8" />
+			</div>
+			<p>{m.journal_delete_confirm()}</p>
+		</div>
 		<form
 			method="POST"
 			action="?/delete"
@@ -438,13 +492,13 @@
 					}
 				};
 			}}
-			class="flex justify-end gap-3"
+			class="flex justify-center gap-3"
 		>
 			<input type="hidden" name="id" value={deletingLogId} />
 			<Button type="button" variant="ghost" onclick={() => (isDeleteModalOpen = false)}
 				>{m.journal_cancel_button()}</Button
 			>
-			<Button type="submit" variant="error">{m.journal_delete_button()}</Button>
+			<Button type="submit" class="btn-error text-white">{m.journal_delete_button()}</Button>
 		</form>
 	</div>
 </Modal>
