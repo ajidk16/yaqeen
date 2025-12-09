@@ -157,93 +157,200 @@
 
 <div class="min-h-screen bg-base-200 p-4 pb-24 lg:p-8">
 	<div class="max-w-4xl mx-auto space-y-8">
-		<!-- Hero Section -->
+		<!-- Hero Section with Enhanced Design -->
 		<div
-			class="relative overflow-hidden rounded-3xl bg-linear-to-br from-primary via-secondary to-accent p-6 md:p-8 text-primary-content shadow-xl"
+			class="relative overflow-hidden rounded-3xl bg-linear-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20 shadow-2xl"
 		>
-			<!-- Background Pattern -->
-			<div class="absolute inset-0 opacity-10">
+			<div
+				class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent"
+			></div>
+			<div class="absolute inset-0 opacity-[0.03]">
 				<svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
 					<pattern id="islamic-pattern" patternUnits="userSpaceOnUse" width="20" height="20">
-						<path d="M10 0L20 10L10 20L0 10Z" fill="currentColor" />
+						<path d="M10 0L20 10L10 20L0 10Z" fill="currentColor" class="text-primary" />
 					</pattern>
 					<rect width="100%" height="100%" fill="url(#islamic-pattern)" />
 				</svg>
 			</div>
 
-			<div class="relative z-10">
-				<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-					<div class="space-y-3">
-						<div class="flex items-center gap-2 opacity-80">
-							<Calendar class="size-4" />
-							<span class="text-sm font-medium">{formattedDate}</span>
+			<!-- Content Container -->
+			<div class="relative z-10 p-6 md:p-8 lg:p-10">
+				<!-- Top Badge -->
+				<div
+					class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 backdrop-blur-sm border border-primary/20 mb-6"
+				>
+					<Calendar class="size-4 text-primary" aria-hidden="true" />
+					<time
+						datetime={currentDate.toISOString()}
+						class="text-sm font-medium text-base-content/80"
+					>
+						{formattedDate}
+					</time>
+				</div>
+
+				<div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
+					<!-- Main Content -->
+					<div class="space-y-4 flex-1">
+						<div class="space-y-2">
+							<h1
+								class="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight bg-linear-to-br from-base-content to-base-content/70 bg-clip-text text-transparent"
+							>
+								Jurnal Al-Quran
+							</h1>
+							<p class="text-base-content/70 text-base md:text-lg max-w-2xl leading-relaxed">
+								Catat tilawah dan hafalan harianmu dengan mudah. Konsistensi adalah kunci kesuksesan
+								dalam menghafal Al-Quran.
+							</p>
 						</div>
-						<h1 class="text-2xl md:text-3xl font-bold">Jurnal Al-Quran</h1>
-						<p class="opacity-80 text-sm md:text-base max-w-md">
-							Catat tilawah dan hafalan harianmu. Konsisten adalah kunci keberhasilan.
-						</p>
+
+						<!-- Quick Stats Preview (Mobile) -->
+						<div class="flex items-center gap-4 lg:hidden pt-2">
+							<div class="flex items-center gap-2 text-sm">
+								<Flame class="size-4 text-warning" aria-hidden="true" />
+								<span class="font-semibold tabular-nums">{stats.streak}</span>
+								<span class="text-base-content/60">hari</span>
+							</div>
+							<div class="w-px h-4 bg-base-content/20"></div>
+							<div class="flex items-center gap-2 text-sm">
+								<FileText class="size-4 text-primary" aria-hidden="true" />
+								<span class="font-semibold tabular-nums">{stats.totalPages}</span>
+								<span class="text-base-content/60">halaman</span>
+							</div>
+						</div>
 					</div>
 
+					<!-- CTA Button -->
 					<a
 						href="/quran/list"
-						class="group flex items-center gap-3 bg-base-100/20 hover:bg-base-100/30 backdrop-blur-sm rounded-2xl px-5 py-4 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+						class="group btn btn-primary btn-lg gap-3 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 self-start lg:self-auto"
+						aria-label="Buka daftar surah Al-Quran"
 					>
-						<div class="p-3 bg-base-100/20 rounded-xl group-hover:bg-base-100/30 transition-colors">
-							<BookOpen class="size-6" />
+						<div
+							class="p-2 bg-primary-content/10 rounded-lg group-hover:bg-primary-content/20 transition-colors"
+						>
+							<BookOpen class="size-5" aria-hidden="true" />
 						</div>
 						<div class="text-left">
-							<p class="font-bold">Baca Al-Quran</p>
-							<p class="text-xs opacity-80">Buka daftar surah</p>
+							<span class="font-bold text-base">Baca Al-Quran</span>
+							<span class="text-xs opacity-90 block">Daftar surah lengkap</span>
 						</div>
 						<ChevronRight
-							class="size-5 opacity-60 group-hover:translate-x-1 transition-transform"
+							class="size-5 group-hover:translate-x-1 transition-transform duration-300"
+							aria-hidden="true"
 						/>
 					</a>
 				</div>
 			</div>
+
+			<!-- Bottom Accent -->
+			<div
+				class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50"
+			></div>
 		</div>
 
-		<!-- Stats Grid -->
-		<div class="grid grid-cols-3 gap-3 md:gap-4">
-			<!-- Streak -->
+		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+			<!-- Streak Card -->
 			<div
-				class="relative overflow-hidden rounded-2xl bg-warning p-4 text-warning-content shadow-lg"
+				class="group relative overflow-hidden rounded-2xl bg-linear-to-br from-warning to-warning/80 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
 			>
-				<div class="absolute -right-2 -top-2 opacity-20">
-					<Flame class="size-16" />
+				<!-- Background Decoration -->
+				<div
+					class="absolute inset-0 bg-linear-to-br from-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-opacity"
+				></div>
+				<div class="absolute -right-4 -top-4 opacity-10 group-hover:opacity-20 transition-opacity">
+					<Flame class="size-24" />
 				</div>
-				<div class="relative z-10">
-					<Flame class="size-5 mb-2" />
-					<p class="text-2xl md:text-3xl font-bold">{stats.streak}</p>
-					<p class="text-xs opacity-80 font-medium">Hari Streak</p>
+
+				<!-- Content -->
+				<div class="relative z-10 space-y-3">
+					<div class="flex items-center justify-between">
+						<div class="p-2.5 bg-warning-content/10 rounded-xl backdrop-blur-sm">
+							<Flame class="size-5 text-warning-content" />
+						</div>
+						<div
+							class="px-2.5 py-1 bg-warning-content/10 rounded-full text-xs font-semibold text-warning-content backdrop-blur-sm"
+						>
+							Aktif
+						</div>
+					</div>
+					<div>
+						<p
+							class="text-4xl md:text-5xl font-bold text-warning-content tracking-tight mb-1 tabular-nums"
+						>
+							{stats.streak}
+						</p>
+						<p class="text-sm font-medium text-warning-content/80">Hari Beruntun</p>
+					</div>
 				</div>
 			</div>
 
-			<!-- Total Pages -->
+			<!-- Total Pages Card -->
 			<div
-				class="relative overflow-hidden rounded-2xl bg-primary p-4 text-primary-content shadow-lg"
+				class="group relative overflow-hidden rounded-2xl bg-linear-to-br from-primary to-primary/80 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
 			>
-				<div class="absolute -right-2 -top-2 opacity-20">
-					<FileText class="size-16" />
+				<!-- Background Decoration -->
+				<div
+					class="absolute inset-0 bg-linear-to-br from-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-opacity"
+				></div>
+				<div class="absolute -right-4 -top-4 opacity-10 group-hover:opacity-20 transition-opacity">
+					<FileText class="size-24" />
 				</div>
-				<div class="relative z-10">
-					<FileText class="size-5 mb-2" />
-					<p class="text-2xl md:text-3xl font-bold">{stats.totalPages}</p>
-					<p class="text-xs opacity-80 font-medium">Total Halaman</p>
+
+				<!-- Content -->
+				<div class="relative z-10 space-y-3">
+					<div class="flex items-center justify-between">
+						<div class="p-2.5 bg-primary-content/10 rounded-xl backdrop-blur-sm">
+							<FileText class="size-5 text-primary-content" />
+						</div>
+						<div
+							class="px-2.5 py-1 bg-primary-content/10 rounded-full text-xs font-semibold text-primary-content backdrop-blur-sm"
+						>
+							Total
+						</div>
+					</div>
+					<div>
+						<p
+							class="text-4xl md:text-5xl font-bold text-primary-content tracking-tight mb-1 tabular-nums"
+						>
+							{stats.totalPages}
+						</p>
+						<p class="text-sm font-medium text-primary-content/80">Halaman Dibaca</p>
+					</div>
 				</div>
 			</div>
 
-			<!-- Memorized Ayahs -->
+			<!-- Memorized Ayahs Card -->
 			<div
-				class="relative overflow-hidden rounded-2xl bg-secondary p-4 text-secondary-content shadow-lg"
+				class="group relative overflow-hidden rounded-2xl bg-linear-to-br from-secondary to-secondary/80 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 sm:col-span-2 lg:col-span-1"
 			>
-				<div class="absolute -right-2 -top-2 opacity-20">
-					<Award class="size-16" />
+				<!-- Background Decoration -->
+				<div
+					class="absolute inset-0 bg-linear-to-br from-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-opacity"
+				></div>
+				<div class="absolute -right-4 -top-4 opacity-10 group-hover:opacity-20 transition-opacity">
+					<Award class="size-24" />
 				</div>
-				<div class="relative z-10">
-					<Award class="size-5 mb-2" />
-					<p class="text-2xl md:text-3xl font-bold">{stats.memorizedAyahs}</p>
-					<p class="text-xs opacity-80 font-medium">Ayat Dihafal</p>
+
+				<!-- Content -->
+				<div class="relative z-10 space-y-3">
+					<div class="flex items-center justify-between">
+						<div class="p-2.5 bg-secondary-content/10 rounded-xl backdrop-blur-sm">
+							<Award class="size-5 text-secondary-content" />
+						</div>
+						<div
+							class="px-2.5 py-1 bg-secondary-content/10 rounded-full text-xs font-semibold text-secondary-content backdrop-blur-sm"
+						>
+							Hafalan
+						</div>
+					</div>
+					<div>
+						<p
+							class="text-4xl md:text-5xl font-bold text-secondary-content tracking-tight mb-1 tabular-nums"
+						>
+							{stats.memorizedAyahs}
+						</p>
+						<p class="text-sm font-medium text-secondary-content/80">Ayat Terhafal</p>
+					</div>
 				</div>
 			</div>
 		</div>

@@ -56,35 +56,57 @@
 			<span>Kembali ke Quran</span>
 		</a>
 
-		<!-- Hero Section with Quote -->
 		<div
-			class="relative overflow-hidden rounded-3xl bg-linear-to-br from-primary via-secondary to-accent p-6 md:p-8 text-primary-content shadow-xl"
+			class="card bg-linear-to-br from-primary/5 via-base-100 to-secondary/5 border border-base-300/50 shadow-xl"
 		>
-			<!-- Background Pattern -->
-			<div class="absolute inset-0 opacity-10">
-				<svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-					<pattern id="islamic-pattern-2" patternUnits="userSpaceOnUse" width="20" height="20">
-						<path d="M10 0L20 10L10 20L0 10Z" fill="currentColor" />
-					</pattern>
-					<rect width="100%" height="100%" fill="url(#islamic-pattern-2)" />
-				</svg>
-			</div>
-
-			<div class="relative z-10 text-center space-y-4">
-				<div
-					class="inline-flex items-center gap-2 bg-base-100/20 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm"
-				>
-					<Sparkles class="size-4" />
-					<span>Quote Hari Ini</span>
+			<div class="card-body p-6 md:p-8">
+				<!-- Quote Badge -->
+				<div class="flex justify-center mb-4">
+					<div class="badge badge-primary badge-lg gap-2 py-4 px-4">
+						<Sparkles class="size-4" />
+						<span class="font-medium">Quote Hari Ini</span>
+					</div>
 				</div>
 
-				<p class="font-amiri text-2xl md:text-3xl leading-relaxed" dir="rtl">
-					{dailyQuote.text}
-				</p>
-				<p class="opacity-80 text-sm md:text-base max-w-2xl mx-auto">
-					{dailyQuote.translation}
-				</p>
-				<p class="text-xs opacity-60 font-medium">{dailyQuote.surah}</p>
+				<!-- Arabic Text -->
+				<blockquote class="space-y-4">
+					<p
+						class="font-amiri text-2xl md:text-3xl lg:text-4xl leading-loose text-center text-base-content/90"
+						dir="rtl"
+						lang="ar"
+					>
+						{dailyQuote.text}
+					</p>
+
+					<!-- Translation -->
+					<div class="divider"></div>
+
+					<p
+						class="text-sm md:text-base lg:text-lg text-center text-base-content/70 max-w-3xl mx-auto leading-relaxed"
+					>
+						{dailyQuote.translation}
+					</p>
+
+					<!-- Surah Reference -->
+					<footer class="text-center">
+						<cite
+							class="inline-flex items-center gap-2 text-xs md:text-sm font-semibold text-primary not-italic"
+						>
+							<BookOpen class="size-4" />
+							<span>{dailyQuote.surah}</span>
+						</cite>
+					</footer>
+				</blockquote>
+
+				<!-- Decorative Islamic Pattern -->
+				<div class="absolute inset-0 opacity-[0.02] pointer-events-none" aria-hidden="true">
+					<svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+						<pattern id="islamic-pattern" patternUnits="userSpaceOnUse" width="20" height="20">
+							<path d="M10 0L20 10L10 20L0 10Z" fill="currentColor" class="text-primary" />
+						</pattern>
+						<rect width="100%" height="100%" fill="url(#islamic-pattern)" />
+					</svg>
+				</div>
 			</div>
 		</div>
 
