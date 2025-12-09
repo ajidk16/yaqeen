@@ -7,9 +7,11 @@
 		PauseCircle,
 		Settings2,
 		Moon,
-		Sun
+		Sun,
+		Pause,
+		Play
 	} from 'lucide-svelte';
-	import { Button, Card } from '$lib/components/ui';
+	import { Button, Card, Modal } from '$lib/components/ui';
 	import VerseItem from '$lib/components/quran/VerseItem.svelte';
 	import ActionMenu from '$lib/components/quran/ActionMenu.svelte';
 	import SurahHeader from '$lib/components/quran/SurahHeader.svelte';
@@ -21,7 +23,7 @@
 	// Props from load
 
 	// State
-	let activeTab = $state('translation'); // translation, page, tafsir
+	let activeTab = $state('page'); // translation, page, tafsir
 	let isPlaying = $state(false);
 	let activeVerse = $state<any>(null);
 	let isMenuOpen = $state(false);
@@ -34,6 +36,7 @@
 	let notes = $state<number[]>(
 		page.data.userInteractions?.notes?.map((n: { ayahNumber: number }) => n.ayahNumber) || []
 	);
+	let notesMap = $state<Record<number, string>>({}); // ayahNumber -> text
 	let isDarkMode = $state(false); // Should sync with global theme ideally
 
 	// New state for filters and modals
@@ -44,6 +47,17 @@
 	let currentNoteText = $state('');
 	let audioRef = $state<HTMLAudioElement | null>(null);
 
+	// Page tab state
+	let currentPageIndex = $state(0);
+	const versesPerPage = 20;
+
+	// Modal for page tab ayah detail
+	let isVerseDetailModalOpen = $state(false);
+	let selectedVerseDetail = $state<any>(null);
+
+	// Tafsir data
+	const tafsir = $derived(page.data.tafsir?.data?.tafsir || []);
+
 	// Initialize highlights map
 	$effect(() => {
 		if (page.data.userInteractions?.highlights) {
@@ -52,6 +66,17 @@
 				map[h.ayahNumber] = h.color;
 			});
 			highlights = map;
+		}
+	});
+
+	// Initialize notes map
+	$effect(() => {
+		if (page.data.userInteractions?.notes) {
+			const map: Record<number, string> = {};
+			page.data.userInteractions.notes.forEach((n: { ayahNumber: number; text: string }) => {
+				map[n.ayahNumber] = n.text;
+			});
+			notesMap = map;
 		}
 	});
 
@@ -79,6 +104,7 @@
 				break;
 			case 'note':
 				isMenuOpen = false;
+				currentNoteText = notesMap[activeVerse?.nomorAyat] || '';
 				isNoteModalOpen = true;
 				break;
 			case 'play':
@@ -212,8 +238,11 @@
 	}
 
 	function handleNoteSaved(note: string) {
-		if (activeVerse && !notes.includes(activeVerse.nomorAyat)) {
-			notes = [...notes, activeVerse.nomorAyat];
+		if (activeVerse) {
+			if (!notes.includes(activeVerse.nomorAyat)) {
+				notes = [...notes, activeVerse.nomorAyat];
+			}
+			notesMap = { ...notesMap, [activeVerse.nomorAyat]: note };
 		}
 		currentNoteText = note;
 	}
@@ -221,8 +250,17 @@
 	function handleNoteDeleted() {
 		if (activeVerse) {
 			notes = notes.filter((n) => n !== activeVerse.nomorAyat);
+			const newMap = { ...notesMap };
+			delete newMap[activeVerse.nomorAyat];
+			notesMap = newMap;
 		}
 		currentNoteText = '';
+	}
+
+	// Open verse detail modal (for page tab)
+	function openVerseDetail(verse: any) {
+		selectedVerseDetail = verse;
+		isVerseDetailModalOpen = true;
 	}
 
 	async function toggleBookmark(ayah: number) {
@@ -354,7 +392,7 @@
 	<main class="max-w-3xl mx-auto py-4">
 		<!-- Bismillah -->
 		{#if quran.nomor !== 1 && quran.nomor !== 9}
-			<div class="text-center py-8 font-amiri text-3xl md:text-4xl text-base-content/80">﷽</div>
+			<div class="text-center py-8 font-amiri text-xl md:text-4xl text-base-content/80">﷽</div>
 		{/if}
 
 		<div class="space-y-2">
@@ -372,57 +410,116 @@
 					</div>
 				{/each}
 			{:else if activeTab === 'page'}
-				<!-- Mushaf Page View -->
+				<!-- Mushaf Page View with Carousel -->
 				<div class="mushaf-container p-4 md:p-8">
-					<!-- Page Header -->
-					<div class="flex items-center justify-between mb-6 px-2">
+					<!-- Page Navigation -->
+					<div class="flex items-center justify-between mb-4 px-2">
 						<button
-							class="flex items-center gap-2 text-base-content/70 hover:text-primary transition-colors"
+							class="btn btn-circle btn-sm btn-ghost"
+							disabled={currentPageIndex === 0}
+							onclick={() => (currentPageIndex = Math.max(0, currentPageIndex - 1))}
 						>
-							<svg
-								class="size-5"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-							>
-								<circle cx="12" cy="12" r="10" />
-								<path d="M12 16v-4M12 8h.01" />
-							</svg>
-							<span class="text-sm font-medium">Surah Info</span>
+							<ChevronLeft class="size-5" />
 						</button>
+						<span class="text-sm font-medium text-base-content/70">
+							Halaman {currentPageIndex + 1} dari {Math.ceil(quran.ayat.length / versesPerPage)}
+						</span>
 						<button
-							class="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
+							class="btn btn-circle btn-sm btn-ghost"
+							disabled={currentPageIndex >= Math.ceil(quran.ayat.length / versesPerPage) - 1}
+							onclick={() =>
+								(currentPageIndex = Math.min(
+									Math.ceil(quran.ayat.length / versesPerPage) - 1,
+									currentPageIndex + 1
+								))}
 						>
-							<svg class="size-5" viewBox="0 0 24 24" fill="currentColor">
-								<polygon points="5 3 19 12 5 21 5 3" />
-							</svg>
-							<span class="text-sm font-medium">Play Audio</span>
+							<ChevronLeft class="size-5 rotate-180" />
 						</button>
 					</div>
 
 					<!-- Mushaf Text Container -->
 					<div
-						class="mushaf-page bg-base-100 dark:bg-base-200 rounded-2xl border border-base-300 p-6 md:p-10 shadow-sm"
+						class="mushaf-page bg-amber-50/50 dark:bg-base-200 rounded-2xl border-4 border-l-primary/60 border-primary/20 overflow-hidden shadow-lg"
 					>
-						<p
-							class="font-amiri text-2xl md:text-3xl lg:text-4xl leading-[2.2] md:leading-[2.4] text-center text-base-content"
-							dir="rtl"
-							style="text-align-last: center; word-spacing: 0.15em;"
+						<!-- Decorative Header -->
+						<div
+							class="bg-linear-to-r from-primary/10 to-primary/5 px-4 py-2 border-b border-primary/20 flex items-center justify-center"
 						>
-							{page.data.mushafPageText}
-						</p>
+							<span class="text-sm font-semibold text-primary/70">۞ {quran.namaLatin} ۞</span>
+						</div>
+
+						<!-- Verses (flowing inline) -->
+						<div class="p-4 md:p-6">
+							<p
+								class="font-amiri text-[1.35rem] md:text-[1.6rem] lg:text-[1.8rem] leading-loose md:leading-[2.1] tracking-tight text-base-content text-right break-all"
+								dir="rtl"
+							>
+								{#each quran.ayat.slice(currentPageIndex * versesPerPage, (currentPageIndex + 1) * versesPerPage) as verse, i (verse.nomorAyat)}
+									<button
+										type="button"
+										class="inline align-middle hover:text-primary transition-colors cursor-pointer p-0 m-0 border-0 bg-transparent"
+										onclick={() => openVerseDetail(verse)}
+									>
+										{verse.teksArab}
+									</button>
+
+									<span class="inline-flex items-start align-middle ml-3">
+										<span class="relative inline-flex items-center justify-center size-5 md:size-8">
+											<svg
+												class="absolute inset-0 w-full h-full text-primary/60"
+												viewBox="0 0 40 40"
+											>
+												<circle
+													cx="20"
+													cy="20"
+													r="18"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2"
+												/>
+												<circle
+													cx="20"
+													cy="20"
+													r="15"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1"
+													opacity="0.5"
+												/>
+												<circle cx="20" cy="2" r="2" fill="currentColor" />
+												<circle cx="20" cy="38" r="2" fill="currentColor" />
+												<circle cx="2" cy="20" r="2" fill="currentColor" />
+												<circle cx="38" cy="20" r="2" fill="currentColor" />
+											</svg>
+											<span class="relative text-xs md:text-sm font-bold text-primary">
+												{verse.nomorAyat}
+											</span>
+										</span>
+									</span>
+								{/each}
+							</p>
+						</div>
 					</div>
 
-					<!-- Page Number -->
-					<div class="text-center mt-6">
-						<span class="text-primary font-medium text-sm">{page.data.surah.pageNumber || 1}</span>
+					<!-- Page Dots Indicator -->
+					<div class="flex justify-center gap-2 mt-6">
+						{#each Array(Math.ceil(quran.ayat.length / versesPerPage)) as _, i}
+							<button
+								class="size-10 rounded-full border-2 flex items-center justify-center text-sm font-bold transition-all {i ===
+								currentPageIndex
+									? 'bg-primary border-primary text-primary-content shadow-lg shadow-primary/30'
+									: 'bg-base-100 border-primary/30 text-primary/70 hover:border-primary hover:bg-primary/10'}"
+								onclick={() => (currentPageIndex = i)}
+							>
+								{i + 1}
+							</button>
+						{/each}
 					</div>
 				</div>
 			{:else}
 				<!-- Tafsir View -->
 				<div class="tafsir-container space-y-6 p-4">
-					{#each quran.ayat as verse (verse.nomorAyat)}
+					{#each tafsir as item (item.ayat)}
 						<div
 							class="bg-base-100 rounded-2xl border border-base-300 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
 						>
@@ -432,15 +529,19 @@
 							>
 								<div class="flex items-center gap-3">
 									<div class="size-8 rounded-full bg-primary/20 flex items-center justify-center">
-										<span class="text-sm font-bold text-primary">{verse.nomorAyat}</span>
+										<span class="text-sm font-bold text-primary">{item.ayat}</span>
 									</div>
-									<p class="font-amiri text-xl text-base-content" dir="rtl">{verse.teksArab}</p>
+									<p class="font-amiri text-xl text-base-content" dir="rtl">
+										{quran.ayat.find((v: any) => v.nomorAyat === item.ayat)?.teksArab || ''}
+									</p>
 								</div>
 							</div>
 
 							<!-- Translation -->
 							<div class="px-4 py-3 border-b border-base-200">
-								<p class="text-sm text-base-content/80">{verse.teksIndonesia}</p>
+								<p class="text-sm text-base-content/80">
+									{quran.ayat.find((v: any) => v.nomorAyat === item.ayat)?.teksIndonesia || ''}
+								</p>
 							</div>
 
 							<!-- Tafsir Content -->
@@ -464,9 +565,7 @@
 											Tafsir
 										</p>
 										<p class="text-sm text-base-content/90 leading-relaxed">
-											{@html quran.tafsir?.wpiId
-												? `Lihat tafsir untuk Surah ${quran.namaLatin}`
-												: 'Tafsir belum tersedia.'}
+											{item.teks}
 										</p>
 									</div>
 								</div>
@@ -495,12 +594,15 @@
 					circle
 					variant="primary"
 					class="shadow-lg shadow-primary/30"
-					onclick={() => (isPlaying = !isPlaying)}
+					onclick={() => {
+						// playSurahAudio()
+						isPlaying = true;
+					}}
 				>
 					{#if isPlaying}
-						<PauseCircle class="size-6" />
+						<Pause class="size-6" />
 					{:else}
-						<PlayCircle class="size-6 ml-0.5" />
+						<Play class="size-6 ml-0.5" />
 					{/if}
 				</Button>
 				<Button size="sm" circle variant="ghost">
@@ -540,6 +642,65 @@
 		surahName={quran.namaLatin}
 		surahNumber={quran.nomor}
 	/>
+
+	<!-- Verse Detail Modal (for Page Tab) -->
+	<Modal bind:open={isVerseDetailModalOpen} title="Detail Ayat">
+		{#if selectedVerseDetail}
+			<div class="space-y-4">
+				<!-- Arabic Text -->
+				<div class="p-4 bg-primary/5 rounded-xl">
+					<p class="font-amiri text-2xl md:text-3xl text-center leading-loose" dir="rtl">
+						{selectedVerseDetail.teksArab}
+					</p>
+				</div>
+
+				<!-- Verse Number -->
+				<div class="text-center">
+					<span class="badge badge-primary badge-lg">
+						Ayat {selectedVerseDetail.nomorAyat}
+					</span>
+				</div>
+
+				<!-- Latin Text -->
+				{#if selectedVerseDetail.teksLatin}
+					<div>
+						<p class="text-xs font-semibold text-secondary mb-1 uppercase tracking-wide">
+							Transliterasi
+						</p>
+						<p class="text-sm italic text-primary/80 leading-relaxed">
+							{selectedVerseDetail.teksLatin}
+						</p>
+					</div>
+				{/if}
+
+				<!-- Translation -->
+				<div>
+					<p class="text-xs font-semibold text-secondary mb-1 uppercase tracking-wide">
+						Terjemahan
+					</p>
+					<p class="text-sm text-base-content/80 leading-relaxed">
+						{selectedVerseDetail.teksIndonesia}
+					</p>
+				</div>
+			</div>
+		{/if}
+
+		{#snippet actions()}
+			<div class="flex items-center justify-end gap-2 w-full">
+				<Button variant="ghost" onclick={() => (isVerseDetailModalOpen = false)}>Tutup</Button>
+				<Button
+					variant="primary"
+					onclick={() => {
+						activeVerse = selectedVerseDetail;
+						isVerseDetailModalOpen = false;
+						isMenuOpen = true;
+					}}
+				>
+					Aksi Lainnya
+				</Button>
+			</div>
+		{/snippet}
+	</Modal>
 </div>
 
 <style>

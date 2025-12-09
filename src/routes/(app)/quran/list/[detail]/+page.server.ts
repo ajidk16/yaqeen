@@ -100,8 +100,55 @@ export const load: PageServerLoad = async ({ params, locals }) => {
         throw error(500, 'Gagal mengambil data tafsir dari API Quran');
     }
     const tafsirData = await tafsirResponse.json();
-    // Here you would normally fetch real user interactions from the database
 
+    // Fetch real user interactions from database
+    let userInteractions = {
+        bookmarks: [] as { ayahNumber: number; surahNumber: number }[],
+        highlights: [] as { ayahNumber: number; surahNumber: number; color: string }[],
+        notes: [] as { ayahNumber: number; surahNumber: number; text: string }[]
+    };
+
+    if (session?.user?.id) {
+        const userId = session.user.id;
+
+        // Fetch bookmarks
+        const bookmarks = await db.query.quranBookmarks.findMany({
+            where: and(
+                eq(table.quranBookmarks.userId, userId),
+                eq(table.quranBookmarks.surahNumber, surahNumber)
+            )
+        });
+        userInteractions.bookmarks = bookmarks.map(b => ({
+            ayahNumber: b.ayahNumber,
+            surahNumber: b.surahNumber
+        }));
+
+        // Fetch highlights
+        const highlights = await db.query.quranHighlights.findMany({
+            where: and(
+                eq(table.quranHighlights.userId, userId),
+                eq(table.quranHighlights.surahNumber, surahNumber)
+            )
+        });
+        userInteractions.highlights = highlights.map(h => ({
+            ayahNumber: h.ayahNumber,
+            surahNumber: h.surahNumber,
+            color: h.color
+        }));
+
+        // Fetch notes
+        const notes = await db.query.quranNotes.findMany({
+            where: and(
+                eq(table.quranNotes.userId, userId),
+                eq(table.quranNotes.surahNumber, surahNumber)
+            )
+        });
+        userInteractions.notes = notes.map(n => ({
+            ayahNumber: n.ayahNumber,
+            surahNumber: n.surahNumber,
+            text: n.text
+        }));
+    }
 
     return {
         surah: dummySurah,
@@ -110,11 +157,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
         quran: quranData,
         tafsir: tafsirData,
         pagination: { total: 7, totalPages: 1, currentPage: 1 },
-        userInteractions: {
-            bookmarks: [{ ayahNumber: 1, surahNumber: 1 }],
-            highlights: [{ ayahNumber: 2, surahNumber: 1, color: 'yellow' }],
-            notes: [{ ayahNumber: 5, surahNumber: 1 }]
-        }
+        userInteractions
     };
 };
 
