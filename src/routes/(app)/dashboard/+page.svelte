@@ -68,7 +68,7 @@
 	// Quick actions data
 	const quickActions = [
 		{
-			icon: Sparkles,
+			icon: Flame,
 			label: m.dashboard_quick_habit(),
 			path: '/habits',
 			color: 'secondary',
@@ -90,7 +90,7 @@
 			textColor: 'text-accent'
 		},
 		{
-			icon: Calendar,
+			icon: Heart,
 			label: m.dashboard_quick_journal(),
 			path: '/journal',
 			color: 'info',

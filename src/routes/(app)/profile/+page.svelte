@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fly } from 'svelte/transition';
+	import { fly, scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 	import {
 		User,
@@ -12,8 +12,9 @@
 		Crown,
 		Palette
 	} from 'lucide-svelte';
-	import { Button, Avatar } from '$lib/components/ui';
+	import { Button, Avatar, Badge } from '$lib/components/ui';
 	import { page } from '$app/state';
+	import { enhance } from '$app/forms';
 	import * as m from '$lib/paraglide/messages.js';
 
 	let { data } = $props();
@@ -24,87 +25,112 @@
 			icon: User,
 			label: m.profile_menu_edit(),
 			href: '/profile/edit',
-			color: 'text-primary'
+			color: 'text-primary',
+			gradient: 'from-primary/20 to-purple-500/20'
 		},
 		{
 			icon: Bell,
 			label: m.profile_menu_notifications(),
 			href: '/profile/notifications',
-			color: 'text-secondary'
+			color: 'text-secondary',
+			gradient: 'from-secondary/20 to-pink-500/20'
 		},
 		{
 			icon: Palette,
 			label: m.profile_menu_preferences(),
 			href: '/profile/settings',
-			color: 'text-accent'
+			color: 'text-accent',
+			gradient: 'from-accent/20 to-teal-500/20'
 		},
 		{
 			icon: Shield,
 			label: m.profile_menu_security(),
 			href: '/profile/security',
-			color: 'text-success'
+			color: 'text-success',
+			gradient: 'from-success/20 to-emerald-500/20'
 		},
 		{
 			icon: CircleHelp,
 			label: m.profile_menu_help(),
 			href: '/profile/support',
-			color: 'text-info'
+			color: 'text-info',
+			gradient: 'from-info/20 to-blue-500/20'
 		}
 	];
 </script>
 
-<div class="min-h-screen bg-base-100 p-4 pb-24 lg:p-8">
-	<div class="max-w-2xl mx-auto space-y-8">
-		<!-- Header -->
-		<div
-			class="flex items-center justify-between"
+<div class="min-h-screen bg-base-200 p-4 pb-24 lg:p-8">
+	<div class="mx-auto max-w-2xl space-y-6">
+		<!-- Header with Glassmorphism -->
+		<header
+			class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/5 via-transparent to-accent/5 p-6 lg:p-8"
 			in:fly={{ y: -20, duration: 800, easing: quintOut }}
 		>
-			<h1 class="text-3xl font-bold">{m.profile_title()}</h1>
-		</div>
-
-		<!-- Profile Card -->
-		<div
-			class="card bg-base-100 shadow-xl border border-base-content/5 overflow-hidden relative group"
-			in:fly={{ y: 20, duration: 800, delay: 100 }}
-		>
+			<!-- Animated background orbs -->
 			<div
-				class="absolute top-0 left-0 w-full h-32 bg-linear-to-r from-primary/20 to-secondary/20"
+				class="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-primary/10 blur-3xl animate-breathe"
+			></div>
+			<div
+				class="pointer-events-none absolute -bottom-20 -left-20 size-56 rounded-full bg-accent/10 blur-3xl animate-breathe"
+				style="animation-delay: -2s"
 			></div>
 
-			<div class="card-body pt-20 relative">
-				<div class="flex flex-col md:flex-row items-center md:items-end gap-6">
+			<h1 class="relative z-10 text-3xl font-bold lg:text-4xl">{m.profile_title()}</h1>
+		</header>
+
+		<!-- Profile Card with Gradient Banner -->
+		<div
+			class="glass-card overflow-hidden rounded-3xl"
+			in:fly={{ y: 20, duration: 800, delay: 100 }}
+		>
+			<!-- Gradient Banner -->
+			<div class="relative h-32 bg-gradient-to-r from-primary via-purple-500 to-secondary">
+				<div class="absolute inset-0 bg-black/10"></div>
+				<!-- Decorative elements -->
+				<div
+					class="pointer-events-none absolute -right-10 -top-10 size-40 rounded-full bg-white/10 blur-2xl"
+				></div>
+				<div
+					class="pointer-events-none absolute -bottom-10 -left-10 size-32 rounded-full bg-black/10 blur-2xl"
+				></div>
+			</div>
+
+			<div class="relative z-10 -mt-16 px-6 pb-6">
+				<div class="flex flex-col items-center gap-4 md:flex-row md:items-end md:gap-6">
+					<!-- Avatar with Ring -->
 					<div class="relative">
-						<div class="p-1 bg-base-100 rounded-full">
-							<Avatar
-								src={user?.image}
-								alt={user?.name}
-								size="xl"
-								class="ring-4 ring-base-100 shadow-lg"
-							/>
+						<div class="inline-block rounded-full bg-base-100 p-1 shadow-xl">
+							<Avatar src={user?.image} alt={user?.name} size="xl" class="ring-4 ring-base-100" />
 						</div>
 						{#if user?.isPremium}
 							<div
-								class="absolute -bottom-2 -right-2 bg-warning text-warning-content p-1.5 rounded-full shadow-sm"
+								class="absolute -bottom-1 -right-1 rounded-full bg-warning p-2 text-warning-content shadow-lg"
 								title="Premium Member"
+								in:scale={{ duration: 300, delay: 200 }}
 							>
 								<Crown class="size-4" />
 							</div>
 						{/if}
 					</div>
 
-					<div class="flex-1 text-center md:text-left space-y-1">
+					<!-- User Info -->
+					<div class="flex-1 space-y-1 text-center md:text-left">
 						<h2 class="text-2xl font-bold">{user?.name}</h2>
 						<p class="text-base-content/60">{user?.email}</p>
 						{#if user?.isPremium}
-							<div class="badge badge-warning gap-1 mt-2">
+							<Badge class="badge-warning mt-2 gap-1">
 								<Crown class="size-3" />
 								{m.profile_premium_badge()}
-							</div>
+							</Badge>
 						{/if}
 					</div>
 
-					<Button size="sm" class="gap-2" onclick={() => (window.location.href = '/profile/edit')}>
+					<!-- Edit Button -->
+					<Button
+						size="sm"
+						class="gap-2 rounded-full"
+						onclick={() => (window.location.href = '/profile/edit')}
+					>
 						<Settings class="size-4" />
 						{m.profile_menu_edit()}
 					</Button>
@@ -112,38 +138,36 @@
 			</div>
 		</div>
 
-		<!-- Menu -->
-		<div class="space-y-4">
-			<div class="grid gap-3">
-				{#each menuItems as item, i}
-					<a
-						href={item.href}
-						class="card bg-base-100 shadow-sm border border-base-content/5 hover:shadow-md hover:border-primary/20 transition-all duration-300 group"
-						in:fly={{ x: -20, duration: 500, delay: 200 + i * 100 }}
+		<!-- Menu Items -->
+		<div class="space-y-3">
+			{#each menuItems as item, i}
+				<a
+					href={item.href}
+					class="glass-card group flex items-center gap-4 rounded-2xl p-4 transition-all duration-300 hover:shadow-lg"
+					in:fly={{ x: -20, duration: 500, delay: 200 + i * 80 }}
+				>
+					<div
+						class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br {item.gradient} transition-transform duration-300 group-hover:scale-110"
 					>
-						<div class="card-body p-4 flex-row items-center gap-4">
-							<div
-								class="size-10 rounded-xl bg-base-200/50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
-							>
-								<item.icon class="size-5 {item.color}" />
-							</div>
-							<div class="flex-1 font-medium text-lg">
-								{item.label}
-							</div>
-							<ChevronRight
-								class="size-5 text-base-content/30 group-hover:text-primary group-hover:translate-x-1 transition-all"
-							/>
-						</div>
-					</a>
-				{/each}
-			</div>
-
-			<form action="/auth/signout" method="POST" class="pt-4">
-				<button type="submit" class="btn btn-ghost btn-block text-error hover:bg-error/10 gap-2">
-					<LogOut class="size-5" />
-					{m.profile_logout_button()}
-				</button>
-			</form>
+						<item.icon class="size-6 {item.color}" />
+					</div>
+					<span class="flex-1 text-lg font-medium">{item.label}</span>
+					<ChevronRight
+						class="size-5 text-base-content/30 transition-all group-hover:translate-x-1 group-hover:text-primary"
+					/>
+				</a>
+			{/each}
 		</div>
+
+		<!-- Logout Button -->
+		<form action="/dashboard?/logout" method="POST" use:enhance class="pt-2">
+			<button
+				type="submit"
+				class="btn btn-ghost w-full gap-2 rounded-2xl text-error hover:bg-error/10"
+			>
+				<LogOut class="size-5" />
+				{m.profile_logout_button()}
+			</button>
+		</form>
 	</div>
 </div>
