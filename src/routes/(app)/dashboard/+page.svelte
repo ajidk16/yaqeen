@@ -9,7 +9,8 @@
 		BookOpen,
 		Activity,
 		Sparkles,
-		Heart
+		Heart,
+		ChevronRight
 	} from 'lucide-svelte';
 	import { Badge, Button } from '$lib/components/ui';
 	import { goto, invalidateAll } from '$app/navigation';
@@ -53,9 +54,6 @@
 					body: formData
 				});
 
-				// Clear prayer-times cookie to force refetch
-				// document.cookie = 'prayer-times=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-
 				await invalidateAll();
 				isLoading = false;
 			},
@@ -67,223 +65,318 @@
 		);
 	}
 
-	// $effect(() => {
-	// 	if (!timer.nextPrayer && !isLoading) {
-	// 		refreshLocation();
-	// 	}
-	// });
+	// Quick actions data
+	const quickActions = [
+		{
+			icon: Sparkles,
+			label: m.dashboard_quick_habit(),
+			path: '/habits',
+			color: 'secondary',
+			hoverBorder: 'hover:border-secondary',
+			hoverText: 'hover:text-secondary',
+			hoverShadow: 'hover:shadow-secondary/10',
+			bgColor: 'bg-secondary/10',
+			textColor: 'text-secondary'
+		},
+		{
+			icon: BookOpen,
+			label: m.dashboard_quick_quran(),
+			path: '/quran/list',
+			color: 'accent',
+			hoverBorder: 'hover:border-accent',
+			hoverText: 'hover:text-accent',
+			hoverShadow: 'hover:shadow-accent/10',
+			bgColor: 'bg-accent/10',
+			textColor: 'text-accent'
+		},
+		{
+			icon: Calendar,
+			label: m.dashboard_quick_journal(),
+			path: '/journal',
+			color: 'info',
+			hoverBorder: 'hover:border-info',
+			hoverText: 'hover:text-info',
+			hoverShadow: 'hover:shadow-info/10',
+			bgColor: 'bg-info/10',
+			textColor: 'text-info'
+		},
+		{
+			icon: Clock,
+			label: m.dashboard_prayer_schedule_button(),
+			path: '/jadwal-solat',
+			color: 'primary',
+			hoverBorder: 'hover:border-primary',
+			hoverText: 'hover:text-primary',
+			hoverShadow: 'hover:shadow-primary/10',
+			bgColor: 'bg-primary/10',
+			textColor: 'text-primary'
+		}
+	];
 </script>
 
-<div class="min-h-screen bg-base-100 p-4 pb-24 lg:p-8">
-	<div class="max-w-4xl mx-auto space-y-8">
+<div class="min-h-screen bg-base-200 p-4 pb-24 lg:p-8">
+	<div class="mx-auto max-w-4xl space-y-6">
+		<!-- Hero Section with Floating Orbs -->
 		<header
-			class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+			class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 p-6 lg:p-8"
 			in:fly={{ y: -20, duration: 800, easing: quintOut }}
 		>
-			<div>
-				<h1 class="text-3xl font-bold">
-					{getGreeting()}, <span class="text-primary capitalize">{profile?.name}!</span> 👋
-				</h1>
-				<p class="text-base-content/60 mt-1">"{m.dashboard_quote()}"</p>
-			</div>
+			<!-- Animated background orbs -->
+			<div
+				class="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-primary/10 blur-3xl animate-breathe"
+			></div>
+			<div
+				class="pointer-events-none absolute -bottom-20 -left-20 size-56 rounded-full bg-secondary/10 blur-3xl animate-breathe"
+				style="animation-delay: -2s"
+			></div>
 
 			<div
-				class="flex items-center gap-3 bg-base-100 shadow-sm border border-base-content/10 px-4 py-2 rounded-full"
+				class="relative z-10 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center"
 			>
-				<div class="relative">
-					<Flame class="size-6 text-orange-500 animate-pulse" />
-					<div class="absolute inset-0 bg-orange-500/20 blur-lg rounded-full animate-pulse"></div>
-				</div>
 				<div>
-					<span class="font-bold text-lg">{profile?.streak}</span>
-					<span class="text-xs text-base-content/60 ml-1">{m.dashboard_streak_label()}</span>
+					<h1 class="text-3xl font-bold lg:text-4xl">
+						{getGreeting()}, <span class="text-gradient-primary">{profile?.name}!</span> 👋
+					</h1>
+					<p class="mt-2 text-base-content/60">"{m.dashboard_quote()}"</p>
+				</div>
+
+				<!-- Enhanced Streak Badge -->
+				<div
+					class="glass-card flex items-center gap-3 rounded-2xl px-5 py-3 transition-all hover:shadow-lg"
+				>
+					<div class="relative">
+						<Flame class="size-7 text-orange-500" />
+						<div
+							class="absolute inset-0 rounded-full bg-orange-500/30 blur-xl animate-pulse-glow"
+						></div>
+					</div>
+					<div>
+						<span class="text-2xl font-black tabular-nums">{profile?.streak}</span>
+						<span class="ml-1 text-xs text-base-content/60">{m.dashboard_streak_label()}</span>
+					</div>
 				</div>
 			</div>
 		</header>
 
-		<div class="grid md:grid-cols-3 gap-6">
+		<!-- Main Grid - Bento Style -->
+		<div class="grid gap-6 md:grid-cols-3">
+			<!-- Prayer Timer - Hero Card -->
 			<div
-				class="md:col-span-2 card bg-linear-to-br from-primary to-primary-focus text-primary-content shadow-xl overflow-hidden relative"
+				class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary to-purple-600 text-primary-content shadow-2xl shadow-primary/20 md:col-span-2"
 				in:scale={{ duration: 600, start: 0.95, delay: 100 }}
 			>
+				<!-- Decorative elements -->
 				<div
-					class="absolute top-0 right-0 -mt-10 -mr-10 size-40 rounded-full bg-white/50 blur-3xl"
+					class="pointer-events-none absolute -right-16 -top-16 size-48 rounded-full bg-white/10 blur-2xl"
+				></div>
+				<div
+					class="pointer-events-none absolute -bottom-16 -left-16 size-40 rounded-full bg-black/10 blur-2xl"
 				></div>
 
 				{#if timer.nextPrayer}
-					<div class="card-body p-8 text-center relative z-10">
+					<div class="relative z-10 p-8 text-center">
 						<Badge
-							class="bg-white/20 text-white/80 px-3 py-1 rounded-full flex items-center gap-2 mx-auto mb-4"
+							class="mx-auto mb-4 flex items-center gap-2 rounded-full bg-white/20 px-4 py-2 text-white/90 backdrop-blur-sm"
 						>
 							<Clock class="size-4" />
 							<span>{formatDate(new Date())}</span>
 						</Badge>
-						<h2 class="text-4xl font-bold tracking-tight mt-2">
+
+						<h2 class="mt-2 text-4xl font-black tracking-tight lg:text-5xl">
 							{timer.nextPrayer.name ?? m.prayer_fajr()}
 						</h2>
-						<div class="text-6xl font-black font-mono tracking-tighter my-4 tabular-nums">
+
+						<div
+							class="my-6 font-mono text-5xl font-black tracking-tighter tabular-nums lg:text-7xl"
+						>
 							{timer.countdown}
 						</div>
-						<div class="flex justify-between items-center">
+
+						<div class="flex flex-wrap items-center justify-center gap-4">
 							<Badge
-								class="bg-white/20 text-white/80 px-3 py-1 rounded-full flex items-center gap-2"
+								class="flex items-center gap-2 rounded-full bg-white/20 px-4 py-2 text-white/90 backdrop-blur-sm"
 							>
 								<Clock class="size-4" />
 								<span>{timer.nextPrayer.time}</span>
 							</Badge>
-							<Button
-								onclick={() => {
-									goto('/jadwal-solat');
-									// timer.playAudio();
-									// timer.checkAudio();
-								}}
-								class="rounded-xl"
+							<!-- <Button
+								onclick={() => goto('/jadwal-solat')}
+								class="border-0 bg-white/20 text-white hover:bg-white/30"
 								size="sm"
-								variant="primary">{m.dashboard_prayer_schedule_button()}</Button
 							>
+								{m.dashboard_prayer_schedule_button()}
+								<ChevronRight class="ml-1 size-4" />
+							</Button> -->
 						</div>
 					</div>
 				{:else}
 					<div
-						class="p-8 text-center relative z-10 flex flex-col items-center h-full justify-center gap-4"
+						class="relative z-10 flex h-full flex-col items-center justify-center gap-4 p-8 text-center"
 					>
+						<div class="size-16 rounded-full bg-white/20 flex items-center justify-center">
+							<Check class="size-8" />
+						</div>
 						<h2 class="text-2xl font-bold">{m.dashboard_all_prayers_completed()}</h2>
-						<p class="text-primary-content">{m.dashboard_see_you_tomorrow()}</p>
+						<p class="text-primary-content/80">{m.dashboard_see_you_tomorrow()}</p>
 					</div>
 				{/if}
 			</div>
 
-			<div
-				class="card bg-base-100 shadow-sm border border-base-content/10"
-				in:fly={{ x: 20, duration: 800, delay: 200 }}
-			>
-				<div class="card-body p-6">
-					<h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+			<!-- Daily Progress Card -->
+			<div class="glass-card rounded-2xl p-6" in:fly={{ x: 20, duration: 800, delay: 200 }}>
+				<h3 class="mb-5 flex items-center gap-2 text-lg font-bold">
+					<div class="flex size-9 items-center justify-center rounded-xl bg-secondary/10">
 						<Activity class="size-5 text-secondary" />
-						{m.dashboard_daily_progress()}
-					</h3>
+					</div>
+					{m.dashboard_daily_progress()}
+				</h3>
 
-					<div class="space-y-4">
-						<div>
-							<div class="flex justify-between text-sm mb-1">
-								<span>{m.dashboard_progress_worship()}</span>
-								<span class="font-bold text-primary">{profile?.progress?.ibadah ?? 0}%</span>
-							</div>
-							<progress
-								class="progress progress-primary w-full"
-								value={profile?.progress?.ibadah ?? 0}
-								max="100"
-							></progress>
+				<div class="space-y-5">
+					<!-- Ibadah Progress -->
+					<div>
+						<div class="mb-2 flex items-center justify-between text-sm">
+							<span class="flex items-center gap-2">
+								<Check class="size-4 text-primary" />
+								{m.dashboard_progress_worship()}
+							</span>
+							<span class="font-bold text-primary">{profile?.progress?.ibadah ?? 0}%</span>
 						</div>
-						<div>
-							<div class="flex justify-between text-sm mb-1">
-								<span>{m.dashboard_progress_habits()}</span>
-								<span class="font-bold text-secondary">{profile?.progress?.habits ?? 0}%</span>
-							</div>
-							<progress
-								class="progress progress-secondary w-full"
-								value={profile?.progress?.habits ?? 0}
-								max="100"
-							></progress>
+						<div class="h-2.5 w-full overflow-hidden rounded-full bg-base-content/10">
+							<div
+								class="h-full rounded-full bg-gradient-to-r from-primary to-purple-500 transition-all duration-500"
+								style="width: {profile?.progress?.ibadah ?? 0}%"
+							></div>
 						</div>
-						<div>
-							<div class="flex justify-between text-sm mb-1">
-								<span>{m.dashboard_progress_quran()}</span>
-								<span class="font-bold text-accent">{profile?.progress?.quran ?? 0}%</span>
-							</div>
-							<progress
-								class="progress progress-accent w-full"
-								value={profile?.progress?.quran ?? 0}
-								max="100"
-							></progress>
+					</div>
+
+					<!-- Habits Progress -->
+					<div>
+						<div class="mb-2 flex items-center justify-between text-sm">
+							<span class="flex items-center gap-2">
+								<Flame class="size-4 text-secondary" />
+								{m.dashboard_progress_habits()}
+							</span>
+							<span class="font-bold text-secondary">{profile?.progress?.habits ?? 0}%</span>
+						</div>
+						<div class="h-2.5 w-full overflow-hidden rounded-full bg-base-content/10">
+							<div
+								class="h-full rounded-full bg-gradient-to-r from-secondary to-pink-500 transition-all duration-500"
+								style="width: {profile?.progress?.habits ?? 0}%"
+							></div>
+						</div>
+					</div>
+
+					<!-- Quran Progress -->
+					<div>
+						<div class="mb-2 flex items-center justify-between text-sm">
+							<span class="flex items-center gap-2">
+								<BookOpen class="size-4 text-accent" />
+								{m.dashboard_progress_quran()}
+							</span>
+							<span class="font-bold text-accent">{profile?.progress?.quran ?? 0}%</span>
+						</div>
+						<div class="h-2.5 w-full overflow-hidden rounded-full bg-base-content/10">
+							<div
+								class="h-full rounded-full bg-gradient-to-r from-accent to-teal-400 transition-all duration-500"
+								style="width: {profile?.progress?.quran ?? 0}%"
+							></div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 
-		<div class="space-y-4" in:fly={{ y: 20, duration: 800, delay: 300 }}>
+		<!-- Recent Activity Section -->
+		<section class="space-y-4" in:fly={{ y: 20, duration: 800, delay: 300 }}>
 			<div class="flex items-center justify-between">
-				<h2 class="text-xl font-bold flex items-center gap-2">
+				<h2 class="flex items-center gap-2 text-xl font-bold">
 					<Calendar class="size-5 text-base-content/60" />
 					{m.dashboard_recent_activity()}
 				</h2>
 				<Button
-					variant="link"
-					class="text-primary no-underline hover:underline p-0 h-auto"
-					onclick={() => goto('/habits')}>{m.dashboard_view_all()}</Button
+					variant="ghost"
+					class="h-auto p-0 text-primary hover:bg-transparent hover:underline"
+					onclick={() => goto('/habits')}
 				>
+					{m.dashboard_view_all()}
+					<ChevronRight class="ml-1 size-4" />
+				</Button>
 			</div>
 
-			<div class="grid gap-3">
-				{#each profile?.recentActivity as activity, i}
-					{@const Icon =
-						activity.type === 'prayer' ? Check : activity.type === 'quran' ? BookOpen : Activity}
-					{@const color =
-						activity.type === 'prayer'
-							? 'text-success'
-							: activity.type === 'quran'
-								? 'text-primary'
-								: 'text-warning'}
-					<div
-						class="card bg-base-100 shadow-sm border border-base-content/5 hover:shadow-md transition-all duration-300"
-						in:fly={{ y: 20, duration: 500, delay: 400 + i * 100 }}
-					>
-						<div class="card-body p-4 flex-row items-center gap-4">
+			<!-- Timeline Style Activity Feed -->
+			<div class="relative pl-6">
+				<!-- Vertical timeline line -->
+				<div class="absolute bottom-0 left-[7px] top-0 w-0.5 bg-base-content/10"></div>
+
+				<div class="space-y-3">
+					{#each profile?.recentActivity as activity, i}
+						{@const Icon =
+							activity.type === 'prayer' ? Check : activity.type === 'quran' ? BookOpen : Activity}
+						{@const color =
+							activity.type === 'prayer'
+								? 'text-success'
+								: activity.type === 'quran'
+									? 'text-primary'
+									: 'text-warning'}
+						{@const dotColor =
+							activity.type === 'prayer'
+								? 'bg-success'
+								: activity.type === 'quran'
+									? 'bg-primary'
+									: 'bg-warning'}
+						<div
+							class="glass-card relative rounded-xl p-4 transition-all duration-300 hover:shadow-md"
+							in:fly={{ y: 20, duration: 500, delay: 400 + i * 80 }}
+						>
+							<!-- Timeline dot -->
 							<div
-								class="size-10 rounded-full bg-base-200 flex items-center justify-center shrink-0"
-							>
-								<Icon class="size-5 {color}" />
-							</div>
-							<div class="flex-1">
-								<h4 class="font-bold text-sm">{activity.title}</h4>
-								<p class="text-xs text-base-content/60">
-									{activity.originalTime ? formatTime(activity.originalTime) : ''}
-								</p>
+								class="absolute -left-[17px] top-5 size-2.5 rounded-full {dotColor} ring-4 ring-base-200"
+							></div>
+
+							<div class="flex items-center gap-4">
+								<div
+									class="flex size-10 shrink-0 items-center justify-center rounded-full bg-base-200"
+								>
+									<Icon class="size-5 {color}" />
+								</div>
+								<div class="flex-1">
+									<h4 class="text-sm font-semibold">{activity.title}</h4>
+									<p class="text-xs text-base-content/50">
+										{activity.originalTime ? formatTime(activity.originalTime) : ''}
+									</p>
+								</div>
 							</div>
 						</div>
-					</div>
-				{/each}
-				{#if profile?.recentActivity.length === 0}
-					<div class="text-center py-8 text-base-content/40 italic">
-						{m.dashboard_no_activity()}
-					</div>
-				{/if}
-			</div>
-		</div>
+					{/each}
 
-		<div
-			class="grid grid-cols-2 sm:grid-cols-3 gap-4"
+					{#if profile?.recentActivity.length === 0}
+						<div class="py-8 text-center italic text-base-content/40">
+							{m.dashboard_no_activity()}
+						</div>
+					{/if}
+				</div>
+			</div>
+		</section>
+
+		<!-- Quick Actions Grid -->
+		<section
+			class="grid grid-cols-2 gap-3 sm:grid-cols-4"
 			in:fly={{ y: 20, duration: 800, delay: 500 }}
 		>
-			<!-- <Button
-				class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-primary hover:text-primary transition-all"
-				onclick={() => goto('/stats')}
-			>
-				<Heart class="size-6" />
-				<span class="text-xs font-medium">{m.dashboard_quick_mood()}</span>
-			</Button> -->
-			<Button
-				class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-secondary hover:text-secondary transition-all"
-				onclick={() => goto('/habits')}
-			>
-				<Sparkles class="size-6" />
-				<span class="text-xs font-medium">{m.dashboard_quick_habit()}</span>
-			</Button>
-			<Button
-				class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-accent hover:text-accent transition-all"
-				onclick={() => goto('/quran/list')}
-			>
-				<BookOpen class="size-6" />
-				<span class="text-xs font-medium">{m.dashboard_quick_quran()}</span>
-			</Button>
-			<Button
-				class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-info hover:text-info transition-all"
-				onclick={() => goto('/journal')}
-			>
-				<Calendar class="size-6" />
-				<span class="text-xs font-medium">{m.dashboard_quick_journal()}</span>
-			</Button>
-		</div>
+			{#each quickActions as action, i}
+				<button
+					class="glass-card group flex flex-col items-center gap-3 rounded-2xl border-2 border-transparent p-6 transition-all duration-300 {action.hoverBorder} {action.hoverText} {action.hoverShadow} hover:shadow-lg"
+					onclick={() => goto(action.path)}
+					in:scale={{ duration: 400, start: 0.9, delay: 550 + i * 50 }}
+				>
+					<div
+						class="flex size-12 items-center justify-center rounded-xl {action.bgColor} transition-all duration-300 group-hover:scale-110"
+					>
+						<action.icon class="size-6 {action.textColor}" />
+					</div>
+					<span class="text-center text-xs font-medium">{action.label}</span>
+				</button>
+			{/each}
+		</section>
 	</div>
 </div>

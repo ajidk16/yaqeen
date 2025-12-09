@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fly } from 'svelte/transition';
+	import { fly, scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 	import {
 		Sun,
@@ -12,9 +12,11 @@
 		ChevronRight,
 		Star,
 		MapPin,
-		Plus
+		Plus,
+		Clock,
+		X
 	} from 'lucide-svelte';
-	import { Card, Button } from '$lib/components/ui';
+	import { Button, Badge } from '$lib/components/ui';
 	import { goto, invalidateAll } from '$app/navigation';
 	import { formatDate } from '$lib/utils/format.js';
 	import { page } from '$app/state';
@@ -42,7 +44,7 @@
 	// Sunnah Prayers State (Habits)
 	interface SunnahPrayer {
 		id: string;
-		title: string; // Changed from name to title to match DB
+		title: string;
 		category: string;
 		completed: boolean;
 		time?: string;
@@ -171,120 +173,198 @@
 	);
 
 	const profile = $derived(page?.data?.user || {});
+
+	// Status options for segmented control
+	const statusOptions = [
+		{
+			value: 'none',
+			label: m.ibadah_status_none(),
+			icon: X,
+			color: 'base-300',
+			textColor: 'base-content'
+		},
+		{
+			value: 'munfarid',
+			label: m.ibadah_status_munfarid(),
+			icon: User,
+			color: 'info',
+			textColor: 'info-content'
+		},
+		{
+			value: 'jamaah',
+			label: m.ibadah_status_jamaah(),
+			icon: Users,
+			color: 'success',
+			textColor: 'success-content'
+		}
+	];
+
+	// Derived category groups
+	let sunnahCategory = $derived(sunnahPrayers.filter((p) => p.category === 'Sunnah'));
+	let mubahCategory = $derived(sunnahPrayers.filter((p) => p.category === 'Mubah'));
 </script>
 
-<div class="min-h-screen bg-base-100 p-4 pb-24 lg:p-8">
-	<div class="max-w-4xl mx-auto space-y-8">
-		<!-- Header -->
-		<div
-			class="flex flex-col md:flex-row justify-between items-center gap-4"
+<div class="min-h-screen bg-base-200 p-4 pb-24 lg:p-8">
+	<div class="mx-auto max-w-4xl space-y-6">
+		<!-- Header Section with Glassmorphism -->
+		<header
+			class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 p-6 lg:p-8"
 			in:fly={{ y: -20, duration: 800, easing: quintOut }}
 		>
-			<div>
-				<h1 class="text-3xl font-bold">{m.ibadah_title()}</h1>
-				<div class="flex items-center gap-2 text-base-content/60 mt-1">
-					<MapPin class="size-4" />
-					<span class="text-sm">{profile?.location?.city}</span>
+			<!-- Animated background orbs -->
+			<div
+				class="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-primary/10 blur-3xl animate-breathe"
+			></div>
+			<div
+				class="pointer-events-none absolute -bottom-20 -left-20 size-56 rounded-full bg-secondary/10 blur-3xl animate-breathe"
+				style="animation-delay: -2s"
+			></div>
+
+			<div
+				class="relative z-10 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center"
+			>
+				<div>
+					<h1 class="text-3xl font-bold lg:text-4xl">{m.ibadah_title()}</h1>
+					<div class="mt-2 flex items-center gap-2 text-base-content/60">
+						<MapPin class="size-4" />
+						<span class="text-sm">{profile?.location?.city || 'Jakarta, ID'}</span>
+					</div>
+				</div>
+
+				<!-- Enhanced Date Navigator -->
+				<div class="glass-card flex items-center gap-1 rounded-2xl p-1.5">
+					<Button variant="ghost" size="sm" circle onclick={() => changeDate(-1)}>
+						<ChevronLeft class="size-5" />
+					</Button>
+					<button
+						onclick={() => (isCalendarOpen = true)}
+						class="flex min-w-[160px] items-center justify-center gap-2 rounded-xl px-4 py-2 font-medium transition-colors hover:bg-base-content/5"
+					>
+						<Calendar class="size-4 text-primary" />
+						<span>{formatDate(selectedDate)}</span>
+					</button>
+					<Button variant="ghost" size="sm" circle onclick={() => changeDate(1)}>
+						<ChevronRight class="size-5" />
+					</Button>
 				</div>
 			</div>
+		</header>
 
-			<div class="flex items-center gap-4 bg-base-200 rounded-full p-1 pr-4">
-				<Button variant="ghost" size="sm" circle onclick={() => changeDate(-1)}>
-					<ChevronLeft class="size-5" />
-				</Button>
-				<button
-					onclick={() => (isCalendarOpen = true)}
-					class="flex items-center gap-2 font-medium min-w-[180px] justify-center"
-				>
-					<Calendar class="size-4 text-primary" />
-					<span>{formatDate(selectedDate)}</span>
-				</button>
-				<Button variant="ghost" size="sm" circle onclick={() => changeDate(1)}>
-					<ChevronRight class="size-5" />
-				</Button>
-			</div>
-		</div>
-
-		<!-- Progress Overview -->
+		<!-- Progress Overview - Radial Progress -->
 		<div
 			class="grid grid-cols-2 gap-4"
 			in:fly={{ y: 20, duration: 800, delay: 100, easing: quintOut }}
 		>
-			<Card class="bg-linear-to-br from-primary/10 to-primary/5 border-primary/20">
-				<div class="p-4 text-center">
-					<h3 class="text-sm font-medium text-base-content/70 mb-2">{m.ibadah_fardhu_title()}</h3>
-					<div class="text-3xl font-bold text-primary">{Math.round(fardhuProgress)}%</div>
-					<progress class="progress progress-primary w-full mt-2" value={fardhuProgress} max="100"
-					></progress>
+			<!-- Fardhu Progress Card -->
+			<div class="glass-card rounded-2xl p-6 text-center">
+				<div class="relative mx-auto mb-3 inline-flex items-center justify-center">
+					<!-- Radial Progress SVG -->
+					<svg class="size-24 -rotate-90" viewBox="0 0 96 96">
+						<circle
+							cx="48"
+							cy="48"
+							r="40"
+							stroke-width="8"
+							class="fill-none stroke-base-content/10"
+						/>
+						<circle
+							cx="48"
+							cy="48"
+							r="40"
+							stroke-width="8"
+							class="fill-none stroke-primary transition-all duration-700"
+							stroke-linecap="round"
+							stroke-dasharray="{fardhuProgress * 2.51} 251"
+						/>
+					</svg>
+					<span class="absolute text-2xl font-bold text-primary">{Math.round(fardhuProgress)}%</span
+					>
 				</div>
-			</Card>
-			<Card class="bg-linear-to-br from-secondary/10 to-secondary/5 border-secondary/20">
-				<div class="p-4 text-center">
-					<h3 class="text-sm font-medium text-base-content/70 mb-2">{m.ibadah_sunnah_title()}</h3>
-					<div class="text-3xl font-bold text-secondary">{Math.round(sunnahProgress)}%</div>
-					<progress class="progress progress-secondary w-full mt-2" value={sunnahProgress} max="100"
-					></progress>
-				</div>
-			</Card>
-		</div>
-
-		<!-- Fardhu Prayers -->
-		<section class="space-y-4">
-			<div class="flex items-center justify-between">
-				<h2 class="text-xl font-bold flex items-center gap-2">
-					<div class="size-2 rounded-full bg-primary"></div>
-					{m.ibadah_fardhu_section()}
-				</h2>
+				<h3 class="font-medium text-base-content/70">{m.ibadah_fardhu_title()}</h3>
+				<p class="mt-1 text-xs text-base-content/50">
+					{fardhuPrayers.filter((p) => p.status !== 'none').length}/{fardhuPrayers.length} selesai
+				</p>
 			</div>
 
-			<div class="grid gap-4">
+			<!-- Sunnah Progress Card -->
+			<div class="glass-card rounded-2xl p-6 text-center">
+				<div class="relative mx-auto mb-3 inline-flex items-center justify-center">
+					<svg class="size-24 -rotate-90" viewBox="0 0 96 96">
+						<circle
+							cx="48"
+							cy="48"
+							r="40"
+							stroke-width="8"
+							class="fill-none stroke-base-content/10"
+						/>
+						<circle
+							cx="48"
+							cy="48"
+							r="40"
+							stroke-width="8"
+							class="fill-none stroke-secondary transition-all duration-700"
+							stroke-linecap="round"
+							stroke-dasharray="{sunnahProgress * 2.51} 251"
+						/>
+					</svg>
+					<span class="absolute text-2xl font-bold text-secondary"
+						>{Math.round(sunnahProgress)}%</span
+					>
+				</div>
+				<h3 class="font-medium text-base-content/70">{m.ibadah_sunnah_title()}</h3>
+				<p class="mt-1 text-xs text-base-content/50">
+					{sunnahPrayers.filter((p) => p.completed).length}/{sunnahPrayers.length} selesai
+				</p>
+			</div>
+		</div>
+
+		<!-- Fardhu Prayers Section -->
+		<section class="space-y-4">
+			<div class="flex items-center gap-2">
+				<div class="flex size-8 items-center justify-center rounded-lg bg-primary/10">
+					<div class="size-2 rounded-full bg-primary"></div>
+				</div>
+				<h2 class="text-xl font-bold">{m.ibadah_fardhu_section()}</h2>
+			</div>
+
+			<div class="space-y-3">
 				{#each fardhuPrayers as prayer, i}
 					<div
-						class="card bg-base-100 shadow-sm border border-base-content/10 hover:shadow-md transition-all duration-300"
-						in:fly={{ x: -20, duration: 600, delay: 200 + i * 100, easing: quintOut }}
+						class="glass-card rounded-2xl p-5 transition-all duration-300 hover:shadow-lg"
+						in:fly={{ x: -20, duration: 600, delay: 200 + i * 80, easing: quintOut }}
 					>
-						<div class="card-body p-4 sm:p-6 flex-row flex-wrap items-center justify-between gap-4">
+						<div
+							class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center"
+						>
+							<!-- Prayer Info -->
 							<div class="flex items-center gap-4">
 								<div
-									class="size-12 rounded-xl bg-base-200 flex items-center justify-center text-base-content/70"
+									class="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-purple-500/20 text-primary"
 								>
-									<prayer.icon size="24" />
+									<prayer.icon size={28} />
 								</div>
 								<div>
-									<h3 class="font-bold text-lg">{prayer?.name}</h3>
-									<p class="text-sm text-base-content/60 font-mono flex items-center gap-1">
-										{prayer?.time}
+									<h3 class="text-xl font-bold capitalize">{prayer?.name}</h3>
+									<p class="flex items-center gap-1.5 text-sm text-base-content/60">
+										<Clock class="size-3.5" />
+										<span class="font-mono">{prayer?.time}</span>
 									</p>
 								</div>
 							</div>
 
-							<div class="flex items-center gap-2 bg-base-200/50 p-1 rounded-lg">
-								<button
-									class="btn btn-sm border-none shadow-none {prayer?.status === 'none'
-										? 'btn-active bg-base-300'
-										: 'btn-ghost'}"
-									onclick={() => updateFardhuStatus(prayer?.id, 'none')}
-								>
-									{m.ibadah_status_none()}
-								</button>
-								<button
-									class="btn btn-sm border-none shadow-none gap-2 {prayer?.status === 'munfarid'
-										? 'bg-info text-info-content'
-										: 'btn-ghost'}"
-									onclick={() => updateFardhuStatus(prayer?.id, 'munfarid')}
-								>
-									<User class="size-4" />
-									{m.ibadah_status_munfarid()}
-								</button>
-								<button
-									class="btn btn-sm border-none shadow-none gap-2 {prayer?.status === 'jamaah'
-										? 'bg-success text-success-content'
-										: 'btn-ghost'}"
-									onclick={() => updateFardhuStatus(prayer?.id, 'jamaah')}
-								>
-									<Users class="size-4" />
-									{m.ibadah_status_jamaah()}
-								</button>
+							<!-- Segmented Status Control -->
+							<div class="flex w-full items-center gap-1 rounded-xl bg-base-200/50 p-1.5 sm:w-auto">
+								{#each statusOptions as status}
+									{@const isActive = prayer?.status === status.value}
+									<button
+										class="flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 sm:flex-initial
+											{isActive ? `bg-${status.color} text-${status.textColor} shadow-sm` : 'hover:bg-base-content/5'}"
+										onclick={() => updateFardhuStatus(prayer?.id, status.value as PrayerStatus)}
+									>
+										<status.icon class="size-4" />
+										<span class="hidden sm:inline">{status.label}</span>
+									</button>
+								{/each}
 							</div>
 						</div>
 					</div>
@@ -295,97 +375,110 @@
 		<!-- Sunnah Prayers (Dynamic Habits) -->
 		<section class="space-y-6">
 			<div class="flex items-center justify-between">
-				<h2 class="text-xl font-bold flex items-center gap-2">
-					<div class="size-2 rounded-full bg-secondary"></div>
-					{m.ibadah_others_section()}
-				</h2>
-				<Button variant="info" size="xs" onclick={() => goto('/habits/habits')}>
-					<Plus class="size-4 mr-1" />
+				<div class="flex items-center gap-2">
+					<div class="flex size-8 items-center justify-center rounded-lg bg-secondary/10">
+						<Star class="size-4 text-secondary" />
+					</div>
+					<h2 class="text-xl font-bold">{m.ibadah_others_section()}</h2>
+				</div>
+				<Button
+					variant="ghost"
+					size="sm"
+					class="text-primary"
+					onclick={() => goto('/habits/habits')}
+				>
 					{m.ibadah_manage_habits()}
+					<ChevronRight class="ml-1 size-4" />
 				</Button>
 			</div>
 
-			<div class="grid md:grid-cols-2 gap-6">
-				<!-- Sunnah -->
-				<div class="space-y-4">
-					<h3 class="text-sm font-medium text-base-content/60 uppercase tracking-wider ml-1">
+			<div class="grid gap-6 md:grid-cols-2">
+				<!-- Sunnah Category -->
+				<div class="space-y-3">
+					<h3
+						class="ml-1 flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-base-content/60"
+					>
+						<div class="size-1.5 rounded-full bg-secondary"></div>
 						{m.ibadah_category_sunnah()}
 					</h3>
-					{#each sunnahPrayers.filter((p) => p.category === 'Sunnah') as prayer, i}
+					{#each sunnahCategory as prayer, i}
 						<button
-							class="w-full text-left group cursor-pointer"
+							class="glass-card group w-full cursor-pointer rounded-xl p-4 text-left transition-all duration-300 hover:shadow-md
+								{prayer.completed ? 'ring-2 ring-success/30 bg-success/5' : ''}"
 							onclick={() => toggleSunnah(prayer.id)}
 							in:fly={{ y: 20, duration: 600, delay: 600 + i * 50, easing: quintOut }}
 						>
-							<div
-								class="flex items-center gap-4 p-4 rounded-xl border transition-all duration-200 {prayer.completed
-									? 'bg-secondary/10 border-secondary/20'
-									: 'bg-base-100 border-base-content/10 hover:border-secondary/30'}"
-							>
+							<div class="flex items-center gap-4">
+								<!-- Animated Checkbox -->
 								<div
-									class="size-6 rounded-full border-2 flex items-center justify-center transition-colors {prayer.completed
-										? 'border-secondary bg-secondary text-white'
-										: 'border-base-content/30 group-hover:border-secondary/50'}"
+									class="relative flex size-6 items-center justify-center rounded-full border-2 transition-all duration-300
+										{prayer.completed
+										? 'scale-110 border-success bg-success text-white'
+										: 'border-base-content/30 group-hover:border-secondary'}"
 								>
 									{#if prayer.completed}
 										<Check class="size-3.5" />
 									{/if}
 								</div>
-								<span class="font-medium {prayer.completed ? 'text-secondary' : ''}"
-									>{prayer.title}</span
-								>
+
+								<span class="flex-1 font-medium {prayer.completed ? 'text-success' : ''}">
+									{prayer.title}
+								</span>
+
+								{#if prayer.completed}
+									<Badge class="badge-success badge-sm text-white">Selesai</Badge>
+								{/if}
 							</div>
 						</button>
 					{/each}
-					{#if sunnahPrayers.filter((p) => p.category === 'Sunnah').length === 0}
-						<div class="text-sm text-base-content/40 italic ml-1">{m.ibadah_no_sunnah()}</div>
+					{#if sunnahCategory.length === 0}
+						<div class="ml-1 text-sm italic text-base-content/40">{m.ibadah_no_sunnah()}</div>
 					{/if}
 				</div>
 
-				<!-- Mubah / Extra -->
-				<div class="space-y-4">
-					<h3 class="text-sm font-medium text-base-content/60 uppercase tracking-wider ml-1">
+				<!-- Mubah / Extra Category -->
+				<div class="space-y-3">
+					<h3
+						class="ml-1 flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-base-content/60"
+					>
+						<div class="size-1.5 rounded-full bg-accent"></div>
 						{m.ibadah_category_mubah()}
 					</h3>
-					{#each sunnahPrayers.filter((p) => p.category === 'Mubah') as prayer, i}
-						<div
-							class="card bg-base-100 shadow-sm border border-base-content/10 overflow-hidden group hover:shadow-md transition-all duration-300"
-							in:fly={{ y: 20, duration: 600, delay: 800 + i * 100, easing: quintOut }}
+					{#each mubahCategory as prayer, i}
+						<button
+							class="glass-card group w-full cursor-pointer rounded-xl p-4 text-left transition-all duration-300 hover:shadow-md
+								{prayer.completed ? 'ring-2 ring-accent/30 bg-accent/5' : ''}"
+							onclick={() => toggleSunnah(prayer.id)}
+							in:fly={{ y: 20, duration: 600, delay: 800 + i * 50, easing: quintOut }}
 						>
-							<div class="card-body p-0">
-								<button
-									class="w-full text-left p-6 flex items-center justify-between cursor-pointer"
-									onclick={() => toggleSunnah(prayer.id)}
+							<div class="flex items-center gap-4">
+								<div
+									class="flex size-10 items-center justify-center rounded-lg bg-accent/10 text-accent transition-all group-hover:scale-105"
 								>
-									<div class="flex items-center gap-4">
-										<div
-											class="size-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent"
-										>
-											<Star class="size-5" />
-										</div>
-										<div>
-											<h3 class="font-bold">{prayer.title}</h3>
-											<p class="text-xs text-base-content/60 mt-1">
-												{prayer.time || m.ibadah_anytime()}
-											</p>
-										</div>
-									</div>
+									<Star class="size-5" />
+								</div>
+								<div class="flex-1">
+									<h4 class="font-bold {prayer.completed ? 'text-accent' : ''}">{prayer.title}</h4>
+									<p class="mt-0.5 text-xs text-base-content/60">
+										{prayer.time || m.ibadah_anytime()}
+									</p>
+								</div>
 
-									<div
-										class="size-8 rounded-full border-2 flex items-center justify-center transition-all {prayer.completed
-											? 'border-accent bg-accent text-white scale-110'
-											: 'border-base-content/20 group-hover:border-accent/50'}"
-									>
-										{#if prayer.completed}
-											<Check class="size-4" />
-										{/if}
-									</div>
-								</button>
+								<div
+									class="flex size-8 items-center justify-center rounded-full border-2 transition-all
+										{prayer.completed
+										? 'scale-110 border-accent bg-accent text-white'
+										: 'border-base-content/20 group-hover:border-accent/50'}"
+								>
+									{#if prayer.completed}
+										<Check class="size-4" />
+									{/if}
+								</div>
 							</div>
-						</div>
+						</button>
 					{/each}
-					{#if sunnahPrayers.filter((p) => p.category === 'Mubah').length === 0}
-						<div class="text-sm text-base-content/40 italic ml-1">{m.ibadah_no_mubah()}</div>
+					{#if mubahCategory.length === 0}
+						<div class="ml-1 text-sm italic text-base-content/40">{m.ibadah_no_mubah()}</div>
 					{/if}
 				</div>
 			</div>

@@ -31,6 +31,13 @@
 	--color-learning: #F59E0B;
 	--color-learning-bg: oklch(0.97 0.02 80); /* Soft amber */
 
+	/* Enhanced Shadows for Depth */
+	--shadow-card: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+	--shadow-card-hover: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+	--shadow-glow-primary: 0 0 40px oklch(0.7 0.15 260 / 0.25);
+	--shadow-glow-secondary: 0 0 40px oklch(0.7 0.15 330 / 0.25);
+	--shadow-glow-accent: 0 0 40px oklch(0.7 0.1 180 / 0.25);
+
 	/* Animations */
 	--animate-float: float 6s ease-in-out infinite;
 	--animate-fade-in-up: fadeInUp 0.5s ease-out forwards;
@@ -65,11 +72,40 @@
 		from { opacity: 0; transform: translateX(20px); }
 		to { opacity: 1; transform: translateX(0); }
 	}
+
+	@keyframes pulseGlow {
+		0%, 100% { opacity: 0.5; transform: scale(1); }
+		50% { opacity: 1; transform: scale(1.05); }
+	}
+
+	@keyframes shimmer {
+		0% { background-position: -200% 0; }
+		100% { background-position: 200% 0; }
+	}
+
+	@keyframes breathe {
+		0%, 100% { transform: scale(1); opacity: 0.6; }
+		50% { transform: scale(1.1); opacity: 0.8; }
+	}
 }
 
 @layer utilities {
 	.animate-float {
 		animation: float 3s ease-in-out infinite;
+	}
+
+	.animate-pulse-glow {
+		animation: pulseGlow 2s ease-in-out infinite;
+	}
+
+	.animate-shimmer {
+		background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+		background-size: 200% 100%;
+		animation: shimmer 2s infinite;
+	}
+
+	.animate-breathe {
+		animation: breathe 4s ease-in-out infinite;
 	}
 
 	.animate-on-scroll {
@@ -78,6 +114,31 @@
 
 	.visible {
 		opacity: 1;
+	}
+
+	/* Glassmorphism Card */
+	.glass-card {
+		@apply bg-base-100/80 backdrop-blur-xl border border-base-content/5 shadow-sm;
+	}
+
+	/* Dark mode glass adjustment */
+	:root[data-theme="dark"] .glass-card,
+	.dark .glass-card {
+		@apply bg-base-100/60 border-base-content/10;
+	}
+
+	/* Card with glow effect */
+	.card-glow-primary {
+		box-shadow: var(--shadow-glow-primary);
+	}
+
+	.card-glow-secondary {
+		box-shadow: var(--shadow-glow-secondary);
+	}
+
+	/* Gradient text */
+	.text-gradient-primary {
+		@apply bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent;
 	}
 }
 

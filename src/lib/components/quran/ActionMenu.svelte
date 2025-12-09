@@ -202,7 +202,7 @@
 				</button>
 
 				<!-- Add to Hafalan -->
-				<button
+				<!-- <button
 					class="w-full flex items-center gap-4 p-4 bg-linear-to-r from-secondary/5 to-secondary/10 border border-secondary/20 rounded-2xl hover:from-secondary/10 hover:to-secondary/15 transition-all"
 					onclick={() => onAction('addToHafalan')}
 				>
@@ -214,7 +214,7 @@
 						<span class="text-xs text-base-content/60">Tambahkan ke target hafalan</span>
 					</div>
 					<BookPlus class="size-5 text-secondary/50" />
-				</button>
+				</button> -->
 			</div>
 
 			<!-- Share as Image -->
