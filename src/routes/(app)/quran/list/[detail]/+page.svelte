@@ -1,16 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import {
-		ChevronLeft,
-		MoreVertical,
-		PlayCircle,
-		PauseCircle,
-		Settings2,
-		Moon,
-		Sun,
-		Pause,
-		Play
-	} from 'lucide-svelte';
+	import { ChevronLeft, Settings2, Moon, Sun, Pause, Play } from 'lucide-svelte';
 	import { Button, Card, Modal } from '$lib/components/ui';
 	import VerseItem from '$lib/components/quran/VerseItem.svelte';
 	import ActionMenu from '$lib/components/quran/ActionMenu.svelte';
@@ -23,7 +13,7 @@
 	// Props from load
 
 	// State
-	let activeTab = $state('page'); // translation, page, tafsir
+	let activeTab = $state('translation'); // translation, page, tafsir
 	let isPlaying = $state(false);
 	let activeVerse = $state<any>(null);
 	let isMenuOpen = $state(false);
@@ -88,6 +78,9 @@
 	});
 
 	// Actions
+	let currentPlayingVerse = $state<number | null>(null);
+
+	// Actions
 	function handleVerseAction(action: string, payload?: any) {
 		console.log('Action:', action, payload);
 
@@ -130,36 +123,32 @@
 		}
 	}
 
-	function copyVerseToClipboard() {
-		if (!activeVerse) return;
-		const text = `${activeVerse.teksArab}\n\n${activeVerse.teksIndonesia}\n\n— QS. ${quran.namaLatin}: ${activeVerse.nomorAyat}`;
-		navigator.clipboard.writeText(text);
-		toast.success('Teks ayat berhasil disalin!');
-		isMenuOpen = false;
-	}
-
-	async function shareVerse() {
-		if (!activeVerse) return;
-		const shareData = {
-			title: `QS. ${quran.namaLatin}: ${activeVerse.nomorAyat}`,
-			text: `${activeVerse.teksArab}\n\n${activeVerse.teksIndonesia}`,
-			url: `${window.location.origin}/quran/list/${quran.nomor}#ayah-${activeVerse.nomorAyat}`
-		};
-
-		try {
-			if (navigator.share) {
-				await navigator.share(shareData);
-			} else {
-				// Fallback: copy to clipboard
-				await navigator.clipboard.writeText(`${shareData.text}\n\n${shareData.url}`);
-				toast.success('Link berhasil disalin!');
-			}
-		} catch (e) {
-			if ((e as Error).name !== 'AbortError') {
-				console.error('Share failed:', e);
+	function scrollToVerse(ayahNumber: number) {
+		// Calculate if we need to switch page in Mushaf view
+		if (activeTab === 'page') {
+			const targetPage = Math.floor((ayahNumber - 1) / versesPerPage);
+			if (currentPageIndex !== targetPage) {
+				currentPageIndex = targetPage;
+				// Wait for DOM update
+				setTimeout(() => {
+					doScroll(ayahNumber);
+				}, 100);
+				return;
 			}
 		}
-		isMenuOpen = false;
+		doScroll(ayahNumber);
+	}
+
+	function doScroll(ayahNumber: number) {
+		const element = document.getElementById(`ayah-${ayahNumber}`);
+		if (element) {
+			element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			// Add highlight effect
+			element.classList.add('bg-primary/20');
+			setTimeout(() => {
+				element.classList.remove('bg-primary/20');
+			}, 2000);
+		}
 	}
 
 	function playVerseAudio(verse: any) {
@@ -168,37 +157,37 @@
 			return;
 		}
 
-		// Create or reuse audio element
+		// Stop current if playing
 		if (audioRef) {
 			audioRef.pause();
+			audioRef = null;
 		}
+
+		currentPlayingVerse = verse.nomorAyat;
+		scrollToVerse(verse.nomorAyat);
+
 		audioRef = new Audio(verse.audio[selectedQori]);
 		audioRef.play();
 		isPlaying = true;
 
 		audioRef.onended = () => {
-			isPlaying = false;
+			// Auto play next verse
+			const nextVerseNumber = verse.nomorAyat + 1;
+			if (nextVerseNumber <= quran.jumlahAyat) {
+				const nextVerse = quran.ayat.find((v: any) => v.nomorAyat === nextVerseNumber);
+				if (nextVerse) {
+					playVerseAudio(nextVerse);
+				} else {
+					isPlaying = false;
+					currentPlayingVerse = null;
+				}
+			} else {
+				isPlaying = false;
+				currentPlayingVerse = null;
+			}
 		};
 
 		isMenuOpen = false;
-	}
-
-	function playSurahAudio() {
-		if (!quran.audioFull?.[selectedQori]) {
-			toast.error('Audio tidak tersedia');
-			return;
-		}
-
-		if (audioRef) {
-			audioRef.pause();
-		}
-		audioRef = new Audio(quran.audioFull[selectedQori]);
-		audioRef.play();
-		isPlaying = true;
-
-		audioRef.onended = () => {
-			isPlaying = false;
-		};
 	}
 
 	async function addToTilawah() {
@@ -328,14 +317,14 @@
 					<ChevronLeft class="size-5" />
 				</a>
 				<div>
-					<h1 class="font-bold text-lg leading-tight">{quran.namaLatin}</h1>
-					<p class="text-xs text-base-content/60">
+					<h1 class="font-bold text-lg leading-tight">Kembali</h1>
+					<!-- <p class="text-xs text-base-content/60">
 						{quran.arti} • {quran.jumlahAyat} Ayat
-					</p>
+					</p> -->
 				</div>
 			</div>
 
-			<div class="flex gap-1">
+			<!-- <div class="flex gap-1">
 				<button class="btn btn-ghost btn-circle btn-sm" onclick={() => (isDarkMode = !isDarkMode)}>
 					{#if isDarkMode}
 						<Sun class="size-5" />
@@ -346,7 +335,7 @@
 				<button class="btn btn-ghost btn-circle btn-sm">
 					<Settings2 class="size-5" />
 				</button>
-			</div>
+			</div> -->
 		</div>
 
 		<!-- Tabs -->
@@ -383,7 +372,12 @@
 	</header>
 
 	<!-- Surah Header Card -->
-	<SurahHeader surah={quran} {selectedQori} {isPlaying} onPlayAudio={playSurahAudio} />
+	<SurahHeader
+		surah={quran}
+		{selectedQori}
+		{isPlaying}
+		onPlayAudio={() => playVerseAudio(quran.ayat[0])}
+	/>
 
 	<!-- Verse Filter -->
 	<VerseFilter totalAyat={quran.jumlahAyat} bind:selectedAyat bind:selectedQori />
@@ -456,8 +450,12 @@
 							>
 								{#each quran.ayat.slice(currentPageIndex * versesPerPage, (currentPageIndex + 1) * versesPerPage) as verse, i (verse.nomorAyat)}
 									<button
+										id="ayah-{verse.nomorAyat}"
 										type="button"
-										class="inline align-middle hover:text-primary transition-colors cursor-pointer p-0 m-0 border-0 bg-transparent"
+										class="inline align-middle hover:text-primary transition-colors cursor-pointer p-0 m-0 border-0 bg-transparent {currentPlayingVerse ===
+										verse.nomorAyat
+											? 'text-primary drop-shadow-[0_0_8px_rgba(var(--primary),0.5)]'
+											: ''}"
 										onclick={() => openVerseDetail(verse)}
 									>
 										{verse.teksArab}
@@ -595,8 +593,19 @@
 					variant="primary"
 					class="shadow-lg shadow-primary/30"
 					onclick={() => {
-						// playSurahAudio()
-						isPlaying = true;
+						if (isPlaying && audioRef) {
+							audioRef.pause();
+							isPlaying = false;
+						} else if (!isPlaying && audioRef) {
+							audioRef.play();
+							isPlaying = true;
+						} else {
+							// Start from first verse or current playing
+							const verseToPlay = currentPlayingVerse
+								? quran.ayat.find((v: any) => v.nomorAyat === currentPlayingVerse)
+								: quran.ayat[0];
+							playVerseAudio(verseToPlay);
+						}
 					}}
 				>
 					{#if isPlaying}

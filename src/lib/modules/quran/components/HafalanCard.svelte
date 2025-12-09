@@ -60,10 +60,7 @@
 					onchange={handleSurahChange}
 				>
 					{#each quranMetadata as s}
-						<option value={s.name}
-							>{s.number}. {s.name} ({s.ayahs}
-							{m.quran_tilawah_pages ? m.quran_tilawah_pages() : 'ayat'})</option
-						>
+						<option value={s.name}>{s.number}. {s.name} </option>
 					{/each}
 				</select>
 			</div>

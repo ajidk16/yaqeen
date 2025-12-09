@@ -19,7 +19,7 @@
 		onPlayAudio?: () => void;
 	}
 
-	let { surah, selectedQori = '01', isPlaying = false, onPlayAudio }: Props = $props();
+	let { surah, selectedQori = '01' }: Props = $props();
 
 	let showDescription = $state(false);
 
@@ -59,23 +59,6 @@
 					<span class="text-base-content/60 font-normal">({surah.arti})</span>
 				</p>
 			</div>
-
-			<!-- Play Full Surah Button -->
-			{#if audioUrl}
-				<Button
-					variant="primary"
-					class="shadow-lg shadow-primary/20 flex-none"
-					onclick={onPlayAudio}
-				>
-					{#if isPlaying}
-						<PauseCircle class="size-5 mr-2" />
-						<span>Jeda</span>
-					{:else}
-						<PlayCircle class="size-5 mr-2" />
-						<span>Putar</span>
-					{/if}
-				</Button>
-			{/if}
 		</div>
 
 		<!-- Info Badges -->
