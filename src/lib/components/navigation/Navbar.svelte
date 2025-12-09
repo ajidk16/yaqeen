@@ -128,7 +128,7 @@
 					<span class="text-sm font-medium text-base-content/70">Theme</span>
 					<ToggleTheme />
 				</div> -->
-				<div class="mt-4">
+				<div class="mt-4 space-y-4">
 					{#if page.data.user}
 						<Button
 							onclick={() => {
@@ -149,16 +149,18 @@
 						>
 							{m.nav_login()}
 						</Button>
+						<Button
+							onclick={() => {
+								goto('#cta');
+								isMenuOpen = false;
+							}}
+							variant="primary"
+							block
+							class="rounded-full"
+						>
+							{m.nav_cta()}
+						</Button>
 					{/if}
-					<Button
-						onclick={() => {
-							goto('#cta');
-							isMenuOpen = false;
-						}}
-						variant="primary"
-						block
-						class="rounded-full">{m.nav_cta()}</Button
-					>
 				</div>
 			</div>
 		</div>
