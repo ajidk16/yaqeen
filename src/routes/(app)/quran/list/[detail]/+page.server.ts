@@ -6,8 +6,6 @@ import { eq, and } from 'drizzle-orm';
 import { error } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
-	// Updated auth logic based on hooks.server.ts
-    const user = locals.user;
     const session = locals.session;
 	const surahNumber = Number(params.detail);
 
@@ -15,79 +13,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		error(404, 'Surah tidak ditemukan');
 	}
     
-    // --- DUMMY DATA for Al-Fatihah ---
-    const alFatihahVerses = [
-        {
-            id: 1,
-            number: { inSurah: 1 },
-            text: { arab: 'بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ' },
-            transliteration: { text: "Bismillāhir-raḥmānir-raḥīm" },
-            translation: { text: "Dengan nama Allah Yang Maha Pengasih, Maha Penyayang." },
-            tafsir: { text: "Ayat ini disebut Basmalah. Setiap Muslim dianjurkan untuk memulai setiap pekerjaan dengan menyebut nama Allah. Ar-Rahman dan Ar-Rahim keduanya berasal dari kata rahmat, namun Ar-Rahman menunjukkan kasih sayang yang luas mencakup semua makhluk, sedangkan Ar-Rahim khusus untuk orang-orang beriman." }
-        },
-        {
-            id: 2,
-            number: { inSurah: 2 },
-            text: { arab: 'ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ' },
-            transliteration: { text: "Al-ḥamdu lillāhi rabbil-'ālamīn" },
-            translation: { text: "Segala puji bagi Allah, Tuhan seluruh alam." },
-            tafsir: { text: "Al-Hamd adalah pujian yang sempurna yang hanya layak bagi Allah. Rabb berarti Tuhan yang memelihara, mengatur, dan mendidik seluruh alam. Al-'Alamin mencakup semua makhluk: manusia, jin, malaikat, hewan, tumbuhan, dan seluruh alam semesta." }
-        },
-        {
-            id: 3,
-            number: { inSurah: 3 },
-            text: { arab: 'ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ' },
-            transliteration: { text: "Ar-raḥmānir-raḥīm" },
-            translation: { text: "Yang Maha Pengasih, Maha Penyayang." },
-            tafsir: { text: "Pengulangan dua sifat ini menegaskan betapa luasnya kasih sayang Allah. Dalam hadits Qudsi, Allah berfirman bahwa rahmat-Nya mengalahkan murka-Nya. Rahmat Allah meliputi segala sesuatu dan diberikan kepada semua makhluk." }
-        },
-        {
-            id: 4,
-            number: { inSurah: 4 },
-            text: { arab: 'مَـٰلِكِ يَوْمِ ٱلدِّينِ' },
-            transliteration: { text: "Māliki yawmid-dīn" },
-            translation: { text: "Pemilik hari pembalasan." },
-            tafsir: { text: "Yaumid-Din adalah Hari Kiamat, hari di mana semua amal akan dihisab dan dibalas. Allah adalah satu-satunya Penguasa dan Hakim pada hari itu. Tidak ada seorang pun yang dapat menolong kecuali dengan izin-Nya." }
-        },
-        {
-            id: 5,
-            number: { inSurah: 5 },
-            text: { arab: 'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ' },
-            transliteration: { text: "Iyyāka na'budu wa iyyāka nasta'īn" },
-            translation: { text: "Hanya kepada Engkaulah kami menyembah dan hanya kepada Engkaulah kami memohon pertolongan." },
-            tafsir: { text: "Ayat ini adalah inti tauhid. Mendahulukan objek (Iyyaka) menunjukkan pengkhususan ibadah hanya untuk Allah. Ibadah tanpa pertolongan Allah tidak akan terlaksana, maka kita memohon pertolongan-Nya dalam segala urusan." }
-        },
-        {
-            id: 6,
-            number: { inSurah: 6 },
-            text: { arab: 'ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ' },
-            transliteration: { text: "Ihdinash-shirātal-mustaqīm" },
-            translation: { text: "Tunjukilah kami jalan yang lurus." },
-            tafsir: { text: "Ash-Shirath Al-Mustaqim adalah jalan Islam, jalan yang ditempuh oleh Nabi Muhammad ﷺ dan para sahabatnya. Hidayah yang dimohon meliputi petunjuk ke jalan yang benar dan kekuatan untuk istiqamah di atasnya." }
-        },
-        {
-            id: 7,
-            number: { inSurah: 7 },
-            text: { arab: 'صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ' },
-            transliteration: { text: "Shirāthal-ladhīna an'amta 'alayhim ghayril-maghdhūbi 'alayhim wa ladh-dhāllīn" },
-            translation: { text: "(Yaitu) jalan orang-orang yang telah Engkau beri nikmat, bukan (jalan) mereka yang dimurkai, dan bukan (pula jalan) mereka yang sesat." },
-            tafsir: { text: "Orang-orang yang diberi nikmat adalah para Nabi, shiddiqin, syuhada, dan orang-orang saleh. Al-Maghdhubi 'alaihim adalah mereka yang mengetahui kebenaran tapi tidak mengamalkannya. Adh-Dhallin adalah mereka yang beribadah tanpa ilmu." }
-        }
-    ];
-
-    const dummySurah = {
-        id: surahNumber,
-        nameSimple: 'Al-Fatihah',
-        nameArabic: 'الفاتحة',
-        translatedName: { name: 'Pembukaan' },
-        versesCount: 7,
-        bismillahPre: false,
-        revelationPlace: 'makkah',
-        pageNumber: 1
-    };
-
-    // Full text for mushaf page view
-    const mushafPageText = `بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ ۝١ ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ ۝٢ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ ۝٣ مَـٰلِكِ يَوْمِ ٱلدِّينِ ۝٤ إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ ۝٥ ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ ۝٦ صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ ۝٧`;
 
     const quranResponse = await fetch(`https://equran.id/api/v2/surat/${surahNumber}`);
     if (!quranResponse.ok) {
@@ -101,17 +26,15 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     }
     const tafsirData = await tafsirResponse.json();
 
-    // Fetch real user interactions from database
     let userInteractions = {
         bookmarks: [] as { ayahNumber: number; surahNumber: number }[],
         highlights: [] as { ayahNumber: number; surahNumber: number; color: string }[],
         notes: [] as { ayahNumber: number; surahNumber: number; text: string }[]
     };
 
-    if (session?.user?.id) {
-        const userId = session.user.id;
+    if (locals?.user?.id) {
+        const userId = locals.user.id;
 
-        // Fetch bookmarks
         const bookmarks = await db.query.quranBookmarks.findMany({
             where: and(
                 eq(table.quranBookmarks.userId, userId),
@@ -151,9 +74,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     }
 
     return {
-        surah: dummySurah,
-        verses: alFatihahVerses,
-        mushafPageText: mushafPageText,
         quran: quranData,
         tafsir: tafsirData,
         pagination: { total: 7, totalPages: 1, currentPage: 1 },
@@ -175,7 +95,7 @@ export const actions = {
         try {
             const existing = await db.query.quranBookmarks.findFirst({
                 where: and(
-                    eq(table.quranBookmarks.userId, session.user.id),
+                    eq(table.quranBookmarks.userId, String(locals.user?.id)),
                     eq(table.quranBookmarks.surahNumber, surahNumber),
                     eq(table.quranBookmarks.ayahNumber, ayahNumber)
                 )
@@ -187,7 +107,7 @@ export const actions = {
             } else {
                 await db.insert(table.quranBookmarks).values({
                     id: crypto.randomUUID(),
-                    userId: session.user.id,
+                    userId: String(locals.user?.id),
                     surahNumber,
                     ayahNumber
                 });
@@ -213,7 +133,7 @@ export const actions = {
         try {
             const existing = await db.query.quranHighlights.findFirst({
                  where: and(
-                    eq(table.quranHighlights.userId, session.user.id),
+                    eq(table.quranHighlights.userId, String(locals.user?.id)),
                     eq(table.quranHighlights.surahNumber, surahNumber),
                     eq(table.quranHighlights.ayahNumber, ayahNumber)
                 )
@@ -230,7 +150,7 @@ export const actions = {
             } else if (color) {
                  await db.insert(table.quranHighlights).values({
                     id: crypto.randomUUID(),
-                    userId: session.user.id,
+                    userId: String(locals.user?.id),
                     surahNumber,
                     ayahNumber,
                     color
@@ -257,7 +177,7 @@ export const actions = {
         try {
             const existing = await db.query.quranNotes.findFirst({
                 where: and(
-                    eq(table.quranNotes.userId, session.user.id),
+                    eq(table.quranNotes.userId, String(locals.user?.id)),
                     eq(table.quranNotes.surahNumber, surahNumber),
                     eq(table.quranNotes.ayahNumber, ayahNumber)
                 )
@@ -271,7 +191,7 @@ export const actions = {
             } else {
                 await db.insert(table.quranNotes).values({
                     id: crypto.randomUUID(),
-                    userId: session.user.id,
+                    userId: String(locals.user?.id),
                     surahNumber,
                     ayahNumber,
                     text
@@ -297,7 +217,7 @@ export const actions = {
         try {
             await db.delete(table.quranNotes).where(
                 and(
-                    eq(table.quranNotes.userId, session.user.id),
+                    eq(table.quranNotes.userId, String(locals.user?.id)),
                     eq(table.quranNotes.surahNumber, surahNumber),
                     eq(table.quranNotes.ayahNumber, ayahNumber)
                 )
@@ -326,7 +246,7 @@ export const actions = {
             // Check if already has progress for today
             const existing = await db.query.quranProgress.findFirst({
                 where: and(
-                    eq(table.quranProgress.userId, session.user.id),
+                    eq(table.quranProgress.userId, String(locals.user?.id)),
                     eq(table.quranProgress.date, today)
                 )
             });
@@ -342,7 +262,7 @@ export const actions = {
             } else {
                 await db.insert(table.quranProgress).values({
                     id: crypto.randomUUID(),
-                    userId: session.user.id,
+                    userId: String(locals.user?.id),
                     date: today,
                     startPage: ayahNumber,
                     endPage: ayahNumber,
@@ -373,7 +293,7 @@ export const actions = {
             // Check if already tracking this surah
             const existing = await db.query.hafalanProgress.findFirst({
                 where: and(
-                    eq(table.hafalanProgress.userId, session.user.id),
+                    eq(table.hafalanProgress.userId, String(locals.user?.id)),
                     eq(table.hafalanProgress.surahName, surahName)
                 )
             });
@@ -394,7 +314,7 @@ export const actions = {
             } else {
                 await db.insert(table.hafalanProgress).values({
                     id: crypto.randomUUID(),
-                    userId: session.user.id,
+                    userId: String(locals.user?.id),
                     surahName,
                     date: today,
                     ayahStart: ayahNumber,
