@@ -4,18 +4,10 @@ import { db } from '$lib/server/db';
 import { user, verification } from '$lib/server/db/schema';
 import { verifyOtp, generateOtp, hashOtp, getOtpExpiration, generateVerificationId } from '$lib/server/otp';
 import { render } from 'svelte/server';
-import nodemailer from 'nodemailer';
-import Otp from '$lib/email/otp.svelte';
-import { GMAIL_PASS, GMAIL_USER } from '$env/static/private';
+import { sendVerificationEmail } from '$lib/server/email';
 import type { Actions, PageServerLoad } from './$types';
 
-const transporter = nodemailer.createTransport({
-	service: "gmail",
-	auth: {
-		user: GMAIL_USER,
-		pass: GMAIL_PASS,
-	},
-});
+
 
 export const load: PageServerLoad = async ({ cookies }) => {
 	const email = cookies.get('verify_email');
@@ -109,20 +101,10 @@ export const actions: Actions = {
 			updatedAt: new Date()
 		});
 
-		// Send email
-		const otpResult = render(Otp, {
-			props: { otp, appName: 'Yaa Qeen' }
-		});
-
 		try {
-			await transporter.sendMail({
-				from: `Yaa Qeen <${GMAIL_USER}>`,
-				to: email,
-				subject: 'Kode Verifikasi Baru Yaa Qeen',
-				html: otpResult.body
-			});
+			await sendVerificationEmail(email, otp);
 		} catch (error) {
-			console.error('Failed to send email:', error);
+			console.error('Failed to resend email:', error);
 			return fail(500, { message: 'Gagal mengirim email' });
 		}
 

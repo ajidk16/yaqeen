@@ -3,7 +3,9 @@ import { generateIdFromEntropySize } from "lucia";
 import { hash } from "@node-rs/argon2";
 import { lucia } from "$lib/server/auth";
 import { db } from "$lib/server/db";
-import { user, account } from "$lib/server/db/schema";
+import { user, account, verification } from "$lib/server/db/schema";
+import { generateOtp, hashOtp, getOtpExpiration, generateVerificationId } from '$lib/server/otp';
+import { sendVerificationEmail } from '$lib/server/email';
 import { eq } from "drizzle-orm";
 import type { Actions } from "./$types";
 
@@ -58,7 +60,7 @@ export const actions: Actions = {
 			parallelism: 1
 		});
 
-		// Create user
+	// Create user
 		try {
 			await db.insert(user).values({
 				id: userId,
@@ -90,6 +92,38 @@ export const actions: Actions = {
 				path: ".",
 				...sessionCookie.attributes
 			});
+
+			// Generate and send OTP
+			const otp = generateOtp();
+			const hashedOtp = hashOtp(otp);
+			const expiresAt = getOtpExpiration(10);
+			const verificationId = generateVerificationId();
+
+			await db.insert(verification).values({
+				id: verificationId,
+				identifier: email,
+				value: hashedOtp,
+				expiresAt,
+				createdAt: new Date(),
+				updatedAt: new Date()
+			});
+
+			try {
+				await sendVerificationEmail(email, otp);
+			} catch (error) {
+				console.error('Failed to send verification email during registration:', error);
+				// Still redirect to verify, user can request resend there
+			}
+
+			// Set verify_email cookie for the verify page
+			cookies.set('verify_email', email, {
+				path: '/',
+				httpOnly: true,
+				secure: true,
+				sameSite: 'strict',
+				maxAge: 60 * 10 // 10 minutes
+			});
+
 		} catch (e) {
             console.error(e);
 			return fail(500, {
@@ -97,6 +131,6 @@ export const actions: Actions = {
 			});
 		}
 
-		redirect(302, "/dashboard");
+		redirect(302, "/verify");
 	}
 };

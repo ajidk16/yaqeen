@@ -6,10 +6,6 @@ export const load = async ({cookies}) => {
 
     const chapters = await fetch(`https://equran.id/api/v2/surat`).then(res => res.json());
 
-    // const chaptersdk = await quran.chapters.findAll();
-    // console.log('chaptersdk', chaptersdk);
-
-    // const chapters = await getChapters(accessToken,QURAN_CLIENT_ID);
 
 
     return {

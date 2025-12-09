@@ -253,16 +253,16 @@
 		</div>
 
 		<div
-			class="grid grid-cols-2 sm:grid-cols-4 gap-4"
+			class="grid grid-cols-2 sm:grid-cols-3 gap-4"
 			in:fly={{ y: 20, duration: 800, delay: 500 }}
 		>
-			<Button
+			<!-- <Button
 				class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-primary hover:text-primary transition-all"
 				onclick={() => goto('/stats')}
 			>
 				<Heart class="size-6" />
 				<span class="text-xs font-medium">{m.dashboard_quick_mood()}</span>
-			</Button>
+			</Button> -->
 			<Button
 				class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-secondary hover:text-secondary transition-all"
 				onclick={() => goto('/habits')}
@@ -272,7 +272,7 @@
 			</Button>
 			<Button
 				class="h-auto py-4 flex-col gap-2 border-base-content/10 hover:border-accent hover:text-accent transition-all"
-				onclick={() => goto('/quran')}
+				onclick={() => goto('/quran/list')}
 			>
 				<BookOpen class="size-6" />
 				<span class="text-xs font-medium">{m.dashboard_quick_quran()}</span>
