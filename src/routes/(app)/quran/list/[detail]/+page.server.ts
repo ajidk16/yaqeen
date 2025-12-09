@@ -260,9 +260,39 @@ export const actions = {
                     surahName,
                     ayahNumber
                 });
-                return { success: true, action: 'added' };
             }
-            return { success: true, action: 'already_exists' };
+
+            // *** Sync with Hafalan Progress ***
+            // Find existing hafalan progress for this surah
+            const hafalanProg = await db.query.hafalanProgress.findFirst({
+                where: and(
+                    eq(table.hafalanProgress.userId, String(locals.user?.id)),
+                    eq(table.hafalanProgress.surahName, surahName)
+                )
+            });
+
+            if (hafalanProg) {
+                const currentProgress = (hafalanProg.progress as number[]) || [];
+                if (!currentProgress.includes(ayahNumber)) {
+                    const updatedProgress = [...currentProgress, ayahNumber];
+                    // Sort specifically? Not strictly needed by jsonb but good for sanity
+                    updatedProgress.sort((a, b) => a - b);
+
+                    await db
+                        .update(table.hafalanProgress)
+                        .set({
+                            progress: updatedProgress,
+                            lastReviewed: new Date(),
+                            ayahEnd: Math.max(hafalanProg.ayahEnd, ayahNumber)
+                        })
+                        .where(eq(table.hafalanProgress.id, hafalanProg.id));
+                } else {
+                    // Update last reviewed even if already present
+                    await db.update(table.hafalanProgress).set({ lastReviewed: new Date() }).where(eq(table.hafalanProgress.id, hafalanProg.id));
+                }
+            }
+
+            return { success: true, action: existing ? 'already_exists' : 'added' };
         } catch (e) {
             console.error(e);
             return { success: false, error: 'Database error' };

@@ -71,7 +71,7 @@
 			<div class="w-12 h-1.5 bg-base-300 rounded-full mx-auto mb-4"></div>
 			<div class="flex items-start justify-between">
 				<div class="flex-1 min-w-0">
-					<h3 class="font-bold text-lg">QS. {surahName}: {verse?.number?.inSurah}</h3>
+					<h3 class="font-bold text-lg">QS. {surahName}: {verse?.nomorAyat}</h3>
 					<p class="text-sm text-base-content/60 line-clamp-2 mt-1">
 						{verse?.translation?.text}
 					</p>

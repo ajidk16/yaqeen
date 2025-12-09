@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { Search, BookOpen, ChevronLeft, Sparkles, Filter } from 'lucide-svelte';
-	import { quranMetadata } from '$lib/data/quran-metadata';
-	import * as m from '$lib/paraglide/messages.js';
+	// import { quranMetadata } from '$lib/data/quran-metadata';
 	import { fly, fade } from 'svelte/transition';
 	import { page } from '$app/state';
 
 	let searchQuery = $state('');
 	let selectedType = $state<'all' | 'Meccan' | 'Medinan'>('all');
-	const chapters = $derived(page.data.chapters.data);
+
+	// Using $derived checking for page.data.chapters validity
+	const chapters = $derived(page.data.chapters?.data || []);
 
 	// Daily quotes
 	const quotes = [
@@ -26,12 +27,17 @@
 	let dailyQuote = $state(quotes[Math.floor(Math.random() * quotes.length)]);
 
 	let filteredSurahs = $derived(
-		quranMetadata.filter((surah) => {
+		chapters.filter((surah: any) => {
 			const matchesSearch =
-				surah.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				surah.englishName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				surah.number.toString().includes(searchQuery);
-			const matchesType = selectedType === 'all' || surah.type === selectedType;
+				surah.namaLatin.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				(surah.arti && surah.arti.toLowerCase().includes(searchQuery.toLowerCase())) ||
+				surah.nomor.toString().includes(searchQuery);
+
+			const matchesType =
+				selectedType === 'all' ||
+				(selectedType === 'Meccan' && surah.tempatTurun === 'Mekah') ||
+				(selectedType === 'Medinan' && surah.tempatTurun === 'Madinah');
+
 			return matchesSearch && matchesType;
 		})
 	);
@@ -47,7 +53,7 @@
 			<div class="p-1.5 rounded-lg bg-base-300 group-hover:bg-primary/10 transition-colors">
 				<ChevronLeft class="size-4" />
 			</div>
-			<span>Kembali ke Jurnal</span>
+			<span>Kembali ke Quran</span>
 		</a>
 
 		<!-- Hero Section with Quote -->
@@ -132,15 +138,26 @@
 
 			<!-- Results Count -->
 			<p class="text-sm text-base-content/50">
-				Menampilkan {filteredSurahs.length} dari {quranMetadata.length} surah
+				Menampilkan {filteredSurahs.length} dari {chapters.length} surah
 			</p>
 		</div>
 
 		<!-- Surah Grid -->
 		<div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-			{#if page.data.chapters.code !== 200}
-				<!-- No Results Found -->
-				<div class="text-center py-16 flex items-center justify-center" in:fade={{ duration: 200 }}>
+			{#if page.data.chapters.code !== 200 && chapters.length === 0}
+				<!-- No Results Found (API Error) -->
+				<div
+					class="text-center py-16 col-span-full flex flex-col items-center justify-center"
+					in:fade={{ duration: 200 }}
+				>
+					<p class="text-base-content/60">Gagal memuat data surah.</p>
+				</div>
+			{:else if filteredSurahs.length === 0}
+				<!-- Search Empty -->
+				<div
+					class="text-center py-16 col-span-full flex flex-col items-center justify-center"
+					in:fade={{ duration: 200 }}
+				>
 					<div class="inline-flex items-center justify-center p-4 rounded-full bg-base-300 mb-4">
 						<Search class="size-8 opacity-40" />
 					</div>
@@ -158,7 +175,7 @@
 					</button>
 				</div>
 			{:else}
-				{#each chapters as surah, idx (surah.nomor)}
+				{#each filteredSurahs as surah, idx (surah.nomor)}
 					<a
 						href="/quran/list/{surah.nomor}"
 						class="group"
@@ -217,25 +234,7 @@
 			{/if}
 		</div>
 
-		{#if filteredSurahs.length === 0}
-			<div class="text-center py-16" in:fade={{ duration: 200 }}>
-				<div class="inline-flex items-center justify-center p-4 rounded-full bg-base-300 mb-4">
-					<Search class="size-8 opacity-40" />
-				</div>
-				<p class="text-base-content/60">
-					Tidak ditemukan surah dengan kata kunci "{searchQuery}"
-				</p>
-				<button
-					class="mt-4 text-sm text-primary hover:underline"
-					onclick={() => {
-						searchQuery = '';
-						selectedType = 'all';
-					}}
-				>
-					Reset pencarian
-				</button>
-			</div>
-		{/if}
+		<!-- {#if filteredSurahs.length === 0} removed redundant block -->
 	</div>
 </div>
 

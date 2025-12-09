@@ -62,9 +62,9 @@
 
 	// Stats (mock data for now, can be derived from server)
 	let stats = $derived({
-		streak: page?.data.stats?.streak ?? 7,
+		streak: page.data.stats.currentStreak ?? 7,
 		totalPages: page?.data.stats?.totalPages ?? 142,
-		memorizedAyahs: page?.data.stats?.memorizedAyahs ?? 28
+		memorizedAyahs: page?.data.stats?.ayahsMemorized ?? 28
 	});
 
 	// Actions
@@ -274,6 +274,6 @@
 		</div>
 
 		<!-- Extended Stats -->
-		<QuranStats stats={page?.data.stats} />
+		<!-- <QuranStats stats={page?.data.stats} /> -->
 	</div>
 </div>

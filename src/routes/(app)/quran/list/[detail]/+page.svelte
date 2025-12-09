@@ -341,17 +341,23 @@
 	<!-- Sticky Header -->
 	<header class="sticky top-0 z-40 bg-base-100/80 backdrop-blur-md border-b border-base-200">
 		<div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
-			<div class="flex items-center gap-3">
+			<!-- <div class="flex items-center gap-3">
 				<a href="/quran/list" class="btn btn-ghost btn-circle btn-sm">
 					<ChevronLeft class="size-5" />
 				</a>
 				<div>
 					<h1 class="font-bold text-lg leading-tight">Kembali</h1>
-					<!-- <p class="text-xs text-base-content/60">
-						{quran.arti} • {quran.jumlahAyat} Ayat
-					</p> -->
 				</div>
-			</div>
+			</div> -->
+			<a
+				href="/quran/list"
+				class="inline-flex items-center gap-2 text-sm font-medium text-base-content/60 hover:text-primary transition-colors group"
+			>
+				<div class="p-1.5 rounded-lg bg-base-300 group-hover:bg-primary/10 transition-colors">
+					<ChevronLeft class="size-4" />
+				</div>
+				<span>Kembali ke Daftar Surah</span>
+			</a>
 
 			<!-- <div class="flex gap-1">
 				<button class="btn btn-ghost btn-circle btn-sm" onclick={() => (isDarkMode = !isDarkMode)}>
