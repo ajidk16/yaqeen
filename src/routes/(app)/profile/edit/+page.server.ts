@@ -37,6 +37,7 @@ export const actions: Actions = {
 		const theme = formData.get("theme") as string; // 'light' | 'dark'
 		const notifications = formData.get("notifications") === 'on';
 		const image = formData.get("image") as File;
+		const gender = formData.get("gender") as string;
 
 		// Handle avatar upload (simplified for now, assuming base64 or URL if client handles upload)
 		// Ideally, we should handle file upload here or use a signed URL for client-side upload.
@@ -98,7 +99,8 @@ export const actions: Actions = {
 						notifications
 					},
 					updatedAt: new Date(),
-					image: coverImage
+					image: coverImage,
+					gender
 				})
 				.where(eq(user.id, locals.user.id));
 		} catch (e) {

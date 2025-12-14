@@ -196,6 +196,35 @@
 								</label>
 							</div>
 
+							<!-- tambah gender -->
+							<div class="form-control w-full sm:col-span-2">
+								<label class="label" for="gender">
+									<span class="label-text font-medium">Jenis Kelamin</span>
+								</label>
+								<div class="flex gap-4">
+									<label class="flex items-center gap-2 cursor-pointer">
+										<input
+											type="radio"
+											name="gender"
+											value="male"
+											class="radio radio-primary"
+											checked={profile.gender === 'male'}
+										/>
+										<span>Laki-laki</span>
+									</label>
+									<label class="flex items-center gap-2 cursor-pointer">
+										<input
+											type="radio"
+											name="gender"
+											value="female"
+											class="radio radio-primary"
+											checked={profile.gender === 'female'}
+										/>
+										<span>Perempuan</span>
+									</label>
+								</div>
+							</div>
+
 							<div class="form-control w-full sm:col-span-2">
 								<label class="label" for="location">
 									<span class="label-text font-medium">Lokasi</span>
