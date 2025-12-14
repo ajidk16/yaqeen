@@ -211,7 +211,7 @@
 	<div class="mx-auto max-w-4xl space-y-6">
 		<!-- Header Section with Glassmorphism -->
 		<header
-			class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 p-6 lg:p-8"
+			class="relative overflow-hidden rounded-3xl bg-linear-to-br from-primary/5 via-transparent to-secondary/5 p-6 lg:p-8"
 			in:fly={{ y: -20, duration: 800, easing: quintOut }}
 		>
 			<!-- Animated background orbs -->
@@ -252,7 +252,7 @@
 					</Button>
 					<button
 						onclick={() => (isCalendarOpen = true)}
-						class="flex min-w-[160px] items-center justify-center gap-2 rounded-xl px-4 py-2 font-medium transition-colors hover:bg-base-content/5"
+						class="flex min-w-40 items-center justify-center gap-2 rounded-xl px-4 py-2 font-medium transition-colors hover:bg-base-content/5"
 					>
 						<Calendar class="size-4 text-primary" />
 						<span>{formatDate(selectedDate)}</span>
@@ -352,7 +352,7 @@
 						>
 							<div class="flex items-center gap-4">
 								<div
-									class="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-purple-500/20 text-primary"
+									class="flex size-14 items-center justify-center rounded-2xl bg-linear-to-br from-primary/20 to-purple-500/20 text-primary"
 								>
 									<prayer.icon size={28} />
 								</div>

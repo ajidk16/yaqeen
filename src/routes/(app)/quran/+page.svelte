@@ -251,7 +251,7 @@
 
 			<!-- Bottom Accent -->
 			<div
-				class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50"
+				class="absolute bottom-0 left-0 right-0 h-1 bg-linear-to-r from-primary/50 via-primary to-primary/50"
 			></div>
 		</div>
 

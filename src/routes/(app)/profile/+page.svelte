@@ -19,7 +19,6 @@
 	import * as m from '$lib/paraglide/messages.js';
 
 	const user = $derived(page.data.user);
-	console.log('test user', user);
 
 	const menuItems = [
 		// {
@@ -109,7 +108,7 @@
 					<div class="relative">
 						<div class="inline-block rounded-full bg-base-100 p-1 shadow-xl">
 							<Avatar
-								src={user?.image ?? `https://i.pravatar.cc/150?u=${user?.id}`}
+								src={user?.image ? user?.image : `https://i.pravatar.cc/150?u=${user?.name}`}
 								alt={user?.name}
 								size="xl"
 								class="ring-4 rounded-full ring-base-100"

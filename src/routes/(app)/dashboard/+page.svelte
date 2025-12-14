@@ -118,7 +118,7 @@
 	<div class="mx-auto max-w-4xl space-y-6">
 		<!-- Hero Section with Floating Orbs -->
 		<header
-			class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 p-6 lg:p-8"
+			class="relative overflow-hidden rounded-3xl bg-linear-to-br from-primary/5 via-transparent to-secondary/5 p-6 lg:p-8"
 			in:fly={{ y: -20, duration: 800, easing: quintOut }}
 		>
 			<!-- Animated background orbs -->
@@ -162,7 +162,7 @@
 		<div class="grid gap-6 md:grid-cols-3">
 			<!-- Prayer Timer - Hero Card -->
 			<div
-				class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary to-purple-600 text-primary-content shadow-2xl shadow-primary/20 md:col-span-2"
+				class="relative overflow-hidden rounded-3xl bg-linear-to-br from-primary via-primary to-purple-600 text-primary-content shadow-2xl shadow-primary/20 md:col-span-2"
 				in:scale={{ duration: 600, start: 0.95, delay: 100 }}
 			>
 				<!-- Decorative elements -->
@@ -243,7 +243,7 @@
 						</div>
 						<div class="h-2.5 w-full overflow-hidden rounded-full bg-base-content/10">
 							<div
-								class="h-full rounded-full bg-gradient-to-r from-primary to-purple-500 transition-all duration-500"
+								class="h-full rounded-full bg-linear-to-br from-primary to-purple-500 transition-all duration-500"
 								style="width: {profile?.progress?.ibadah ?? 0}%"
 							></div>
 						</div>
@@ -260,7 +260,7 @@
 						</div>
 						<div class="h-2.5 w-full overflow-hidden rounded-full bg-base-content/10">
 							<div
-								class="h-full rounded-full bg-gradient-to-r from-secondary to-pink-500 transition-all duration-500"
+								class="h-full rounded-full bg-linear-to-br from-secondary to-pink-500 transition-all duration-500"
 								style="width: {profile?.progress?.habits ?? 0}%"
 							></div>
 						</div>
@@ -277,7 +277,7 @@
 						</div>
 						<div class="h-2.5 w-full overflow-hidden rounded-full bg-base-content/10">
 							<div
-								class="h-full rounded-full bg-gradient-to-r from-accent to-teal-400 transition-all duration-500"
+								class="h-full rounded-full bg-linear-to-br from-accent to-teal-400 transition-all duration-500"
 								style="width: {profile?.progress?.quran ?? 0}%"
 							></div>
 						</div>

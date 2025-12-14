@@ -59,7 +59,7 @@
 	<div class="mx-auto max-w-2xl space-y-6">
 		<!-- Header with Glassmorphism -->
 		<header
-			class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-accent/5 via-transparent to-primary/5 p-6"
+			class="relative overflow-hidden rounded-3xl bg-linear-to-br from-accent/5 via-transparent to-primary/5 p-6"
 			in:fly={{ y: -20, duration: 800, easing: quintOut }}
 		>
 			<!-- Animated background orbs -->
