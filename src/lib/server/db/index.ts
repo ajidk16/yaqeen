@@ -1,13 +1,9 @@
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import ws from 'ws';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
 import * as schema from './schema';
-import { env } from '$env/dynamic/private';
+import { DATABASE_URL } from '$env/static/private';
 
-if (!env.DATABASE_URL) throw new Error('DATABASE_URL is not set');
+if (!DATABASE_URL) throw new Error('DATABASE_URL is not set');
 
-neonConfig.webSocketConstructor = ws;
-
-const pool = new Pool({ connectionString: env.DATABASE_URL });
-
-export const db = drizzle(pool, { schema });
+const client = postgres(DATABASE_URL);
+export const db = drizzle(client, { schema: { ...schema } });

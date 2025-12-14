@@ -8,26 +8,27 @@
 		ChevronRight,
 		Bell,
 		Shield,
-		CircleHelp,
 		Crown,
-		Palette
+		Palette,
+		HeartPulse,
+		Info
 	} from 'lucide-svelte';
 	import { Button, Avatar, Badge } from '$lib/components/ui';
 	import { page } from '$app/state';
 	import { enhance } from '$app/forms';
 	import * as m from '$lib/paraglide/messages.js';
 
-	let { data } = $props();
 	const user = $derived(page.data.user);
+	console.log('test user', user);
 
 	const menuItems = [
-		{
-			icon: User,
-			label: m.profile_menu_edit(),
-			href: '/profile/edit',
-			color: 'text-primary',
-			gradient: 'from-primary/20 to-purple-500/20'
-		},
+		// {
+		// 	icon: User,
+		// 	label: m.profile_menu_edit(),
+		// 	href: '/profile/edit',
+		// 	color: 'text-primary',
+		// 	gradient: 'from-primary/20 to-purple-500/20'
+		// },
 		{
 			icon: Bell,
 			label: m.profile_menu_notifications(),
@@ -50,7 +51,14 @@
 			gradient: 'from-success/20 to-emerald-500/20'
 		},
 		{
-			icon: CircleHelp,
+			label: 'Jadwal Haid',
+			href: '/calendar',
+			color: 'text-primary',
+			icon: HeartPulse,
+			gender: 'female'
+		},
+		{
+			icon: Info,
 			label: m.profile_menu_help(),
 			href: '/profile/support',
 			color: 'text-info',
@@ -63,7 +71,7 @@
 	<div class="mx-auto max-w-2xl space-y-6">
 		<!-- Header with Glassmorphism -->
 		<header
-			class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/5 via-transparent to-accent/5 p-6 lg:p-8"
+			class="relative overflow-hidden rounded-3xl bg-linear-to-br from-primary/5 via-transparent to-accent/5 p-6 lg:p-8"
 			in:fly={{ y: -20, duration: 800, easing: quintOut }}
 		>
 			<!-- Animated background orbs -->
@@ -84,7 +92,7 @@
 			in:fly={{ y: 20, duration: 800, delay: 100 }}
 		>
 			<!-- Gradient Banner -->
-			<div class="relative h-32 bg-gradient-to-r from-primary via-purple-500 to-secondary">
+			<div class="relative h-32 bg-linear-to-r from-primary via-purple-500 to-secondary">
 				<div class="absolute inset-0 bg-black/10"></div>
 				<!-- Decorative elements -->
 				<div
@@ -100,7 +108,12 @@
 					<!-- Avatar with Ring -->
 					<div class="relative">
 						<div class="inline-block rounded-full bg-base-100 p-1 shadow-xl">
-							<Avatar src={user?.image} alt={user?.name} size="xl" class="ring-4 ring-base-100" />
+							<Avatar
+								src={user?.image ?? `https://i.pravatar.cc/150?u=${user?.id}`}
+								alt={user?.name}
+								size="xl"
+								class="ring-4 rounded-full ring-base-100"
+							/>
 						</div>
 						{#if user?.isPremium}
 							<div
@@ -115,7 +128,7 @@
 
 					<!-- User Info -->
 					<div class="flex-1 space-y-1 text-center md:text-left">
-						<h2 class="text-2xl font-bold">{user?.name}</h2>
+						<h2 class="text-2xl capitalize font-bold">{user?.name}</h2>
 						<p class="text-base-content/60">{user?.email}</p>
 						{#if user?.isPremium}
 							<Badge class="badge-warning mt-2 gap-1">
@@ -141,21 +154,23 @@
 		<!-- Menu Items -->
 		<div class="space-y-3">
 			{#each menuItems as item, i}
-				<a
-					href={item.href}
-					class="glass-card group flex items-center gap-4 rounded-2xl p-4 transition-all duration-300 hover:shadow-lg"
-					in:fly={{ x: -20, duration: 500, delay: 200 + i * 80 }}
-				>
-					<div
-						class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br {item.gradient} transition-transform duration-300 group-hover:scale-110"
+				{#if !item.gender || item.gender === user?.gender}
+					<a
+						href={item.href}
+						class="glass-card group flex items-center gap-4 rounded-2xl p-4 transition-all duration-300 hover:shadow-lg"
+						in:fly={{ x: -20, duration: 500, delay: 200 + i * 80 }}
 					>
-						<item.icon class="size-6 {item.color}" />
-					</div>
-					<span class="flex-1 text-lg font-medium">{item.label}</span>
-					<ChevronRight
-						class="size-5 text-base-content/30 transition-all group-hover:translate-x-1 group-hover:text-primary"
-					/>
-				</a>
+						<div
+							class="flex size-12 items-center justify-center rounded-xl bg-linear-to-br {item.gradient} transition-transform duration-300 group-hover:scale-110"
+						>
+							<item.icon class="size-6 {item.color}" />
+						</div>
+						<span class="flex-1 text-lg font-medium">{item.label}</span>
+						<ChevronRight
+							class="size-5 text-base-content/30 transition-all group-hover:translate-x-1 group-hover:text-primary"
+						/>
+					</a>
+				{/if}
 			{/each}
 		</div>
 

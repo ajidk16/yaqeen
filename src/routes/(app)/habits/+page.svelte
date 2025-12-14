@@ -14,7 +14,8 @@
 		MapPin,
 		Plus,
 		Clock,
-		X
+		X,
+		Info
 	} from 'lucide-svelte';
 	import { Button, Badge } from '$lib/components/ui';
 	import { goto, invalidateAll } from '$app/navigation';
@@ -100,6 +101,7 @@
 	async function updateFardhuStatus(id: string, status: PrayerStatus) {
 		// Optimistic update
 		const index = fardhuPrayers.findIndex((p) => p.id === id);
+		if (page.data.isMenstruating) return; // Block interaction
 		if (index !== -1) {
 			fardhuPrayers[index].status = status;
 		}
@@ -119,6 +121,7 @@
 	async function toggleSunnah(id: string) {
 		// Optimistic update
 		const index = sunnahPrayers.findIndex((p) => p.id === id);
+		if (page.data.isMenstruating) return; // Block interaction
 		if (index !== -1) {
 			sunnahPrayers[index].completed = !sunnahPrayers[index].completed;
 		}
@@ -219,6 +222,17 @@
 				class="pointer-events-none absolute -bottom-20 -left-20 size-56 rounded-full bg-secondary/10 blur-3xl animate-breathe"
 				style="animation-delay: -2s"
 			></div>
+
+			{#if page.data.isMenstruating}
+				<div
+					class="mb-6 rounded-xl bg-error/10 p-4 text-error border border-error/20 flex items-center gap-3 relative z-10"
+				>
+					<Info class="size-5 shrink-0" />
+					<p class="font-medium">
+						Lagi halangan/datang bulan. Aktivitas ibadah dimatikan sementara.
+					</p>
+				</div>
+			{/if}
 
 			<div
 				class="relative z-10 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center"
@@ -336,7 +350,6 @@
 						<div
 							class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center"
 						>
-							<!-- Prayer Info -->
 							<div class="flex items-center gap-4">
 								<div
 									class="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-purple-500/20 text-primary"
@@ -352,7 +365,6 @@
 								</div>
 							</div>
 
-							<!-- Segmented Status Control -->
 							<div class="flex w-full items-center gap-1 rounded-xl bg-base-200/50 p-1.5 sm:w-auto">
 								{#each statusOptions as status}
 									{@const isActive = prayer?.status === status.value}

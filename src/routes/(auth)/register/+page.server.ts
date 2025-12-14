@@ -15,6 +15,7 @@ export const actions: Actions = {
 		const email = formData.get("email");
 		const password = formData.get("password");
 		const name = formData.get("name");
+		const gender = formData.get("gender");
 		// const agreeTerms = formData.get("agreeTerms"); // Checkbox might be "on" or null
 		const userAgent = request.headers.get('user-agent');
 		const ipAddress = getClientAddress();
@@ -37,6 +38,11 @@ export const actions: Actions = {
 		if (typeof name !== "string" || name.length < 1) {
 			return fail(400, {
 				message: "Invalid name"
+			});
+		}
+		if (typeof gender !== "string" || (gender !== 'male' && gender !== 'female')) {
+			return fail(400, {
+				message: "Invalid gender"
 			});
 		}
 
@@ -67,6 +73,7 @@ export const actions: Actions = {
 				email: email,
 				name: name,
 				emailVerified: false,
+				gender: gender as 'male' | 'female',
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			});

@@ -6,7 +6,8 @@
 		Award,
 		ChevronRight,
 		Calendar,
-		Sparkles
+		Sparkles,
+		Info
 	} from 'lucide-svelte';
 	import confetti from 'canvas-confetti';
 	import { page } from '$app/state';
@@ -67,10 +68,13 @@
 		memorizedAyahs: page?.data.stats?.ayahsMemorized ?? 28
 	});
 
+	let isMenstruating = $derived(page.data.isMenstruating || false);
+
 	// Actions
 	let saveTimeout: NodeJS.Timeout;
 
 	async function saveProgress() {
+		if (isMenstruating) return;
 		const input = new FormData();
 		input.append('tilawahProgress', currentEntry.tilawahProgress.toString());
 		input.append('hafalanSurah', currentEntry.hafalanSurah);
@@ -85,6 +89,7 @@
 	}
 
 	async function updateTarget(newTarget: number) {
+		if (isMenstruating) return;
 		tilawahTarget = newTarget;
 		const formData = new FormData();
 		formData.append('target', newTarget.toString());
@@ -107,6 +112,7 @@
 	}
 
 	function toggleAyah(ayah: number) {
+		if (isMenstruating) return;
 		let newProgress = [...currentEntry.hafalanProgress];
 		if (newProgress.includes(ayah)) {
 			newProgress = newProgress.filter((a) => a !== ayah);
@@ -122,6 +128,7 @@
 	}
 
 	function handleTilawahUpdate(newProgress: number) {
+		if (isMenstruating) return;
 		updateEntry({ tilawahProgress: newProgress });
 		if (newProgress === tilawahTarget) {
 			triggerConfetti();
@@ -221,7 +228,7 @@
 
 					<!-- CTA Button -->
 					<a
-						href="/quran/list"
+						href={isMenstruating ? undefined : '/quran/surah'}
 						class="group btn btn-primary btn-lg gap-3 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 self-start lg:self-auto"
 						aria-label="Buka daftar surah Al-Quran"
 					>
@@ -354,6 +361,15 @@
 				</div>
 			</div>
 		</div>
+
+		{#if isMenstruating}
+			<div
+				class="rounded-xl bg-error/10 p-4 text-error border border-error/20 flex items-center gap-3"
+			>
+				<Info class="size-5 shrink-0" />
+				<p class="font-medium">Lagi halangan/datang bulan. Pencatatan Quran dimatikan sementara.</p>
+			</div>
+		{/if}
 
 		<!-- Date Navigator -->
 		<DateNavigator>

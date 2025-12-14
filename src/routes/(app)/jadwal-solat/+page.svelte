@@ -46,6 +46,8 @@
 
 		navigator.geolocation.getCurrentPosition(
 			async (position) => {
+				console.log('Got position:', position.coords.latitude, position.coords.longitude);
+				return
 				const formData = new FormData();
 				formData.append('latitude', position.coords.latitude.toString());
 				formData.append('longitude', position.coords.longitude.toString());

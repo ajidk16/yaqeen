@@ -330,7 +330,7 @@
 						>
 							<!-- Timeline dot -->
 							<div
-								class="absolute -left-[17px] top-5 size-2.5 rounded-full {dotColor} ring-4 ring-base-200"
+								class="absolute -left-5.5 top-7 size-3 rounded-full {dotColor} ring-4 ring-base-200"
 							></div>
 
 							<div class="flex items-center gap-4">
@@ -365,7 +365,7 @@
 		>
 			{#each quickActions as action, i}
 				<button
-					class="glass-card group flex flex-col items-center gap-3 rounded-2xl border-2 border-transparent p-6 transition-all duration-300 {action.hoverBorder} {action.hoverText} {action.hoverShadow} hover:shadow-lg"
+					class="glass-card cursor-pointer group flex flex-col items-center gap-3 rounded-2xl border-2 border-transparent p-6 transition-all duration-300 {action.hoverBorder} {action.hoverText} {action.hoverShadow} hover:shadow-lg"
 					onclick={() => goto(action.path)}
 					in:scale={{ duration: 400, start: 0.9, delay: 550 + i * 50 }}
 				>

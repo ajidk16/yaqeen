@@ -1,5 +1,8 @@
 import type { LayoutServerLoad } from './$types';
 import { fetchPrayerTimes, formatPrayerTimes, type PrayerTime } from '$lib/server/services/prayer';
+import { db } from '$lib/server/db';
+import { menstruationLogs } from '$lib/server/db/schema';
+import { eq, and, isNull, lte, or, gte, sql } from 'drizzle-orm';
 
 export const load: LayoutServerLoad = async ({ cookies, fetch, locals }) => {
 	let prayerTimes: PrayerTime[] | null = null;
@@ -14,8 +17,8 @@ export const load: LayoutServerLoad = async ({ cookies, fetch, locals }) => {
 			const cachedDate = new Date(parsed.timestamp).toDateString();
 
 			// Check if data is for today and location matches (simple check)
-			if (today === cachedDate && 
-				parsed.lat === profile?.location.lat && 
+			if (today === cachedDate &&
+				parsed.lat === profile?.location.lat &&
 				parsed.lng === profile?.location.lng) {
 				prayerTimes = parsed.data;
 			}
@@ -31,7 +34,7 @@ export const load: LayoutServerLoad = async ({ cookies, fetch, locals }) => {
 			const lng = Number(profile.location.lng);
 
 			const { timings, meta } = await fetchPrayerTimes(lat, lng, fetch);
-			
+
 			prayerTimes = formatPrayerTimes(timings, profile.preferences);
 
 			// Save to cookie (30 days)
@@ -51,8 +54,25 @@ export const load: LayoutServerLoad = async ({ cookies, fetch, locals }) => {
 		}
 	}
 
+	// 3. Check menstruation status
+	let isMenstruating = false;
+	if (profile?.gender === 'female' && profile.id) {
+		const activeLog = await db.query.menstruationLogs.findFirst({
+			where: and(
+				eq(menstruationLogs.userId, profile.id),
+				lte(menstruationLogs.startDate, sql`CURRENT_DATE`),
+				or(
+					isNull(menstruationLogs.endDate),
+					gte(menstruationLogs.endDate, sql`CURRENT_DATE`)
+				)
+			)
+		});
+		isMenstruating = !!activeLog;
+	}
+
 	return {
 		prayerTimes: prayerTimes || [],
-		user: profile
+		user: profile,
+		isMenstruating
 	};
 };

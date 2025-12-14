@@ -14,7 +14,8 @@ export const user = pgTable('user', {
 	preferences: jsonb('preferences').default({ theme: 'light', notifications: false }), // theme, notifications, etc.
 	settings: jsonb('settings').default({  dataSaver: false, periodMode: false }), // periodMode, dataSaver, etc.
 	mazhab: text('mazhab').default('shafi'),
-	location: jsonb('location').default({ city: '', lat:0, lng: 0, method: 'false' }) // { city: string, lat: number, lng: number, method: 'auto' | 'manual' }
+	location: jsonb('location').default({ city: '', lat:0, lng: 0, method: 'false' }), // { city: string, lat: number, lng: number, method: 'auto' | 'manual' }
+	gender: text('gender').default('male') // 'male' or 'female'
 });
 
 export const session = pgTable('session', {
@@ -198,3 +199,12 @@ export const ibadahLogs	= relations(habitLogs, ({ one }) => ({
     references: [habits.id],
   }),
 }));
+
+export const menstruationLogs = pgTable('menstruation_logs', {
+	id: text('id').primaryKey(),
+	userId: text('user_id').references(() => user.id).notNull(),
+	startDate: date('start_date').notNull(),
+	endDate: date('end_date'), // Null means currently active
+	notes: text('notes'),
+	createdAt: timestamp('created_at').defaultNow()
+});

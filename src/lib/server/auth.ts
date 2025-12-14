@@ -21,7 +21,8 @@ export const lucia = new Lucia(adapter, {
 			settings: attributes.settings ?? {},
 			location: attributes.location ?? {},
 			preferences: attributes.preferences ?? {},
-			emailVerified: attributes.emailVerified ?? false
+			emailVerified: attributes.emailVerified ?? false,
+			gender: attributes.gender
 		};
 	}
 });
@@ -38,6 +39,7 @@ interface DatabaseUserAttributes {
 	name: string;
 	image: string;
 	emailVerified: boolean;
+	gender: string;
 	settings: {
 		darkMode: boolean;
 		quranTarget: number;
