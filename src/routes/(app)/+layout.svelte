@@ -2,9 +2,9 @@
 	import Sidebar from '$lib/components/layout/Sidebar.svelte';
 	import BottomNav from '$lib/components/layout/BottomNav.svelte';
 	import AddHabitModal from '$lib/components/habits/AddHabitModal.svelte';
-	import PrayerCountdown from '$lib/components/prayer/PrayerCountdown.svelte';
+	import SyncStatus from '$lib/components/layout/SyncStatus.svelte';
 
-	let { children } = $props();
+	let { children, data } = $props();
 </script>
 
 <div class="min-h-screen bg-surface-200 pb-20 font-body text-content-primary md:pb-0 md:pl-20">
@@ -18,8 +18,7 @@
 	<BottomNav class="md:hidden" />
 
 	<AddHabitModal />
-	<!-- <PrayerCountdown
-		prayerTimes={data.prayerTimes}
-		soundPreference={data.user?.preferences?.notificationSettings?.sound}
-	/> -->
+
+	<!-- Offline Sync Status -->
+	<SyncStatus userId={data?.user?.id} />
 </div>
