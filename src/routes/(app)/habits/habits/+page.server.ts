@@ -3,30 +3,31 @@ import { habits, habitLogs } from "$lib/server/db/schema";
 import { eq, and } from "drizzle-orm";
 import { fail } from "@sveltejs/kit";
 import { nanoid } from 'nanoid';
+import { generateSuggestions } from '$lib/server/services/habitSuggestions';
 
 export const load = async ({ locals }) => {
 	// Check if user is logged in using locals.user (populated by hooks)
     if (!locals.user) {
-        return { habits: [] };
+        return { habits: [], suggestions: { suggestions: [], hasEnoughData: false, totalCompletions: 0 } };
     }
     
     const userId = locals.user.id;
-    if (!userId) return { habits: [] };
+    if (!userId) return { habits: [], suggestions: { suggestions: [], hasEnoughData: false, totalCompletions: 0 } };
 
-    // Fetch habits
-    const userHabits = await db.query.habits.findMany({
-        where: eq(habits.userId, userId),
-        orderBy: (habits, { desc }) => [desc(habits.createdAt)]
-    });
-
-    // Fetch today's logs
-    const today = new Date().toISOString().split('T')[0];
-    const todaysLogs = await db.query.habitLogs.findMany({
-        where: and(
-            eq(habitLogs.userId, userId),
-            eq(habitLogs.date, today)
-        )
-    });
+    // Fetch habits and suggestions in parallel
+    const [userHabits, todaysLogs, suggestionsData] = await Promise.all([
+        db.query.habits.findMany({
+            where: eq(habits.userId, userId),
+            orderBy: (habits, { desc }) => [desc(habits.createdAt)]
+        }),
+        db.query.habitLogs.findMany({
+            where: and(
+                eq(habitLogs.userId, userId),
+                eq(habitLogs.date, new Date().toISOString().split('T')[0])
+            )
+        }),
+        generateSuggestions(userId)
+    ]);
 
     // Combine data
     const habitsWithStatus = userHabits.map(habit => {
@@ -40,7 +41,8 @@ export const load = async ({ locals }) => {
     });
 
 	return {
-		habits: habitsWithStatus
+		habits: habitsWithStatus,
+		suggestions: suggestionsData
 	};
 };
 

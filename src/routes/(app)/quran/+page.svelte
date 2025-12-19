@@ -228,7 +228,7 @@
 
 					<!-- CTA Button -->
 					<a
-						href={isMenstruating ? undefined : '/quran/surah'}
+						href={isMenstruating ? undefined : '/quran/list'}
 						class="group btn btn-primary btn-lg gap-3 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 self-start lg:self-auto"
 						aria-label="Buka daftar surah Al-Quran"
 					>

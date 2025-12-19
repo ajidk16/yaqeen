@@ -11,7 +11,7 @@
 	<Sidebar />
 
 	<!-- Main Content Area -->
-	<main class="mx-auto max-w-md px-4 py-6 md:max-w-4xl">
+	<main class="mx-auto max-w-md py-6 md:max-w-4xl">
 		{@render children()}
 	</main>
 

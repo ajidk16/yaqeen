@@ -4,7 +4,7 @@
 	import { Button, Card, Modal } from '$lib/components/ui';
 	import VerseItem from '$lib/components/quran/VerseItem.svelte';
 	import ActionMenu from '$lib/components/quran/ActionMenu.svelte';
-	import SurahHeader from '$lib/components/quran/SurahHeader.svelte';
+	import SurahHeader from '$lib/components/quran/listHeader.svelte';
 	import VerseFilter from '$lib/components/quran/VerseFilter.svelte';
 	import NoteModal from '$lib/components/quran/NoteModal.svelte';
 	import ShareImageModal from '$lib/components/quran/ShareImageModal.svelte';

@@ -21,16 +21,20 @@
 		Flame,
 		ChevronLeft
 	} from 'lucide-svelte';
-	import { Button, Input, Badge } from '$lib/components/ui';
+	import { Button, Input } from '$lib/components/ui';
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
+	import SmartSuggestions from '$lib/components/habits/SmartSuggestions.svelte';
 
 	// Types
 	type Category = 'Wajib' | 'Sunnah' | 'Mubah';
 
 	// State
 	let habits = $derived(page.data.habits || []);
+	let suggestions = $derived(
+		page.data.suggestions || { suggestions: [], hasEnoughData: false, totalCompletions: 0 }
+	);
 
 	let newHabitName = $state('');
 	let selectedCategory = $state<Category>('Mubah');
@@ -172,7 +176,7 @@
 	<div class="mx-auto max-w-4xl space-y-6">
 		<!-- Header with Glassmorphism -->
 		<header
-			class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-secondary/5 via-transparent to-accent/5 p-6 lg:p-8"
+			class="relative overflow-hidden rounded-3xl bg-linear-to-br from-secondary/5 via-transparent to-accent/5 p-6 lg:p-8"
 			in:fly={{ y: -20, duration: 800, easing: quintOut }}
 		>
 			<!-- Animated background orbs -->
@@ -212,39 +216,49 @@
 			</div>
 		</header>
 
+		<!-- Smart Suggestions Section -->
+		<SmartSuggestions
+			suggestions={suggestions.suggestions}
+			hasEnoughData={suggestions.hasEnoughData}
+			totalCompletions={suggestions.totalCompletions}
+			total={page.data.habits.length}
+		/>
+
 		<!-- Filters & Search -->
 		<div class="space-y-4">
-			<div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
+			<div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 				<!-- Glass Filter Tabs -->
-				<div class="glass-card inline-flex gap-1 rounded-2xl p-1.5">
-					<button
-						class="rounded-xl px-4 py-2 text-sm font-medium transition-all
-							{filter === 'All' ? 'bg-base-100 shadow-sm' : 'hover:bg-base-content/5'}"
-						onclick={() => (filter = 'All')}
-					>
-						Semua
-					</button>
-					{#each categories as cat}
+				<div class="no-scrollbar flex w-full overflow-x-auto pb-1 lg:w-auto lg:pb-0">
+					<div class="glass-card flex min-w-max gap-1 rounded-2xl p-1.5">
 						<button
-							class="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all
-								{filter === cat.label ? 'bg-base-100 shadow-sm' : 'hover:bg-base-content/5'}"
-							onclick={() => (filter = cat.label)}
+							class="rounded-xl px-4 py-2 text-sm font-medium transition-all
+								{filter === 'All' ? 'bg-base-100 shadow-sm' : 'hover:bg-base-content/5'}"
+							onclick={() => (filter = 'All')}
 						>
-							<div class="size-2 rounded-full bg-{cat.color}"></div>
-							<span class={filter === cat.label ? `text-${cat.color}` : ''}>{cat.label}</span>
+							Semua
 						</button>
-					{/each}
+						{#each categories as cat}
+							<button
+								class="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all
+									{filter === cat.label ? 'bg-base-100 shadow-sm' : 'hover:bg-base-content/5'}"
+								onclick={() => (filter = cat.label)}
+							>
+								<div class="size-2 rounded-full bg-{cat.color}"></div>
+								<span class={filter === cat.label ? `text-${cat.color}` : ''}>{cat.label}</span>
+							</button>
+						{/each}
+					</div>
 				</div>
 
 				<!-- Search -->
-				<div class="relative w-full sm:w-64">
-					<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+				<div class="relative w-full lg:w-72">
+					<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
 						<Search class="size-4 text-base-content/40" />
 					</div>
 					<input
 						type="text"
 						placeholder="Cari kebiasaan..."
-						class="input input-bordered input-sm w-full rounded-full pl-10"
+						class="input input-bordered w-full rounded-2xl bg-base-100/50 pl-11 focus:bg-base-100"
 						bind:value={searchQuery}
 					/>
 				</div>
@@ -252,16 +266,16 @@
 		</div>
 
 		<!-- Habits List -->
-		<div class="mt-6 grid min-h-[300px] content-start gap-3">
+		<div class="mt-6 grid min-h-[300px] content-start gap-4">
 			{#if filteredHabits.length === 0}
-				<div class="py-12 text-center text-base-content/40" in:fade>
+				<div class="flex flex-col items-center justify-center py-20 text-center" in:fade>
 					<div
-						class="mb-4 inline-flex size-16 items-center justify-center rounded-full bg-base-100"
+						class="mb-6 flex size-20 items-center justify-center rounded-3xl bg-base-100 shadow-inner"
 					>
-						<Flame class="size-8" />
+						<Flame class="size-10 text-base-content/20" />
 					</div>
-					<p class="text-lg font-medium">Tidak ada kebiasaan ditemukan</p>
-					<p class="text-sm">Buat kebiasaan baru untuk memulai!</p>
+					<p class="text-xl font-bold">Tidak ada kebiasaan</p>
+					<p class="mt-1 text-base-content/50">Mulai langkah kecilmu hari ini.</p>
 				</div>
 			{:else}
 				{#each filteredHabits as habit (habit.id)}
@@ -269,19 +283,20 @@
 						animate:flip={{ duration: 300, easing: quintOut }}
 						in:fly={{ y: 20, duration: 400 }}
 						out:scale={{ duration: 200 }}
+						class="habit-item"
 					>
 						<div
-							class="glass-card group rounded-2xl p-5 transition-all duration-300 hover:shadow-lg"
+							class="glass-card group relative overflow-hidden rounded-3xl p-4 transition-all duration-300 hover:shadow-xl sm:p-5"
 						>
 							<div class="flex items-center gap-4">
 								<!-- Toggle Checkbox -->
 								<form action="?/toggle" method="POST" use:enhance>
 									<input type="hidden" name="habitId" value={habit.id} />
 									<button
-										class="flex size-14 shrink-0 items-center justify-center rounded-2xl transition-all duration-300
+										class="flex size-12 shrink-0 items-center justify-center rounded-2xl transition-all duration-500 sm:size-14
 											{habit.completed
 											? 'scale-105 bg-success text-white shadow-lg shadow-success/30'
-											: `bg-gradient-to-br ${getCategoryColor(habit.category)} ${getCategoryTextColor(habit.category)} hover:scale-105`}"
+											: `bg-linear-to-br ${getCategoryColor(habit.category)} ${getCategoryTextColor(habit.category)} hover:scale-105`}"
 									>
 										{#if habit.completed}
 											<Check class="size-6" />
@@ -294,38 +309,38 @@
 
 								<!-- Content -->
 								<div class="min-w-0 flex-1">
-									<div class="mb-1 flex items-center gap-2">
+									<div class="flex flex-wrap items-center gap-2">
 										<h3
-											class="truncate text-lg font-bold {habit.completed
-												? 'line-through opacity-50'
+											class="truncate text-base font-bold sm:text-lg {habit.completed
+												? 'line-through opacity-40'
 												: ''}"
 										>
 											{habit.title}
 										</h3>
-										<div class="badge {getBadgeColor(habit.category)} badge-sm">
+										<div class="badge {getBadgeColor(habit.category)} badge-sm font-medium">
 											{habit.category}
 										</div>
 									</div>
-									<p class="text-xs text-base-content/50">
-										{habit.completed ? '✓ Selesai hari ini' : 'Belum selesai'}
+									<p class="mt-0.5 text-xs font-medium text-base-content/40">
+										{habit.completed ? 'Selesai hari ini' : 'Belum dikerjakan'}
 									</p>
 								</div>
 
 								<!-- Actions -->
 								<div
-									class="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 sm:opacity-100"
+									class="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 max-lg:opacity-100"
 								>
 									<button
 										class="btn btn-circle btn-ghost btn-sm"
 										onclick={() => openModal(habit)}
-										title="Ubah Kebiasaan"
+										aria-label="Edit"
 									>
 										<Pencil class="size-4" />
 									</button>
 									<button
-										class="btn btn-circle btn-ghost btn-sm text-error"
+										class="btn btn-circle btn-ghost btn-sm text-error/60 hover:text-error"
 										onclick={() => requestDelete(habit.id)}
-										title="Hapus Kebiasaan"
+										aria-label="Hapus"
 									>
 										<Trash2 class="size-4" />
 									</button>
