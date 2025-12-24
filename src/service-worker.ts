@@ -2,6 +2,7 @@
 /// <reference no-default-lib="true"/>
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { build, files, version } from '$service-worker';
 
@@ -13,9 +14,11 @@ const STATIC_CACHE = `habbitrax-static-${version}`;
 
 // Assets to cache immediately
 const STATIC_ASSETS = [
-	...build,
-	...files
+	...(build || []),
+	...(files || [])
 ];
+
+console.log('[ServiceWorker] Initializing...', { version, buildCount: (build || []).length, filesCount: (files || []).length });
 
 // Install event - cache static assets
 sw.addEventListener('install', (event) => {
@@ -153,7 +156,7 @@ async function networkFirstWithOfflineFallback(request: Request): Promise<Respon
  */
 async function staleWhileRevalidate(request: Request): Promise<Response> {
 	const cached = await caches.match(request);
-	
+
 	const fetchPromise = fetch(request).then((response) => {
 		if (response.ok) {
 			const cache = caches.open(CACHE_NAME);
@@ -171,7 +174,7 @@ async function staleWhileRevalidate(request: Request): Promise<Response> {
 function fetchWithTimeout(request: Request, timeout: number): Promise<Response> {
 	return new Promise((resolve, reject) => {
 		const timer = setTimeout(() => reject(new Error('Timeout')), timeout);
-		
+
 		fetch(request).then((response) => {
 			clearTimeout(timer);
 			resolve(response);
@@ -183,7 +186,7 @@ function fetchWithTimeout(request: Request, timeout: number): Promise<Response> 
 }
 
 // Background sync support
-sw.addEventListener('sync', (event) => {
+sw.addEventListener('sync', (event: any) => {
 	if (event.tag === 'habbitrax-sync') {
 		event.waitUntil(
 			sw.clients.matchAll().then((clients) => {
@@ -203,7 +206,7 @@ sw.addEventListener('push', (event) => {
 			sw.registration.showNotification(data.title || 'YaaQeen', {
 				body: data.body,
 				icon: '/icons/icon-192.png',
-				badge: '/icons/icon-72.png',
+				badge: '/icons/icon-192.png',
 				data: data.data
 			})
 		);
@@ -213,7 +216,7 @@ sw.addEventListener('push', (event) => {
 // Notification click handler
 sw.addEventListener('notificationclick', (event) => {
 	event.notification.close();
-	
+
 	event.waitUntil(
 		sw.clients.matchAll({ type: 'window' }).then((clients) => {
 			// Focus existing window if available
