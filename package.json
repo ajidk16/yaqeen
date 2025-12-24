@@ -32,6 +32,7 @@
 		"@sveltejs/kit": "^2.48.5",
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@tailwindcss/vite": "^4.1.17",
+		"@toon-format/toon": "^2.1.0",
 		"@types/canvas-confetti": "^1.9.0",
 		"@types/node": "^22",
 		"@types/nodemailer": "^7.0.4",

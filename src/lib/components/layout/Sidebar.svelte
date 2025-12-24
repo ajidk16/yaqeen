@@ -51,7 +51,7 @@
 			class="absolute inset-0 rounded-2xl bg-primary/30 blur-xl opacity-0 transition-opacity group-hover:opacity-100"
 		></div>
 		<div
-			class="relative flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-purple-600 font-bold text-white shadow-lg shadow-primary/30 transition-transform hover:scale-110"
+			class="relative flex size-12 items-center justify-center rounded-2xl bg-linear-to-br from-primary to-purple-600 font-bold text-white shadow-lg shadow-primary/30 transition-transform hover:scale-110"
 		>
 			YQ
 		</div>

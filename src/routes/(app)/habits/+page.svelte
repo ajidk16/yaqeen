@@ -443,6 +443,27 @@
 							</div>
 						</button>
 					{/each}
+
+					<!-- Al-Matsurat Link -->
+					<a
+						href="/almatsurat"
+						class="glass-card group flex w-full items-center gap-4 rounded-xl p-4 text-left transition-all duration-300 hover:shadow-md hover:ring-2 hover:ring-ibadah/30"
+						in:fly={{ y: 20, duration: 600, delay: 650, easing: quintOut }}
+					>
+						<div
+							class="flex size-10 items-center justify-center rounded-lg bg-ibadah/10 text-ibadah transition-all group-hover:scale-105"
+						>
+							<Moon class="size-5" />
+						</div>
+						<div class="flex-1">
+							<h4 class="font-bold">Al-Matsurat Sugro</h4>
+							<p class="mt-0.5 text-xs text-base-content/60">Dzikir pagi & sore</p>
+						</div>
+						<ChevronRight
+							class="size-5 text-base-content/40 group-hover:text-ibadah transition-colors"
+						/>
+					</a>
+
 					{#if sunnahCategory.length === 0}
 						<div class="ml-1 text-sm italic text-base-content/40">{m.ibadah_no_sunnah()}</div>
 					{/if}

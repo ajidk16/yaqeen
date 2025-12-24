@@ -208,3 +208,18 @@ export const menstruationLogs = pgTable('menstruation_logs', {
 	notes: text('notes'),
 	createdAt: timestamp('created_at').defaultNow()
 });
+
+// --- Al-Matsurat Dzikr ---
+
+export const almatsuratLogs = pgTable('almatsurat_logs', {
+	id: text('id').primaryKey(),
+	userId: text('user_id').references(() => user.id).notNull(),
+	date: date('date').notNull(),
+	sessionType: text('session_type').notNull(), // 'morning' | 'evening'
+	completedItems: jsonb('completed_items').default([]), // Array of completed dzikr indices with their counts
+	totalItems: integer('total_items').default(32),
+	status: text('status').default('in_progress'), // 'in_progress' | 'completed'
+	startedAt: timestamp('started_at').defaultNow(),
+	completedAt: timestamp('completed_at'),
+	createdAt: timestamp('created_at').defaultNow()
+});

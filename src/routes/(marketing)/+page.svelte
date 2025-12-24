@@ -142,7 +142,7 @@
 					class="relative rounded-2xl border border-base-content/10 bg-base-100/50 backdrop-blur-xl p-2 shadow-2xl"
 				>
 					<div
-						class="aspect-[16/9] rounded-xl bg-gradient-to-br from-base-200 to-base-300 overflow-hidden flex items-center justify-center relative"
+						class="aspect-[16/9] rounded-xl bg-linear-to-br from-base-200 to-base-300 overflow-hidden flex items-center justify-center relative"
 					>
 						<div class="absolute inset-0 bg-grid-pattern opacity-10"></div>
 						<span class="text-base-content/20 font-bold text-2xl">App Interface Preview</span>
@@ -469,7 +469,7 @@
 					>
 						<!-- Social Proof Logos Placeholder -->
 						<span class="text-sm font-medium tracking-widest uppercase"
-							>{m.trusted_badge({count: 10000})}</span
+							>{m.trusted_badge({ count: 10000 })}</span
 						>
 					</div>
 				</div>

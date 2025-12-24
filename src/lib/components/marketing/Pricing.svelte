@@ -89,11 +89,11 @@
 				>
 					<!-- Gradient Border Effect -->
 					<div
-						class="absolute inset-0 bg-gradient-to-br from-primary/20 to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+						class="absolute inset-0 bg-linear-to-br from-primary/20 to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
 					></div>
 
 					<div
-						class="absolute top-0 right-0 bg-gradient-to-l from-primary to-purple-600 text-white text-xs font-bold px-3 py-1 rounded-bl-xl"
+						class="absolute top-0 right-0 bg-linear-to-l from-primary to-purple-600 text-white text-xs font-bold px-3 py-1 rounded-bl-xl"
 					>
 						RECOMMENDED
 					</div>
@@ -124,7 +124,7 @@
 
 					<a
 						href="/register?plan=premium"
-						class="block w-full py-3 px-6 text-center rounded-xl bg-gradient-to-r from-primary to-purple-600 text-white font-bold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-[1.02] relative z-10"
+						class="block w-full py-3 px-6 text-center rounded-xl bg-linear-to-r from-primary to-purple-600 text-white font-bold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-[1.02] relative z-10"
 					>
 						Subscribe & Donate
 					</a>

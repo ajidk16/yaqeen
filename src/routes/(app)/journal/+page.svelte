@@ -146,7 +146,7 @@
 	<div class="mx-auto max-w-2xl space-y-6">
 		<!-- Header with Glassmorphism -->
 		<header
-			class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-error/5 via-transparent to-warning/5 p-6 lg:p-8"
+			class="relative overflow-hidden rounded-3xl bg-linear-to-br from-error/5 via-transparent to-warning/5 p-6 lg:p-8"
 			in:fly={{ y: -20, duration: 800, easing: quintOut }}
 		>
 			<!-- Animated background orbs -->
@@ -164,7 +164,7 @@
 				<div>
 					<h1 class="flex items-center gap-3 text-3xl font-bold lg:text-4xl">
 						<div
-							class="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-error/20 to-warning/20"
+							class="flex size-10 items-center justify-center rounded-xl bg-linear-to-br from-error/20 to-warning/20"
 						>
 							<BookHeart class="size-6 text-error" />
 						</div>
@@ -192,7 +192,7 @@
 		<div class="relative" in:scale={{ duration: 600, start: 0.95, delay: 100 }}>
 			<!-- Gradient border glow -->
 			<div
-				class="absolute -inset-0.5 rounded-3xl bg-gradient-to-br from-error/20 via-warning/20 to-success/20 opacity-50 blur"
+				class="absolute -inset-0.5 rounded-3xl bg-linear-to-br from-error/20 via-warning/20 to-success/20 opacity-50 blur"
 			></div>
 
 			<div class="glass-card relative space-y-6 rounded-3xl p-6 lg:p-8">
@@ -237,7 +237,7 @@
 									onclick={() => (selectedMood = mood.type)}
 								>
 									<div
-										class="flex size-12 items-center justify-center rounded-full bg-gradient-to-br {mood.gradient} transition-transform duration-300 group-hover:scale-110"
+										class="flex size-12 items-center justify-center rounded-full bg-linear-to-br {mood.gradient} transition-transform duration-300 group-hover:scale-110"
 									>
 										<mood.icon
 											class="size-7 transition-all {selectedMood === mood.type
@@ -284,7 +284,7 @@
 					<div class="flex justify-end">
 						<Button
 							type="submit"
-							class="gap-2 rounded-full border-0 bg-gradient-to-r from-error to-warning px-8 text-white shadow-lg shadow-error/20 transition-all hover:shadow-xl hover:shadow-error/30"
+							class="gap-2 rounded-full border-0 bg-linear-to-r from-error to-warning px-8 text-white shadow-lg shadow-error/20 transition-all hover:shadow-xl hover:shadow-error/30"
 							disabled={!gratitudeText.trim() || isSubmitting}
 							loading={isSubmitting}
 						>
@@ -318,7 +318,7 @@
 				<!-- Empty State with Illustration -->
 				<div class="glass-card rounded-3xl p-12 text-center" in:fade>
 					<div
-						class="mx-auto mb-4 flex size-20 items-center justify-center rounded-full bg-gradient-to-br from-warning/10 to-error/10"
+						class="mx-auto mb-4 flex size-20 items-center justify-center rounded-full bg-linear-to-br from-warning/10 to-error/10"
 					>
 						<Sparkles class="size-10 text-warning/50" />
 					</div>
@@ -345,7 +345,7 @@
 							<div class="flex items-start gap-4">
 								<!-- Mood Icon -->
 								<div
-									class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br {moodData.gradient}"
+									class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-linear-to-br {moodData.gradient}"
 								>
 									<!-- svelte-ignore svelte_component_deprecated -->
 									<svelte:component this={moodData.icon} class="size-6 {moodData.color}" />
@@ -426,7 +426,7 @@
 							onclick={() => (editingLog!.mood = mood.type)}
 						>
 							<div
-								class="flex size-10 items-center justify-center rounded-full bg-gradient-to-br {mood.gradient}"
+								class="flex size-10 items-center justify-center rounded-full bg-linear-to-br {mood.gradient}"
 							>
 								<mood.icon
 									class="size-6 {editingLog.mood === mood.type

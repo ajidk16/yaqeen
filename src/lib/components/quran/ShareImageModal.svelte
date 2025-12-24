@@ -22,21 +22,21 @@
 	// Theme configurations
 	const themes = {
 		light: {
-			bg: 'bg-gradient-to-br from-white via-slate-50 to-slate-100',
+			bg: 'bg-linear-to-br from-white via-slate-50 to-slate-100',
 			text: 'text-slate-900',
 			arabic: 'text-slate-800',
 			accent: 'text-primary',
 			border: 'border-slate-200'
 		},
 		dark: {
-			bg: 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900',
+			bg: 'bg-linear-to-br from-slate-900 via-slate-800 to-slate-900',
 			text: 'text-slate-100',
 			arabic: 'text-white',
 			accent: 'text-primary',
 			border: 'border-slate-700'
 		},
 		gold: {
-			bg: 'bg-gradient-to-br from-amber-50 via-amber-100 to-yellow-50',
+			bg: 'bg-linear-to-br from-amber-50 via-amber-100 to-yellow-50',
 			text: 'text-amber-900',
 			arabic: 'text-amber-800',
 			accent: 'text-amber-600',
