@@ -4,7 +4,24 @@ import { db } from '$lib/server/db';
 import { almatsuratLogs } from '$lib/server/db/schema';
 import { eq, and, desc, sql, gte } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
-import { loadAlmatsuratData, calculateTotalRepetitions } from '$lib/utils/almatsurat-parser';
+// Import JSON directly
+import rawAlmatsuratData from '$lib/utils/almatsurat-sugro.json';
+import type { DzikrItem } from '$lib/data/almatsurat';
+
+// Helper functions for parsing
+function parseRepetition(name: string, note?: string): number {
+	const nameMatch = name.match(/\((\d+)x\)/i);
+	if (nameMatch) return parseInt(nameMatch[1], 10);
+	if (note) {
+		const noteMatch = note.match(/Dibaca\s+(\d+)\s+Kali/i);
+		if (noteMatch) return parseInt(noteMatch[1], 10);
+	}
+	return 1;
+}
+
+function cleanName(name: string): string {
+	return name.replace(/\s*-\s*\(\d+x\)/i, '').trim();
+}
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (!locals.user) {
@@ -15,9 +32,22 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	const dateParam = url.searchParams.get('date');
 	const today = dateParam || new Date().toISOString().split('T')[0];
 
-	// Load almatsurat data from .toon file
-	const almatsuratData = loadAlmatsuratData();
-	const totalRepetitions = calculateTotalRepetitions(almatsuratData);
+	// Transform JSON data to DzikrItem[]
+	const almatsuratData: DzikrItem[] = rawAlmatsuratData.map((item, index) => {
+		const firstNote = item.dzikr_list[0]?.note || '';
+		return {
+			index,
+			name: cleanName(item.dzikr_name),
+			verses: item.dzikr_list.map((v) => ({
+				note: v.note || '',
+				arabic: v.text || '',
+				translation: v.trans || ''
+			})),
+			repetition: parseRepetition(item.dzikr_name, firstNote)
+		};
+	});
+
+	const totalRepetitions = almatsuratData.reduce((sum, item) => sum + item.repetition, 0);
 
 	// Get today's session
 	const currentSession = await db
