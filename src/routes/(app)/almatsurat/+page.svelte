@@ -244,12 +244,7 @@
 
 {#if isSliderMode}
 	<!-- Fullscreen Slider Mode -->
-	<div
-		class="fixed inset-0 z-50 bg-base-100 flex flex-col"
-		ontouchstart={handleTouchStart}
-		ontouchmove={handleTouchMove}
-		ontouchend={handleTouchEnd}
-	>
+	<div class="fixed inset-0 z-50 bg-base-100 flex flex-col" ontouchstart={handleTouchStart}>
 		<!-- Header -->
 		<div class="flex items-center justify-between p-4 border-b border-base-content/10">
 			<button class="btn btn-ghost btn-sm btn-circle" onclick={exitSlider}>
